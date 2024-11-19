@@ -57,6 +57,14 @@ def LegendreGaussNodesAndWeights(N):
         L,L_prime = LegendrePolynomialAndDerivative(N+1,0.0)
         x_j[int(N/2)] = 0.0
         w[int(N/2)]   = 2.0/(L_prime)**2
-    return x_j,w
+    x_full = np.zeros(np.shape(x_j)[0]+2)
+    w_full=np.copy(x_full)
+    x_full[1:-1] = x_j[:]
+    x_full[0] = -1
+    x_full[-1] = 1
+    w_full[1:-1] = w[:]
+    w_full[0] = 2/(N*(N+1))
+    w_full[-1] = w_full[0]
+    return x_full,w_full
 
-print(LegendreGaussNodesAndWeights(8))
+print(LegendreGaussNodesAndWeights(3))
