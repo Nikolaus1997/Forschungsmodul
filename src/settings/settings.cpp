@@ -74,28 +74,14 @@ void Settings::loadFromFile(std::string filename)
       endTime = atoi(parameterValue.c_str());
     }
 
-    if (parameterName=="physicalSizeX")
+    if (parameterName=="physicalSizeStart")
     {
       physicalSize[0] = atof(parameterValue.c_str());
     }
 
-    if (parameterName=="physicalSizeY")
+    if (parameterName=="physicalSizeEnd")
     {
       physicalSize[1] = atof(parameterValue.c_str());
-    }
-    if (parameterName=="re")
-    {
-      re = atoi(parameterValue.c_str());
-    }    
-
-    if (parameterName=="gX")
-    {
-      g[0] = atoi(parameterValue.c_str());
-    }
-
-    if (parameterName=="gY")
-    {
-     g[1] = atoi(parameterValue.c_str());
     }
 
     if (parameterName=="dirichletBottomX")
@@ -138,60 +124,28 @@ void Settings::loadFromFile(std::string filename)
        dirichletBcRight[1] = atof(parameterValue.c_str()); 
     }
 
-    if (parameterName=="nCellsX")
+    if (parameterName=="nCells")
     {
          nCells[0] = atof(parameterValue.c_str());
     }
 
-    if (parameterName=="nCellsY")
-    {
-         nCells[1] = atof(parameterValue.c_str());
-    }
-
-    if (parameterName=="useDonorCell")
-    {
-      if(parameterValue=="TRUE"||"true"){
-        useDonorCell = true;
-      }
-      else
-      {
-        useDonorCell = false;
-      }
-    }
-
-    if (parameterName=="tau")
-    {
-        tau = atof(parameterValue.c_str());
-    }
-
-    if (parameterName=="alpha")
-    {
-        alpha = atof(parameterValue.c_str());
-    }
-
     if (parameterName=="maximumDt")
     {
-        maximumDt = atof(parameterValue.c_str());
+        dt = atof(parameterValue.c_str());
     }
 
-    if (parameterName=="pressureSolver")
+    if (parameterName=="CFL")
     {
-        pressureSolver = parameterValue;
-    }
-
-    if (parameterName=="omega")
-    {
-        omega = atof(parameterValue.c_str());
-    }
-
-    if (parameterName=="epsilon")
-    {
-        epsilon = atof(parameterValue.c_str());
+        CFL = atof(parameterValue.c_str());
     }
 
     if (parameterName=="maximumNumberOfIterations")
     {
        maximumNumberOfIterations = atof(parameterValue.c_str());
+    }
+    if (parameterName=="PP_N")
+    {
+       PP_N = atof(parameterValue.c_str());
     }
   }
 }
@@ -200,12 +154,7 @@ void Settings::loadFromFile(std::string filename)
 void Settings::printSettings()
 {
   std::cout << "Settings: " << std::endl
-    << "  physicalSize: " << physicalSize[0] << " x " << physicalSize[1] << ", nCells: " << nCells[0] << " x " << nCells[1] << std::endl
-    << "  endTime: " << endTime << " s, re: " << re << ", g: (" << g[0] << "," << g[1] << "), tau: " << tau << ", maximum dt: " << maximumDt << std::endl
-    << "  dirichletBC: bottom: (" << dirichletBcBottom[0] << "," << dirichletBcBottom[1]  << ")"
-    << ", top: ("  << dirichletBcTop[0] << "," << dirichletBcTop[1]  << ")"
-    << ", left: ("  << dirichletBcLeft[0] << "," << dirichletBcLeft[1] << ")"
-    << ", right: ("  << dirichletBcRight[0] << "," << dirichletBcRight[1] << ")" << std::endl
-    << "  useDonorCell: " << std::boolalpha << useDonorCell << ", alpha: " << alpha << std::endl
-    << "  pressureSolver: " << pressureSolver << ", omega: " << omega << ", epsilon: " << epsilon << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
+    << "  Interval: " << physicalSize[0] << " x " << physicalSize[1] << ", nCells: " << nCells[0]  << std::endl
+    << "  endTime: " << endTime <<  ", maximum dt: " << dt << std::endl
+    << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
 }

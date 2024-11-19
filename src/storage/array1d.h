@@ -8,14 +8,14 @@
  *  The entries can be accessed by two indices i,j.
  */
 
-class Faces
+class Array1D
 {
 public:
   //! constructor
-  Faces(std::array<int,1> size);
+  Array1D(int size);
 
   //! get the size
-  std::array<int,1> size() const;
+  int size() const;
 
   //! access the value at coordinate (i,j), declared not const, i.e. the value can be changed
   double &operator()(int i);
@@ -26,5 +26,5 @@ public:
 protected:
 
   std::vector<double> data_;  //< storage array values, in row-major order
-  const std::array<int,1> size_;    //< width, height of the domain
+  const int size_;    //< width, height of the domain
 };

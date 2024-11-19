@@ -36,7 +36,7 @@ void Computation::initialize(std::string filename)
         std::cout << "Solver not found!" << std::endl;
     }
     //initialize output writer
-    //outputWriterText_ = std::make_unique<OutputWriterText>(discretization_);
+    outputWriterText_ = std::make_unique<OutputWriterText>(discretization_);
     outputWriterParaview_ = std::make_unique<OutputWriterParaview>(discretization_);
 }
 
