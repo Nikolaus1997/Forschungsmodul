@@ -1,5 +1,6 @@
 #include "storage/array1d.h"
 #include <cassert>
+#include "array1d.h"
 
 Array1D::Array1D(int size):size_(size)
 {
@@ -28,4 +29,14 @@ double Array1D::operator()(int i) const
     // assert that indices are in range
     assert(0 <= i && i < size_);
     return data_[index];
+}
+
+void Array1D::printValues()
+{
+    for (double i : data_)
+    {
+        std::cout << i <<' ';
+    }
+    std::cout<<';'<<std::endl;
+    
 }

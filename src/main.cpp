@@ -21,11 +21,12 @@ int main(int argc, char *argv[])
  std::cout <<R"(        \/            \/       \/        \/         \/             \/       \/        \/        \/         \/         \/)"<<std::endl;
  std::cout <<R"(=========================================================================================================================)"<<std::endl;
   // read in the first argument
+
   std::string filename = argv[1];
   
   auto computation = Computation();
   computation.initialize(filename);
-  computation.runSimulation();
+  //computation.runSimulation();
 
   return EXIT_SUCCESS;
 }

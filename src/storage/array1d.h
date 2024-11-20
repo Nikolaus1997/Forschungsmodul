@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include <vector>
 #include <array>
 
@@ -22,6 +22,8 @@ public:
 
   //! get the value at coordinate (i,j), declared const, i.e. it is not possible to change the value
   double operator()(int i) const;
+
+  void printValues();
 
 protected:
 

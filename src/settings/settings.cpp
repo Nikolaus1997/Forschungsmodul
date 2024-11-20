@@ -26,9 +26,10 @@ void Settings::loadFromFile(std::string filename)
     getline(file, line);
 
     // at the end of the file break for loop
-    if (file.eof())
+    if (file.eof()){
       file.close();
       break;
+    }
     //skip lines that start with #
     if (line[0]=='#')
     {

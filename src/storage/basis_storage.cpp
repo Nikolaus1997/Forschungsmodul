@@ -1,18 +1,18 @@
 #include "basis_storage.h"
 
 BasisStorage::BasisStorage(int N):
-    PP_N(N),
-    weights_(N+2,0.0,0.0),
-    nodes_(N+2,0.0,0.0)
+    PP_N_(N),
+    weights_(PP_N_+2),
+    nodes_(PP_N_+2)
     {
 }
 
-const Variable &BasisStorage::weights() const
+const Array1D &BasisStorage::weights() const
 {
     return weights_;
 }
 
-const Variable &BasisStorage::nodes() const
+const Array1D &BasisStorage::nodes() const
 {
     return nodes_;
 }

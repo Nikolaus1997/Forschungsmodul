@@ -2,16 +2,18 @@
 #include <tuple>
 #include <storage/basis_storage.h>
 #include "settings/settings.h"
-#include <memory>
+#include <cmath>
 
 
 class Basis 
 {
 public:
     Basis(int N);
-    std::tuple<double, double> LegendrePolynomialAndDerivative(int N, double x);
-    std::tuple<std::vector<double>, std::vector<double>>  LegendreGaussNodesAndWeights(int N) const;
 
-    Settings settings_;
-    std::shared_ptr<BasisStorage> basis_;
+
+    std::tuple<double, double> LegendrePolynomialAndDerivative(int N, double x);
+    void LegendreGaussNodesAndWeights(int N);
+
+    int N_;
+    BasisStorage basis_;
 };

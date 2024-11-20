@@ -10,4 +10,4 @@ public:
 private:
     const double origin_;
     const double meshWidth_;
-}
+};

@@ -67,4 +67,4 @@ def LegendreGaussNodesAndWeights(N):
     w_full[-1] = w_full[0]
     return x_full,w_full
 
-print(LegendreGaussNodesAndWeights(3))
+print(LegendreGaussNodesAndWeights(2))

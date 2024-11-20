@@ -7,8 +7,8 @@ public:
     //constructor
     BasisStorage(int N);
     
-    const Variable &weights() const;
-    const Variable &nodes() const;
+    const Array1D &weights() const;
+    const Array1D &nodes() const;
 
     double weights(int i) const;
     double &weights(int i);
@@ -18,8 +18,8 @@ public:
 
     
 
-protected:
-    const int PP_N;               // Polynomial degree of the basis 
-    Variable weights_;
-    Variable nodes_;
+
+    const int PP_N_;               // Polynomial degree of the basis 
+    Array1D weights_;
+    Array1D nodes_;
 };
