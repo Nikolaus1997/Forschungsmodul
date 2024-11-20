@@ -6,7 +6,7 @@ void Computation::initialize(std::string filename)
 {   
     //load settings
     settings_ = Settings();
-    std::cout<<filename<<std::endl;
+
     settings_.loadFromFile(filename);
     settings_.printSettings();
     bas_ = std::make_unique<Basis>(settings_.PP_N);

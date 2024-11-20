@@ -155,7 +155,7 @@ void Settings::loadFromFile(std::string filename)
 void Settings::printSettings()
 {
   std::cout << "Settings: " << std::endl
-    << "  Interval: " << physicalSize[0] << " x " << physicalSize[1] << ", nCells: " << nCells[0]  << std::endl
-    << "  endTime: " << endTime <<  ", maximum dt: " << dt << std::endl
-    << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
+    <<"PP_N: "<<PP_N<<std::endl
+    << "  Interval: [" << physicalSize[0] << " , " << physicalSize[1] << "] , nCells: " << nCells[0]  << std::endl
+    << "  endTime: " << endTime <<  ", maximum dt: " << dt << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
 }

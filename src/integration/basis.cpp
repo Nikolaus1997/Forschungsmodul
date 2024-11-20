@@ -84,4 +84,6 @@ for (int i = 0; i <N; i++)
     basis_.nodes(i+1) = nodes[i];
     basis_.weights(i+1) = weights[i];
   }
+    double test = nodes[2]*weights[2];
+    std::cout << test<< std::endl;
 }
