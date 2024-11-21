@@ -7,12 +7,14 @@
  */
 struct Settings
 {
-  std::array<int,1> nCells;          //< number of cells in x and y direction
-  std::array<double,2> physicalSize; //< physical size of the domain
-  double endTime = 10.0;             //< end time of the simulation
-  double dt = 0.1;                   //< maximum time step width
-  double CFL = 0.9;                  //< CFL number
+  std::array<int,1> nCells;             //< number of cells in x and y direction
+  std::array<double,2> physicalSize;    //< physical size of the domain
+  double endTime = 10.0;                //< end time of the simulation
+  double dt = 0.1;                      //< maximum time step width
+  double CFL = 0.9;                     //< CFL number
   int PP_N = 5;                         //< Polynomial degree of the basis functions
+
+  std::string fluxFunction = "linear";  //< Flux function 
 
   std::array<double,2> dirichletBcBottom;  //< prescribed values of u,v at bottom of domain
   std::array<double,2> dirichletBcTop;     //< prescribed values of u,v at top of domain

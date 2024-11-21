@@ -36,7 +36,7 @@ std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double 
         int iterations = 10;
         double dx = 0.0, tol = 1e-8;
 
-    std::cout<<N<<std::endl;
+
         if (N==1)
         {
             basis_.weights(1) = 2.0;
@@ -86,7 +86,7 @@ if (N!=0)
 basis_.weights(0) =  2.0/(N*(N+1));
 basis_.weights(N+1) = basis_.weights(0);
 }
-basis_.nodes(0) = 1.0;
+basis_.nodes(0) = -1.0;
 basis_.nodes(N+1)= 1.0;
 
 }

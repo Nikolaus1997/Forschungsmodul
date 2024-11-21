@@ -154,6 +154,9 @@ void Settings::loadFromFile(std::string filename)
     {
        PP_N = atof(parameterValue.c_str());
     }
+    if (parameterName=="fluxFunction"){
+      fluxFunction=parameterValue;
+    }
   }
 }
 

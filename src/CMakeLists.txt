@@ -15,6 +15,9 @@ add_executable(${PROJECT_NAME}
    storage/variable.cpp 
    storage/basis_storage.cpp
 
+   dg/flux.cpp
+   
+   integration/quad.cpp
    integration/basis.cpp
    
   #  storage/array2d.cpp
@@ -57,13 +60,10 @@ add_compile_options(-Wall -Wextra)
 # Set the version of the C++ standard to use, we use C++14, published in 2014
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 
 message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")

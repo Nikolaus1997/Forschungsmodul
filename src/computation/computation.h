@@ -2,6 +2,8 @@
 
 #include "settings/settings.h"
 #include "integration/basis.h"
+#include "dg/flux.h"
+#include "integration/quad.h"
 
 #include <memory>
 #include <cmath>
@@ -25,6 +27,8 @@ class Computation
 
 
         Settings settings_;
-        std::unique_ptr<Basis> bas_;
+        std::unique_ptr<Quadrature> quad_;
         double dt_;    
+        Flux flux_;
+
 };
