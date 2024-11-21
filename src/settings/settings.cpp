@@ -8,9 +8,15 @@ void Settings::loadFromFile(std::string filename)
   std::string parameterName;
   std::string parameterValue;
 
+  // if(parameterName.find_first_of("/") !=0){
+  //  filename.erase(0,filename.find_first_of('/')+1);
+  // }
+
   // open file
   std::ifstream file(filename.c_str(), std::ios::in);
 
+
+  
   // check if file is open
   if (!file.is_open())
   {

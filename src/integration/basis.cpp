@@ -33,22 +33,23 @@ std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double 
 }
  void   Basis::LegendreGaussNodesAndWeights(int N)
 {
-         int iterations = 10;
+        int iterations = 10;
         double dx = 0.0, tol = 1e-8;
-        std::vector<double> nodes(N), weights(N);
 
+    std::cout<<N<<std::endl;
         if (N==1)
         {
-            weights[0] = 2.0;
-            nodes[0] = 0;
+            basis_.weights(1) = 2.0;
+            basis_.nodes(1) = 0;
         }else if (N==2)
         {
-            weights[0] = 1.0;
-            weights[1] = 1.0;
-            nodes[0] = -std::sqrt(1/3);
-            nodes[1] = -nodes[0];
-        }else
+            basis_.weights(1) = 1.0;
+            basis_.weights(2) = 1.0;
+            basis_.nodes(1) = -std::sqrt(1/3);
+            basis_.nodes(2) = - basis_.nodes(1);
+        }else if(N!=0)
         {
+            std::vector<double> nodes(N), weights(N);
             // Compute the roots (nodes) and weights
             for (int j = 0; j < floor((N + 1) / 2); j++) {
                 // Initial guess using Chebyshev-Gauss nodes
@@ -72,18 +73,20 @@ std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double 
                 weights[j] = w;
                 weights[N - j - 1] = w;
             }
+        for (int i = 0; i <N; i++)
+        {
+            basis_.nodes(i+1) = nodes[i];
+            basis_.weights(i+1) = weights[i];
+        }
         }
 
+
+if (N!=0)
+{
 basis_.weights(0) =  2.0/(N*(N+1));
 basis_.weights(N+1) = basis_.weights(0);
+}
 basis_.nodes(0) = 1.0;
 basis_.nodes(N+1)= 1.0;
 
-for (int i = 0; i <N; i++)
-  {
-    basis_.nodes(i+1) = nodes[i];
-    basis_.weights(i+1) = weights[i];
-  }
-    double test = nodes[2]*weights[2];
-    std::cout << test<< std::endl;
 }
