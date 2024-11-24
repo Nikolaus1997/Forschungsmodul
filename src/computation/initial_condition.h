@@ -10,7 +10,9 @@ public:
     InitialCondition(std::array<double,2> physicalSize, int nCells);
 
     // Destructor (optional, for cleanup if needed)
-    Variable unitStep(Variable u);
+    Variable unitStep(Variable x,double a, double b);
+
+    Variable negativeUnitStep(Variable x, double a, double b);
 
     // Other member functions and data members can be added here
 

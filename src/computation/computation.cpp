@@ -27,7 +27,7 @@ void Computation::initialize(std::string filename)
     // meshWidth_[1] = settings_.physicalSize[1]/settings_.nCells[1];
     
     //initialize discretization
-    std::cout<<"==========================================================================================================================="<<std::endl;
+    std::cout <<R"(====================================================================================)"<<std::endl;
     //initialize the flux function
     std::cout<<settings_.fluxFunction<<std::endl;
     if (settings_.fluxFunction == "linear") {
