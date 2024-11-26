@@ -1,11 +1,11 @@
 #include "output_writer/output_writer_paraview.h"
-
+//TODO: alles umschreiben für eine variable mit solution
 #include <vtkImageData.h>
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 
-OutputWriterParaview::OutputWriterParaview(std::shared_ptr<Discretization> discretization) :
-   OutputWriter(discretization)
+OutputWriterParaview::OutputWriterParaview(std::shared_ptr<Variable> variable) :
+   OutputWriter(variable)
 {
   // Create a vtkWriter_
   vtkWriter_ = vtkSmartPointer<vtkXMLImageDataWriter>::New();
@@ -28,14 +28,14 @@ void OutputWriterParaview::writeFile(double currentTime)
   dataSet->SetOrigin(0, 0, 0);
 
   // set spacing of mesh
-  const double dx = discretization_->meshWidth()[0];
-  const double dy = discretization_->meshWidth()[1];
+  const double dx = variable_->meshWidth();
+  const double dy = 1;
   const double dz = 1;
   dataSet->SetSpacing(dx, dy, dz);
 
   // set number of points in each dimension, 1 cell in z direction
-  std::array<int,2> nCells = discretization_->nCells();
-  dataSet->SetDimensions(nCells[0]+1, nCells[1]+1, 1);  // we want to have points at each corner of each cell
+  int nCells = variable_->size();
+  dataSet->SetDimensions(nCells+1, 1, 1);  // we want to have points at each corner of each cell
   
   // add pressure field variable
   // ---------------------------
@@ -47,21 +47,18 @@ void OutputWriterParaview::writeFile(double currentTime)
   // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
   arrayPressure->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arrayPressure->SetName("pressure");
+  arrayPressure->SetName("solution");
 
   // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
   int index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  for (int j = 0; j < nCells[1]+1; j++)
-  {
-    for (int i = 0; i < nCells[0]+1; i++, index++)
-    {
-      const double x = i*dx;
-      const double y = j*dy;
 
-      arrayPressure->SetValue(index, discretization_->p().interpolateAt(x,y));
-    }
+  for (int i = 0; i < nCells+1; i++, index++)
+  {
+    const double x = i*dx;
+
+    arrayPressure->SetValue(index, variable_->operator(i));
   }
 
   // now, we should have added as many values as there are points in the vtk data structure

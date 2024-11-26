@@ -1,7 +1,7 @@
 #include <initial_condition.h>
 
 InitialCondition::InitialCondition(std::array<double, 2> physicalSize, int nCells):
-nCells_(nCells),u_(nCells_,(physicalSize[1]-physicalSize[0])/nCells)
+nCells_(nCells),u_(physicalSize,(physicalSize[1]-physicalSize[0])/nCells, nCells)
 {
 }
 
