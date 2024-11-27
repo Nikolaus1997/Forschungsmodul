@@ -10,7 +10,7 @@ double Quadrature::GaussLegendreQuad(std::function<double(double)> func, double 
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
-
+    
     for (int i = 0; i < length; i++)
     {
         double node = basis_.nodes(i);

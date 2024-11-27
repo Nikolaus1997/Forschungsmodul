@@ -114,13 +114,35 @@ void Computation::fillX()
     grid_->x(grid_->x_.size()[0]-1) = grid_->faces_(grid_->faces_.size()[0]-1);
 }
 
-void Computation::fillU()
-{
-    for (int i = 0; i < grid_->faces_.size()[0]-1; i++)
-    {
-        grid_->u0(i) = (2*PP_N_+1)/meshWidth_[0]*quad_->GaussLegendreQuad([&](double x) { return integralInit(x); },grid_->faces(i),grid_->faces(i+1));
-        //std::cout<<grid_->u0(i)<<std::endl;
+void Computation::fillU() {
+    for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
+        for (int j = 0; j <= PP_N_; j++) {
+            if (j == 0) {
+                // Compute mean value of the initial condition
+                grid_->u0(i) += 1 / meshWidth_[0] *
+                    quad_->GaussLegendreQuad([&](double x) {
+                        return initialCond_.computeInitialCondition(x, initCondA_, initCondB_);
+                    }, grid_->faces(i), grid_->faces(i+1));
+            } else {
+                // Compute higher-order Legendre coefficients
+                double mean = 0.5 * (grid_->faces_(i+1) + grid_->faces_(i));
+                double diff = 0.5 * (grid_->faces_(i+1) - grid_->faces_(i));
+
+                // Iterate over Gauss-Legendre nodes for accuracy
+                for (int k = 0; k < quad_->basis_.nodes_.size()[0]; k++) {
+                    double transformedNode = diff * quad_->basis_.nodes(k) + mean;
+                    auto [L, L_prime] = quad_->LegendrePolynomialAndDerivative(2*j+1, transformedNode);
+                    //TODO: this is not right
+                    grid_->u0(i) += L * (2*j+1)/meshWidth_[0] *
+                        quad_->GaussLegendreQuad([&](double x) {
+                            return integralInit(x,2*j+1);
+                        }, grid_->faces(i), grid_->faces(i+1));
+                }
+            }
+        }
     }
+    quad_->basis_.nodes_.printValues();
+    std::cout << nNodes << std::endl;
 }
 
 void Computation::fillFaces()
@@ -132,9 +154,9 @@ void Computation::fillFaces()
     
 }
 
-double Computation::integralInit(double x)
+double Computation::integralInit(double x, int j)
 {
-    auto [L, L_prime] = quad_->LegendrePolynomialAndDerivative(nNodes,x);
+    auto [L, L_prime] = quad_->LegendrePolynomialAndDerivative(j,x);
     //quad_->basis_.weights_.printValues();
     double init =  initialCond_.computeInitialCondition(x,initCondA_,initCondB_);
     //std::cout<<init << std::endl;

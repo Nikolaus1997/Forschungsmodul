@@ -27,7 +27,7 @@ class Computation
         void fillX();
         void fillU();
         void fillFaces();
-        double integralInit(double x);
+        double integralInit(double x, int j);
     
     private:
         std::array<double,1> meshWidth_;
