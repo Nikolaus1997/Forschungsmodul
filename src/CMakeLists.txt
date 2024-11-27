@@ -10,13 +10,15 @@ add_executable(${PROJECT_NAME}
    settings/settings.cpp
    
    computation/computation.cpp
+   computation/initial_condition.cpp
 
    storage/array1d.cpp 
    storage/variable.cpp 
    storage/basis_storage.cpp
 
    dg/flux.cpp
-   
+   dg/grid.cpp
+
    integration/quad.cpp
    integration/basis.cpp
    
@@ -26,9 +28,9 @@ add_executable(${PROJECT_NAME}
   #  pressure_solver/gauss_seidel.cpp
   #  pressure_solver/sor.cpp 
   #  pressure_solver/pressure_solver.cpp 
-  #  output_writer/output_writer.cpp
+   output_writer/output_writer.cpp
   #  output_writer/output_writer_text.cpp
-  #  output_writer/output_writer_paraview.cpp 
+   output_writer/output_writer_paraview.cpp 
 
 
   #  discretization/central_differences.cpp 

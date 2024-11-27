@@ -18,7 +18,7 @@ class OutputWriterParaview :
 public:
   //! constructor
   //! @param discretization shared pointer to the discretization object that will contain all the data to be written to the file
-  OutputWriterParaview(std::shared_ptr<Variable> variable);
+  OutputWriterParaview(std::shared_ptr<Grid> grid);
 
   //! write current velocities to file, filename is output_<count>.vti
   void writeFile(double currentTime);

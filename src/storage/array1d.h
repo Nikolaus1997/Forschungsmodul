@@ -12,10 +12,10 @@ class Array1D
 {
 public:
   //! constructor
-  Array1D(int size);
+  Array1D(const std::array<int,1> size);
 
   //! get the size
-  int size() const;
+  const std::array<int,1> size() const;
 
   //! access the value at coordinate (i,j), declared not const, i.e. the value can be changed
   double &operator()(int i);
@@ -28,5 +28,5 @@ public:
 protected:
 
   std::vector<double> data_;  //< storage array values, in row-major order
-  const int size_;    //< width, height of the domain
+  const std::array<int,1> size_;    //< width, height of the domain
 };

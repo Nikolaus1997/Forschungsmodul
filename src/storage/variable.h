@@ -6,10 +6,10 @@ class Variable: public Array1D
 {
 public:
     //constructor
-    Variable(int size,const double meshWidth);
+    Variable(const std::array<int,1> size,const std::array<double, 1>  meshWidth);
 
-    const double meshWidth();
+    const std::array<double, 1>  meshWidth();
 
 private:
-    const double meshWidth_;
+    const std::array<double, 1> meshWidth_;
 };

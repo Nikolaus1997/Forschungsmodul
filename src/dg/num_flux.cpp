@@ -54,6 +54,6 @@ double NumericalFlux::lax(double x_l, double x_r)
 // Enquist flux function
 double NumericalFlux::enquist(double x_l, double x_r)
 {
-    // Example implementation: max of left and right
+
     return (x_l > x_r) ? x_l : x_r;
 }

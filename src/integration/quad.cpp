@@ -8,7 +8,7 @@ Quadrature::Quadrature(int N): Basis(N)
 
 double Quadrature::GaussLegendreQuad(std::function<double(double)> func, double a, double b)
 {
-    int length = basis_.weights_.size();
+    int length = basis_.weights_.size()[0];
     double sol = 0.0;
 
     for (int i = 0; i < length; i++)

@@ -4,6 +4,9 @@
 #include "integration/basis.h"
 #include "dg/flux.h"
 #include "integration/quad.h"
+#include "dg/grid.h"
+#include "computation/initial_condition.h"
+#include "output_writer/output_writer_paraview.h"
 
 #include <memory>
 #include <cmath>
@@ -21,14 +24,27 @@ class Computation
 
         //run the whole simulation until tend 
         //void runSimulation();
+        void fillX();
+        void fillU();
+        void fillFaces();
+        double integralInit(double x);
     
     private:
-
-
-
+        std::array<double,1> meshWidth_;
+        std::array<double,1> innerMeshWidth_;
+        std::array<int, 1>  nCells_;
         Settings settings_;
         std::unique_ptr<Quadrature> quad_;
+        std::shared_ptr<Grid> grid_;
+        std::unique_ptr<OutputWriterParaview> outputWriterParaview_;        
         double dt_;    
+        double b_;
+        double a_;
+        double nNodes;
+        double initCondA_;
+        double initCondB_;
+        int PP_N_;
         Flux flux_;
+        InitialCondition initialCond_;
 
 };

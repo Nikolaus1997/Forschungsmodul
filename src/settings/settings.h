@@ -14,7 +14,10 @@ struct Settings
   double CFL = 0.9;                     //< CFL number
   int PP_N = 5;                         //< Polynomial degree of the basis functions
 
-  std::string fluxFunction = "linear";  //< Flux function 
+  std::string fluxFunction = "linear";        //< Flux function 
+  std::string initialCondition = "unitStep";  //< Initial condition
+  double initCondA = 0.0;                     //< Starting point of the initial Condition
+  double initCondB = 0.0;                     //< End point of the initial Condition
 
   std::array<double,2> dirichletBcBottom;  //< prescribed values of u,v at bottom of domain
   std::array<double,2> dirichletBcTop;     //< prescribed values of u,v at top of domain

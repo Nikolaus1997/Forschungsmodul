@@ -157,6 +157,15 @@ void Settings::loadFromFile(std::string filename)
     if (parameterName=="fluxFunction"){
       fluxFunction=parameterValue;
     }
+    if (parameterName=="initialCondition"){
+      initialCondition=parameterValue;
+    }
+    if(parameterName=="initCondA"){
+      initCondA = atof(parameterValue.c_str());
+    }
+    if(parameterName=="initCondB"){
+      initCondB = atof(parameterValue.c_str());
+    }
   }
 }
 

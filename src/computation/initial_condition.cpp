@@ -1,38 +1,41 @@
-#include <initial_condition.h>
+#include <computation/initial_condition.h>
 
-InitialCondition::InitialCondition(std::array<double, 2> physicalSize, int nCells):
-nCells_(nCells),u_(physicalSize,(physicalSize[1]-physicalSize[0])/nCells, nCells)
-{
+void InitialCondition::setInitialCondType(InitialCondType type){
+    selectedFunction = type;
 }
 
-Variable InitialCondition::unitStep(Variable x,double a,double b)
-{
-    for(int i = 0; i< x.size();i++)
-    {
-        if(x(i)>=a and x(i)<=b)
-        {
-            u_(i) = 1.0;
-        }else 
-        {
-            u_(i) = 0.0;
-        }
-    }
 
-    return u_;
+double InitialCondition::computeInitialCondition(double x, double a, double b)
+{
+    switch (selectedFunction){
+        case InitialCondType::UnitStep:
+            return unitStep( x, a, b);
+        case InitialCondType::NegativeUnitStep:
+            return negativeUnitStep(x,a,b);
+        default:
+            throw std::invalid_argument("Invalid initial condition type");
+    }
 }
 
-Variable InitialCondition::negativeUnitStep(Variable x,double a,double b)
+double InitialCondition::unitStep(double x, double a, double b)
 {
-    for(int i = 0; i< x.size();i++)
+    if (x>=a and x<=b)
     {
-        if(x(i)>=a and x(i)<=b)
-        {
-            u_(i) = -1.0;
-        }else 
-        {
-            u_(i) = 0.0;
-        }
+        return 1.0;
+    }else
+    {
+        return 0.0;
     }
+    
+}
 
-    return u_;
+double InitialCondition::negativeUnitStep(double x, double a, double b)
+{
+        if (x>=a and x<=b)
+    {
+        return -1.0;
+    }else
+    {
+        return 0.0;
+    }
 }

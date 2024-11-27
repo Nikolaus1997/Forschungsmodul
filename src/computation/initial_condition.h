@@ -1,22 +1,26 @@
 #pragma once
 
-#include <vector>
-#include <storage/variable.h>
+#include <stdexcept>
+#include <functional>
 
 class InitialCondition
 {
 public:
-    // Constructor
-    InitialCondition(std::array<double,2> physicalSize, int nCells);
+    enum class InitialCondType{ UnitStep, NegativeUnitStep};
+
+    InitialCondition() : selectedFunction(InitialCondType::UnitStep) {}
+
+
+    void setInitialCondType(InitialCondType type);
+
+    double computeInitialCondition(double x, double a, double b);
 
     // Destructor (optional, for cleanup if needed)
-    Variable unitStep(Variable x,double a, double b);
+    double unitStep(double x, double a, double b);
 
-    Variable negativeUnitStep(Variable x, double a, double b);
+    double negativeUnitStep(double x, double a, double b);
 
     // Other member functions and data members can be added here
-
 private:
-    int nCells_; // Store the number of cells
-    Variable u_;
+    InitialCondType selectedFunction; 
 };

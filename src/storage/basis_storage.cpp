@@ -2,8 +2,8 @@
 
 BasisStorage::BasisStorage(int N):
     PP_N_(N),
-    weights_(PP_N_+2),
-    nodes_(PP_N_+2)
+    weights_({PP_N_+2}),
+    nodes_({PP_N_+2})
     {
 }
 
