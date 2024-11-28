@@ -27,6 +27,7 @@ class Computation
         void fillX();
         void fillU();
         void fillFaces();
+        double integralFlux(double x, int i ,int j);
         double integralInit(double x, int j);
     
     private:

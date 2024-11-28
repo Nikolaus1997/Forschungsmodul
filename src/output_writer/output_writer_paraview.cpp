@@ -35,7 +35,7 @@ void OutputWriterParaview::writeFile(double currentTime)
   dataSet->SetSpacing(dx, dy, dz);
 
   // set number of points in each dimension, 1 cell in z direction
-  int nCells = grid_->u0_.size()[0];
+  int nCells = grid_->u_.size()[0];
   dataSet->SetDimensions(nCells, 1, 1);  // we want to have points at each corner of each cell
   
   // add solution field variable
@@ -60,7 +60,7 @@ void OutputWriterParaview::writeFile(double currentTime)
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arraySolution->SetValue(index,grid_->u0(i));
+    arraySolution->SetValue(index,grid_->u(i));
   }
 
   // now, we should have added as many values as there are points in the vtk data structure
