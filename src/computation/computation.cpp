@@ -155,7 +155,7 @@ double Computation::integralFlux(double x,int i ,int j)
 
 double Computation::integralInit(double x, int j)
 {
-    auto [L, L_prime] = quad_->LegendrePolynomialAndDerivative(quad_->basis_.nodes((j+1)/2),x);
+    auto [L, L_prime] = quad_->LegendrePolynomialAndDerivative((j+1)/2,quad_->basis_.nodes((j+1)/2));
     //quad_->basis_.weights_.printValues();
     double init =  initialCond_.computeInitialCondition(x,initCondA_,initCondB_);
     //std::cout<<init << std::endl;

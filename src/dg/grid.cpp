@@ -4,7 +4,7 @@
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
 nCells_(nCells), meshWidth_(meshWidth), u_      ({nCells_[0]},   meshWidth_),
                                         u0_      ({nCells_[0]},   meshWidth_),
-                                        x_      ({nCells_[0]*numberNodes+nCells_[0]+1},   meshWidth_),
+                                        x_      ({nCells_[0]*(numberNodes+1)+1},   meshWidth_),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_)
 {
