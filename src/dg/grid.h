@@ -21,11 +21,23 @@ public:
 
     double &u(int i);
 
-    const Variable &u0() const;
+    const Variable &ul() const;
 
-    double u0(int i) const;
+    double ul(int i) const;
 
-    double &u0(int i);
+    double &ul(int i);
+
+    const Variable &ur() const;
+
+    double ur(int i) const;
+
+    double &ur(int i);
+
+    const Variable &ut() const;
+
+    double ut(int i) const;
+
+    double &ut(int i);
 
 
     const Variable &x() const;
@@ -55,7 +67,9 @@ protected:
     const std::array<int, 1>        nCells_;
     const std::array<double, 1>     meshWidth_;
     Variable u_;
-    Variable u0_;
+    Variable ul_;
+    Variable ur_;
+    Variable ut_;
     Variable x_;
     Variable faces_;
     Variable rhs_;

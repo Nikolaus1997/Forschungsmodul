@@ -78,7 +78,7 @@ void Settings::loadFromFile(std::string filename)
     //find corresponding parameter name in settings struct and set the correct value
     if (parameterName=="endTime")
     {
-      endTime = atoi(parameterValue.c_str());
+      endTime = atof(parameterValue.c_str());
     }
 
     if (parameterName=="physicalSizeStart")
@@ -160,6 +160,11 @@ void Settings::loadFromFile(std::string filename)
     if (parameterName=="initialCondition"){
       initialCondition=parameterValue;
     }
+
+    if (parameterName=="RiemannSolver"){
+      initialCondition=parameterValue;
+    }
+
     if(parameterName=="initCondA"){
       initCondA = atof(parameterValue.c_str());
     }

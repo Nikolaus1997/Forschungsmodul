@@ -16,6 +16,7 @@ struct Settings
 
   std::string fluxFunction = "linear";        //< Flux function 
   std::string initialCondition = "unitStep";  //< Initial condition
+  std::string RiemannSolver = "upwind";  //< Initial condition
   double initCondA = 0.0;                     //< Starting point of the initial Condition
   double initCondB = 0.0;                     //< End point of the initial Condition
 

@@ -1,10 +1,6 @@
 #include "num_flux.h"
 
-// Constructor implementation
-NumericalFlux::NumericalFlux()
-    : selectedFunction(FunctionType::upwind) // Default to upwind
-{
-}
+
 
 // Set the numerical flux function type
 void NumericalFlux::setNumFluxFunction(FunctionType type)

@@ -7,7 +7,7 @@ N_(N),basis_(N_)
 {
 }
 
-std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double x)
+std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
 
 {
         double L = 0.0, L_prime = 0.0;
@@ -37,11 +37,11 @@ std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double 
         double dx = 0.0, tol = 1e-8;
 
 
-        if (N==1)
+        if (N==0)
         {
             basis_.weights(1) = 2.0;
             basis_.nodes(1) = 0;
-        }else if (N==2)
+        }else if (N==1)
         {
             basis_.weights(1) = 1.0;
             basis_.weights(2) = 1.0;
@@ -84,9 +84,9 @@ std::tuple<double, double> Basis::LegendrePolynomialAndDerivative(int N, double 
 if (N!=0)
 {
 basis_.weights(0) =  2.0/(N*(N+1));
-basis_.weights(N+1) = basis_.weights(0);
+basis_.weights(basis_.nodes_.size()[0]-1) = basis_.weights(0);
 }
 basis_.nodes(0) = -1.0;
-basis_.nodes(N+1)= 1.0;
+basis_.nodes(basis_.nodes_.size()[0]-1)= 1.0;
 
 }

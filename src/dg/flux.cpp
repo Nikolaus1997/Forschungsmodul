@@ -24,7 +24,7 @@ double Flux::burgers(double x) {
 
 double Flux::linear(double x) {
     // Example implementation for Linear flux
-    double a = 0.5;
+    double a = 1.0;
     return a*x;
 }
 

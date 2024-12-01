@@ -18,11 +18,13 @@ add_executable(${PROJECT_NAME}
 
    dg/flux.cpp
    dg/grid.cpp
+   dg/num_flux.cpp
 
    integration/quad.cpp
    integration/basis.cpp
    
-  #  storage/array2d.cpp
+   storage/array2d.cpp
+   storage/Vdm.cpp
   #  storage/field_variable.cpp
 
   #  pressure_solver/gauss_seidel.cpp

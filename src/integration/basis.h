@@ -1,5 +1,5 @@
 #pragma once
-#include <tuple>
+#include <array>
 #include <storage/basis_storage.h>
 #include "settings/settings.h"
 #include <cmath>
@@ -11,7 +11,7 @@ public:
     Basis(int N);
 
 
-    std::tuple<double, double> LegendrePolynomialAndDerivative(int N, double x);
+    std::array<double,2> LegendrePolynomialAndDerivative(int N, double x);
     void LegendreGaussNodesAndWeights(int N);
 
     int N_;

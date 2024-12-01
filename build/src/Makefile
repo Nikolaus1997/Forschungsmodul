@@ -271,6 +271,30 @@ dg/grid.cpp.s:
 	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/dg/grid.cpp.s
 .PHONY : dg/grid.cpp.s
 
+dg/num_flux.o: dg/num_flux.cpp.o
+.PHONY : dg/num_flux.o
+
+# target to build an object file
+dg/num_flux.cpp.o:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o
+.PHONY : dg/num_flux.cpp.o
+
+dg/num_flux.i: dg/num_flux.cpp.i
+.PHONY : dg/num_flux.i
+
+# target to preprocess a source file
+dg/num_flux.cpp.i:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.i
+.PHONY : dg/num_flux.cpp.i
+
+dg/num_flux.s: dg/num_flux.cpp.s
+.PHONY : dg/num_flux.s
+
+# target to generate assembly for a file
+dg/num_flux.cpp.s:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.s
+.PHONY : dg/num_flux.cpp.s
+
 integration/basis.o: integration/basis.cpp.o
 .PHONY : integration/basis.o
 
@@ -415,6 +439,30 @@ settings/settings.cpp.s:
 	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/settings/settings.cpp.s
 .PHONY : settings/settings.cpp.s
 
+storage/Vdm.o: storage/Vdm.cpp.o
+.PHONY : storage/Vdm.o
+
+# target to build an object file
+storage/Vdm.cpp.o:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o
+.PHONY : storage/Vdm.cpp.o
+
+storage/Vdm.i: storage/Vdm.cpp.i
+.PHONY : storage/Vdm.i
+
+# target to preprocess a source file
+storage/Vdm.cpp.i:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.i
+.PHONY : storage/Vdm.cpp.i
+
+storage/Vdm.s: storage/Vdm.cpp.s
+.PHONY : storage/Vdm.s
+
+# target to generate assembly for a file
+storage/Vdm.cpp.s:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.s
+.PHONY : storage/Vdm.cpp.s
+
 storage/array1d.o: storage/array1d.cpp.o
 .PHONY : storage/array1d.o
 
@@ -438,6 +486,30 @@ storage/array1d.s: storage/array1d.cpp.s
 storage/array1d.cpp.s:
 	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.s
 .PHONY : storage/array1d.cpp.s
+
+storage/array2d.o: storage/array2d.cpp.o
+.PHONY : storage/array2d.o
+
+# target to build an object file
+storage/array2d.cpp.o:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o
+.PHONY : storage/array2d.cpp.o
+
+storage/array2d.i: storage/array2d.cpp.i
+.PHONY : storage/array2d.i
+
+# target to preprocess a source file
+storage/array2d.cpp.i:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.i
+.PHONY : storage/array2d.cpp.i
+
+storage/array2d.s: storage/array2d.cpp.s
+.PHONY : storage/array2d.s
+
+# target to generate assembly for a file
+storage/array2d.cpp.s:
+	cd /home/nikolaus/Studium/Forschungsmodul/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/DG_FM.dir/build.make src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.s
+.PHONY : storage/array2d.cpp.s
 
 storage/basis_storage.o: storage/basis_storage.cpp.o
 .PHONY : storage/basis_storage.o
@@ -512,6 +584,9 @@ help:
 	@echo "... dg/grid.o"
 	@echo "... dg/grid.i"
 	@echo "... dg/grid.s"
+	@echo "... dg/num_flux.o"
+	@echo "... dg/num_flux.i"
+	@echo "... dg/num_flux.s"
 	@echo "... integration/basis.o"
 	@echo "... integration/basis.i"
 	@echo "... integration/basis.s"
@@ -530,9 +605,15 @@ help:
 	@echo "... settings/settings.o"
 	@echo "... settings/settings.i"
 	@echo "... settings/settings.s"
+	@echo "... storage/Vdm.o"
+	@echo "... storage/Vdm.i"
+	@echo "... storage/Vdm.s"
 	@echo "... storage/array1d.o"
 	@echo "... storage/array1d.i"
 	@echo "... storage/array1d.s"
+	@echo "... storage/array2d.o"
+	@echo "... storage/array2d.i"
+	@echo "... storage/array2d.s"
 	@echo "... storage/basis_storage.o"
 	@echo "... storage/basis_storage.i"
 	@echo "... storage/basis_storage.s"

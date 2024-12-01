@@ -1,5 +1,6 @@
 #pragma once
-#include <flux.h>
+#include <stdexcept>
+#include <functional>
 
 class NumericalFlux
 {
@@ -22,4 +23,5 @@ class NumericalFlux
 
 private:
     FunctionType selectedFunction; // Stores the currently selected function
+    friend class Computation;
 };

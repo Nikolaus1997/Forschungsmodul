@@ -2,15 +2,18 @@
 
 #include "settings/settings.h"
 #include "integration/basis.h"
+#include "storage/Vdm.h"
 #include "dg/flux.h"
 #include "integration/quad.h"
 #include "dg/grid.h"
 #include "computation/initial_condition.h"
 #include "output_writer/output_writer_paraview.h"
+#include "dg/num_flux.h"
 
 #include <memory>
 #include <cmath>
 #include <algorithm>
+#include <array>
 
 /**
  * This class contains the main loop over all time steps of the simulation and all methods that are called in this loop.
@@ -26,8 +29,13 @@ class Computation
         //void runSimulation();
         void fillX();
         void fillU();
+        void fillUt();
+        void initVdm();
+        void eulerTimeStep();
         void fillFaces();
-        double integralFlux(double x, int i ,int j);
+        void calcUdt();
+        void fillNumFlux();
+        double integralFlux( int i ,int j);
         double integralInit(double x, int j);
     
     private:
@@ -46,6 +54,7 @@ class Computation
         double initCondB_;
         int PP_N_;
         Flux flux_;
+        NumericalFlux gFlux_;
         InitialCondition initialCond_;
-
+        std::shared_ptr<Vandermonde> VdM_;
 };
