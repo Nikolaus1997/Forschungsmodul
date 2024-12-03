@@ -9,6 +9,13 @@ class Vandermonde: public Array2D
         void printValues();
         void LprintValues();
         void LprimePrintValues();
+        
+        Array2D &VdM();
+
+        double VdM(int i, int j) const;
+
+        double &VdM(int i, int j);
+
     protected:
         Array2D VdM_;
         Array2D VdM_t_;
