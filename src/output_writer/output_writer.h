@@ -13,7 +13,7 @@ public:
   OutputWriter(std::shared_ptr<Grid> grid);
 
   //! write current velocities to file, filename is output_<count>.vti
-  virtual void writeFile(double currentTime) = 0;
+  virtual void writeFile(double currentTime,std::string OutputName) = 0;
 
 protected:
 

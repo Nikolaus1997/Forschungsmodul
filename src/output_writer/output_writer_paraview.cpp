@@ -5,6 +5,7 @@
 #include <vtkPointData.h>
 #include <iostream>
 
+
 OutputWriterParaview::OutputWriterParaview(std::shared_ptr<Grid> grid_) :
    OutputWriter(grid_)
 {
@@ -12,11 +13,12 @@ OutputWriterParaview::OutputWriterParaview(std::shared_ptr<Grid> grid_) :
   vtkWriter_ = vtkSmartPointer<vtkXMLImageDataWriter>::New();
 }
 
-void OutputWriterParaview::writeFile(double currentTime)
+void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
 {
   // Assemble the filename
   std::stringstream fileName;
-  fileName << "out/output_" << std::setw(4) << setfill('0') << fileNo_ << "." << vtkWriter_->GetDefaultFileExtension();
+  std::string outputName_ = OutputName;
+  fileName << "out/" <<outputName_<<"_"<< std::setw(4) << setfill('0') << fileNo_ << "." << vtkWriter_->GetDefaultFileExtension();
   
   // increment file no.
   fileNo_++;

@@ -6,6 +6,7 @@
 #include <vtkXMLImageDataWriter.h>
 
 #include <memory>
+#include <dg/flux.h>
 
 /** Write *.vti files that can be viewed with ParaView.
  *  The mesh that can be visualized in ParaView corresponds to the mesh of the computational domain.
@@ -21,7 +22,7 @@ public:
   OutputWriterParaview(std::shared_ptr<Grid> grid);
 
   //! write current velocities to file, filename is output_<count>.vti
-  void writeFile(double currentTime);
+  void writeFile(double currentTime,std::string OutputName);
 
 private:
 

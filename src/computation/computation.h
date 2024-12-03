@@ -9,6 +9,7 @@
 #include "computation/initial_condition.h"
 #include "output_writer/output_writer_paraview.h"
 #include "dg/num_flux.h"
+#include "analyze/timer.cpp"
 
 #include <memory>
 #include <cmath>

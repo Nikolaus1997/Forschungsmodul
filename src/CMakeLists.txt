@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
    dg/flux.cpp
    dg/grid.cpp
    dg/num_flux.cpp
+   analyze/timer.cpp
 
    integration/quad.cpp
    integration/basis.cpp

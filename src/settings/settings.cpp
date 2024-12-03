@@ -161,8 +161,12 @@ void Settings::loadFromFile(std::string filename)
       initialCondition=parameterValue;
     }
 
+    if (parameterName=="OutputName"){
+      OutputName=parameterValue;
+    }
+
     if (parameterName=="RiemannSolver"){
-      initialCondition=parameterValue;
+      RiemannSolver=parameterValue;
     }
 
     if(parameterName=="initCondA"){

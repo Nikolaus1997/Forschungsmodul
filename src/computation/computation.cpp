@@ -17,11 +17,12 @@ void Computation::initialize(std::string filename)
   
 
     PP_N_= settings_.PP_N;
-    dt_ = settings_.dt;
+
 
     nNodes = 2*PP_N_-1;
 
     nCells_= settings_.nCells;
+    dt_ = settings_.CFL*1/nCells_[0];
     meshWidth_[0] =  (b_-a_)/nCells_[0];
     innerMeshWidth_[0] = meshWidth_[0]/nNodes;
     std::array<int,2> t  ={nCells_[0],PP_N_+1};
@@ -103,10 +104,12 @@ void Computation::initialize(std::string filename)
     }else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
+    Timer timer;
+    timer.start();
     double time_ = 0.0;
     int iter = 0.0;
     fillFaces();
-
+    int numberN = 1/dt_*0.1;
     fillX();
     initVdm();
     fillU();
@@ -118,15 +121,15 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
         eulerTimeStep();
         if(time_==0){
         outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
-        outputWriterParaview_->writeFile(time_);
+        outputWriterParaview_->writeFile(time_,settings_.OutputName);
         }
 
-        fillU();
+        //fillU();
 
         time_=time_+dt_;
         //std::cout<<"CalcTimestep: "<<dt_<<std::endl;
-        if(iter % 100 ==0)
-            outputWriterParaview_->writeFile(time_);
+        if(iter % numberN ==0)
+            outputWriterParaview_->writeFile(time_,settings_.OutputName);
         iter++;
     }
 
@@ -137,7 +140,7 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
     // }
     // std::cout<<"x: "<<std::endl;
     // grid_->x_.printValues();
-    quad_->basis_.nodes_.printValues();
+    // quad_->basis_.nodes_.printValues();
     // std::cout<<"faces: "<<std::endl;
     // grid_->faces_.printValues();
     // std::cout<<"u: "<<std::endl;
@@ -150,6 +153,8 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
     //std::cout<<"Integral Value: "<<quad_->GaussLegendreQuad([&](double x) { return initialCond_.computeInitialCondition(grid_->x(3),-0,0); },a,b)<<std::endl;
     //initialize output writer
     // outputWriterText_ = std::make_unique<OutputWriterText>(discretization_);
+    timer.stop();
+    std::cout << "Elapsed time: " << timer.elapsedMilliseconds()/1000 << " s." << " nStates: "<<iter<< std::endl;
 
 }
 
@@ -162,12 +167,7 @@ void Computation::fillX()
     {
         mean = 0.5 * (grid_->faces_(i+1) + grid_->faces_(i));
         diff = 0.5 * (grid_->faces_(i+1) - grid_->faces_(i));
-        // for(int j = 1; j <quad_->basis_.nodes_.size()[0]-1;j++)
-        // {
-            // transformedNode =  diff* quad_->basis_.nodes(j) + mean;
-            // grid_->x(i*(nNodes)+j-1)     = transformedNode;
             grid_->x(i) =mean;
-        //}
     }   
 }
 
@@ -175,11 +175,6 @@ void Computation::fillU() {
     for(int i=0;i<VdM_->VdM_.size()[0];i++){
         grid_->u(i) =0.0;
         for(int j=0;j<VdM_->VdM_.size()[1];j++){
-            // for(int k=1; k<quad_->basis_.nodes_.size()[0]-1;k++){
-            //         grid_->u(i*nNodes+k-1) +=VdM_->L_(k,j)*(2*j+1)/meshWidth_[0] *VdM_-> VdM_(i,j);
-            // }
-
-                //auto [L,L_prime] = quad_->LegendrePolynomialAndDerivative(j,(+grid_->x(i*nNodes+nNodes/2)-grid_->faces(i))/meshWidth_[0]) ;
                 grid_->u(i) +=VdM_->L_(int((nNodes)/2),j) *VdM_-> VdM_(i,j);
             }
     }
@@ -191,11 +186,6 @@ void Computation::fillUt()
         for(int i=0;i<VdM_->VdM_.size()[0];i++){
             grid_->ut(i) = 0.0;
         for(int j=0;j<VdM_->VdM_.size()[1];j++){
-            // for(int k=1; k<quad_->basis_.nodes_.size()[0]-1;k++){
-            //         grid_->u(i*nNodes+k-1) +=VdM_->L_(k,j)*(2*j+1)/meshWidth_[0] *VdM_-> VdM_(i,j);
-            // }
-
-                //auto [L,L_prime] = quad_->LegendrePolynomialAndDerivative(j,(+grid_->x(i*nNodes+nNodes/2)-grid_->faces(i))/meshWidth_[0]) ;
                 grid_->ut(i) +=VdM_->L_(int((nNodes)/2),j) *VdM_-> VdM_t_(i,j);
             }
     }
@@ -251,28 +241,27 @@ void Computation::calcUdt()
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus);
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
             }else if (i==grid_->faces_.size()[0] - 2)
             {
                 double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(0,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus) ;
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
             }else{
             // Compute the numerical flux
                 double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus);
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
             }
             //std::cout<<"flux  "<<flux_term<<std::endl;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            //
             double integ =integralFlux(i, j);
             //std::cout<<"integral "<<integ<<" j: "<<j<<std::endl;
-            VdM_->VdM_t_(i, j) = ( integ- flux_term)* meshWidth_[0]/(2 * j + 1);//*1/innerMeshWidth_[0];
+            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)- flux_term* 1/(2 * j + 1)*1/meshWidth_[0];//*1/innerMeshWidth_[0];
         }
     }
 }

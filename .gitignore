@@ -32,8 +32,8 @@
 *.app
 
 # Build
-# build/*
-# !build/.gitkeep
+build/*
+!build/.gitkeep
 
 # Output files
 build/out/
