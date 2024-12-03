@@ -41,3 +41,18 @@ void Vandermonde::LprimePrintValues()
         std::cout<<";"<<std::endl;
     }
 }
+
+Array2D &Vandermonde::VdM() 
+{
+    return VdM_;
+}
+
+double Vandermonde::VdM(int i, int j) const
+{
+    return VdM_(i,j);
+}
+
+double &Vandermonde::VdM(int i, int j)
+{
+    return VdM_(i,j);
+}
