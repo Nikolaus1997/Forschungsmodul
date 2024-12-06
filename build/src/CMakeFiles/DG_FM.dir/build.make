@@ -73,239 +73,239 @@ src/CMakeFiles/DG_FM.dir/main.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/main.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/main.cpp
 src/CMakeFiles/DG_FM.dir/main.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/DG_FM.dir/main.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/main.cpp.o -MF CMakeFiles/DG_FM.dir/main.cpp.o.d -o CMakeFiles/DG_FM.dir/main.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/main.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/main.cpp.o -MF CMakeFiles/DG_FM.dir/main.cpp.o.d -o CMakeFiles/DG_FM.dir/main.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/main.cpp
 
 src/CMakeFiles/DG_FM.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/main.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/main.cpp > CMakeFiles/DG_FM.dir/main.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/main.cpp > CMakeFiles/DG_FM.dir/main.cpp.i
 
 src/CMakeFiles/DG_FM.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/main.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/main.cpp -o CMakeFiles/DG_FM.dir/main.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/main.cpp -o CMakeFiles/DG_FM.dir/main.cpp.s
 
 src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp
 src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o -MF CMakeFiles/DG_FM.dir/settings/settings.cpp.o.d -o CMakeFiles/DG_FM.dir/settings/settings.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/settings/settings.cpp.o -MF CMakeFiles/DG_FM.dir/settings/settings.cpp.o.d -o CMakeFiles/DG_FM.dir/settings/settings.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp
 
 src/CMakeFiles/DG_FM.dir/settings/settings.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/settings/settings.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp > CMakeFiles/DG_FM.dir/settings/settings.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp > CMakeFiles/DG_FM.dir/settings/settings.cpp.i
 
 src/CMakeFiles/DG_FM.dir/settings/settings.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/settings/settings.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp -o CMakeFiles/DG_FM.dir/settings/settings.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/settings/settings.cpp -o CMakeFiles/DG_FM.dir/settings/settings.cpp.s
 
 src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp
 src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o -MF CMakeFiles/DG_FM.dir/computation/computation.cpp.o.d -o CMakeFiles/DG_FM.dir/computation/computation.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/computation/computation.cpp.o -MF CMakeFiles/DG_FM.dir/computation/computation.cpp.o.d -o CMakeFiles/DG_FM.dir/computation/computation.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp
 
 src/CMakeFiles/DG_FM.dir/computation/computation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/computation/computation.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp > CMakeFiles/DG_FM.dir/computation/computation.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp > CMakeFiles/DG_FM.dir/computation/computation.cpp.i
 
 src/CMakeFiles/DG_FM.dir/computation/computation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/computation/computation.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp -o CMakeFiles/DG_FM.dir/computation/computation.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/computation/computation.cpp -o CMakeFiles/DG_FM.dir/computation/computation.cpp.s
 
 src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp
 src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o -MF CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o.d -o CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o -MF CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o.d -o CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp
 
 src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp > CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp > CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.i
 
 src/CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp -o CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/computation/initial_condition.cpp -o CMakeFiles/DG_FM.dir/computation/initial_condition.cpp.s
 
 src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp
 src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o -MF CMakeFiles/DG_FM.dir/storage/array1d.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/array1d.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.o -MF CMakeFiles/DG_FM.dir/storage/array1d.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/array1d.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp
 
 src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/storage/array1d.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp > CMakeFiles/DG_FM.dir/storage/array1d.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp > CMakeFiles/DG_FM.dir/storage/array1d.cpp.i
 
 src/CMakeFiles/DG_FM.dir/storage/array1d.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/storage/array1d.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp -o CMakeFiles/DG_FM.dir/storage/array1d.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/array1d.cpp -o CMakeFiles/DG_FM.dir/storage/array1d.cpp.s
 
 src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp
 src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o -MF CMakeFiles/DG_FM.dir/storage/variable.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/variable.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/variable.cpp.o -MF CMakeFiles/DG_FM.dir/storage/variable.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/variable.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp
 
 src/CMakeFiles/DG_FM.dir/storage/variable.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/storage/variable.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp > CMakeFiles/DG_FM.dir/storage/variable.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp > CMakeFiles/DG_FM.dir/storage/variable.cpp.i
 
 src/CMakeFiles/DG_FM.dir/storage/variable.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/storage/variable.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp -o CMakeFiles/DG_FM.dir/storage/variable.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/variable.cpp -o CMakeFiles/DG_FM.dir/storage/variable.cpp.s
 
 src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp
 src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o -MF CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o -MF CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp
 
 src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp > CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp > CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.i
 
 src/CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp -o CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/basis_storage.cpp -o CMakeFiles/DG_FM.dir/storage/basis_storage.cpp.s
 
 src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp
 src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o -MF CMakeFiles/DG_FM.dir/dg/flux.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/flux.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/flux.cpp.o -MF CMakeFiles/DG_FM.dir/dg/flux.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/flux.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp
 
 src/CMakeFiles/DG_FM.dir/dg/flux.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/dg/flux.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp > CMakeFiles/DG_FM.dir/dg/flux.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp > CMakeFiles/DG_FM.dir/dg/flux.cpp.i
 
 src/CMakeFiles/DG_FM.dir/dg/flux.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/dg/flux.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp -o CMakeFiles/DG_FM.dir/dg/flux.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/flux.cpp -o CMakeFiles/DG_FM.dir/dg/flux.cpp.s
 
 src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp
 src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o -MF CMakeFiles/DG_FM.dir/dg/grid.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/grid.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/grid.cpp.o -MF CMakeFiles/DG_FM.dir/dg/grid.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/grid.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp
 
 src/CMakeFiles/DG_FM.dir/dg/grid.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/dg/grid.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp > CMakeFiles/DG_FM.dir/dg/grid.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp > CMakeFiles/DG_FM.dir/dg/grid.cpp.i
 
 src/CMakeFiles/DG_FM.dir/dg/grid.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/dg/grid.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp -o CMakeFiles/DG_FM.dir/dg/grid.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/grid.cpp -o CMakeFiles/DG_FM.dir/dg/grid.cpp.s
 
 src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp
 src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o -MF CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o -MF CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o.d -o CMakeFiles/DG_FM.dir/dg/num_flux.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp
 
 src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/dg/num_flux.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp > CMakeFiles/DG_FM.dir/dg/num_flux.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp > CMakeFiles/DG_FM.dir/dg/num_flux.cpp.i
 
 src/CMakeFiles/DG_FM.dir/dg/num_flux.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/dg/num_flux.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp -o CMakeFiles/DG_FM.dir/dg/num_flux.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/dg/num_flux.cpp -o CMakeFiles/DG_FM.dir/dg/num_flux.cpp.s
 
 src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp
 src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o -MF CMakeFiles/DG_FM.dir/analyze/timer.cpp.o.d -o CMakeFiles/DG_FM.dir/analyze/timer.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.o -MF CMakeFiles/DG_FM.dir/analyze/timer.cpp.o.d -o CMakeFiles/DG_FM.dir/analyze/timer.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp
 
 src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/analyze/timer.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp > CMakeFiles/DG_FM.dir/analyze/timer.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp > CMakeFiles/DG_FM.dir/analyze/timer.cpp.i
 
 src/CMakeFiles/DG_FM.dir/analyze/timer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/analyze/timer.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp -o CMakeFiles/DG_FM.dir/analyze/timer.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/analyze/timer.cpp -o CMakeFiles/DG_FM.dir/analyze/timer.cpp.s
 
 src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp
 src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o -MF CMakeFiles/DG_FM.dir/integration/quad.cpp.o.d -o CMakeFiles/DG_FM.dir/integration/quad.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/integration/quad.cpp.o -MF CMakeFiles/DG_FM.dir/integration/quad.cpp.o.d -o CMakeFiles/DG_FM.dir/integration/quad.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp
 
 src/CMakeFiles/DG_FM.dir/integration/quad.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/integration/quad.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp > CMakeFiles/DG_FM.dir/integration/quad.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp > CMakeFiles/DG_FM.dir/integration/quad.cpp.i
 
 src/CMakeFiles/DG_FM.dir/integration/quad.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/integration/quad.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp -o CMakeFiles/DG_FM.dir/integration/quad.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/integration/quad.cpp -o CMakeFiles/DG_FM.dir/integration/quad.cpp.s
 
 src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp
 src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o -MF CMakeFiles/DG_FM.dir/integration/basis.cpp.o.d -o CMakeFiles/DG_FM.dir/integration/basis.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/integration/basis.cpp.o -MF CMakeFiles/DG_FM.dir/integration/basis.cpp.o.d -o CMakeFiles/DG_FM.dir/integration/basis.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp
 
 src/CMakeFiles/DG_FM.dir/integration/basis.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/integration/basis.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp > CMakeFiles/DG_FM.dir/integration/basis.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp > CMakeFiles/DG_FM.dir/integration/basis.cpp.i
 
 src/CMakeFiles/DG_FM.dir/integration/basis.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/integration/basis.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp -o CMakeFiles/DG_FM.dir/integration/basis.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/integration/basis.cpp -o CMakeFiles/DG_FM.dir/integration/basis.cpp.s
 
 src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp
 src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o -MF CMakeFiles/DG_FM.dir/storage/array2d.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/array2d.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.o -MF CMakeFiles/DG_FM.dir/storage/array2d.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/array2d.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp
 
 src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/storage/array2d.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp > CMakeFiles/DG_FM.dir/storage/array2d.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp > CMakeFiles/DG_FM.dir/storage/array2d.cpp.i
 
 src/CMakeFiles/DG_FM.dir/storage/array2d.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/storage/array2d.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp -o CMakeFiles/DG_FM.dir/storage/array2d.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/array2d.cpp -o CMakeFiles/DG_FM.dir/storage/array2d.cpp.s
 
 src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp
 src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o -MF CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o -MF CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o.d -o CMakeFiles/DG_FM.dir/storage/Vdm.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp
 
 src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/storage/Vdm.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp > CMakeFiles/DG_FM.dir/storage/Vdm.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp > CMakeFiles/DG_FM.dir/storage/Vdm.cpp.i
 
 src/CMakeFiles/DG_FM.dir/storage/Vdm.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/storage/Vdm.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp -o CMakeFiles/DG_FM.dir/storage/Vdm.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/storage/Vdm.cpp -o CMakeFiles/DG_FM.dir/storage/Vdm.cpp.s
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o -MF CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o.d -o CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o -MF CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o.d -o CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp > CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp > CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.i
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp -o CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer.cpp -o CMakeFiles/DG_FM.dir/output_writer/output_writer.cpp.s
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o: src/CMakeFiles/DG_FM.dir/flags.make
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o: /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o: src/CMakeFiles/DG_FM.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/nikolaus/Studium/Forschungsmodul/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o -MF CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o.d -o CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o -MF CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o.d -o CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.o -c /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.i"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp > CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.i
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp > CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.i
 
 src/CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.s"
-	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp -o CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.s
+	cd /home/nikolaus/Studium/Forschungsmodul/build/src && /usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/nikolaus/Studium/Forschungsmodul/src/output_writer/output_writer_paraview.cpp -o CMakeFiles/DG_FM.dir/output_writer/output_writer_paraview.cpp.s
 
 # Object files for target DG_FM
 DG_FM_OBJECTS = \

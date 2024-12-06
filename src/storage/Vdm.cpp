@@ -1,7 +1,7 @@
 #include "Vdm.h"
 
 Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
-VdM_(size),L_({nNodes,size[1]}),L_prime_({nNodes,size[1]}),VdM_t_(size)
+VdM_(size),VdM1_(size),VdM2_(size),L_({nNodes,size[1]}),L_prime_({nNodes,size[1]}),VdM_t_(size)
 {
 }
 

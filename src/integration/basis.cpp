@@ -37,11 +37,11 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
         double dx = 0.0, tol = 1e-8;
 
 
-        if (N==0)
+        if (N==1)
         {
             basis_.weights(1) = 2.0;
             basis_.nodes(1) = 0;
-        }else if (N==1)
+        }else if (N==2)
         {
             basis_.weights(1) = 1.0;
             basis_.weights(2) = 1.0;
@@ -64,8 +64,14 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
                 }
 
                 // Store the root and its symmetric counterpart
-                nodes[j] = x;
-                nodes[N - j - 1] = -x;
+                if(sqrt(x*x)<1E-5){
+                    nodes[j] = 0.0;
+                    nodes[N - j - 1] = 0.0;
+                }else{
+                    nodes[j] = x;
+                    nodes[N - j - 1] = -x;
+                }
+
 
                 // Compute the weight for this node
                 auto [L, L_prime] = LegendrePolynomialAndDerivative(N, x);

@@ -4,8 +4,8 @@
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
 nCells_(nCells), meshWidth_(meshWidth), u_      ({nCells_[0]},   meshWidth_),
                                         ut_      ({nCells_[0]},   meshWidth_),
-                                        ul_     ({nCells_[0]},   meshWidth_),
-                                        ur_     ({nCells_[0]},   meshWidth_),
+                                        u1_     ({nCells_[0]},   meshWidth_),
+                                        u2_     ({nCells_[0]},   meshWidth_),
                                         x_      ({nCells_[0]},   meshWidth_),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_)
@@ -49,34 +49,34 @@ double &Grid::ut(int i)
     return ut_(i);
 }
 
-const Variable &Grid::ur() const
+const Variable &Grid::u1() const
 {
-    return ur_;
+    return u1_;
 }
 
-double Grid::ur(int i) const
+double Grid::u1(int i) const
 {
-    return ur_(i);
+    return u1_(i);
 }
 
-double &Grid::ur(int i)
+double &Grid::u1(int i)
 {
-    return ur_(i);
+    return u1_(i);
 }
 
-const Variable &Grid::ul() const
+const Variable &Grid::u2() const
 {
-    return ul_;
+    return u2_;
 }
 
-double Grid::ul(int i) const
+double Grid::u2(int i) const
 {
-    return ul_(i);
+    return u2_(i);
 }
 
-double &Grid::ul(int i)
+double &Grid::u2(int i)
 {
-    return ul_(i);
+    return u2_(i);
 }
 
 

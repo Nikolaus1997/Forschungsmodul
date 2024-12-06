@@ -10,7 +10,7 @@ public:
     LowStorageRungeKutta3(double dt);
 
 
-    void advance(Variable u, const std::function<std::vector<double>(Variable)>& rhsFunc);
+    void advance(Variable u, Variable ut);
 
 protected:
     double dt_; // Time step

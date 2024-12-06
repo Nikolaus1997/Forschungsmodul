@@ -31,19 +31,20 @@ double Quadrature::IntGaussLegendreQuad(std::function<double(double)> func,int j
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
     
-    for (int i = 0; i < length; i++)
+    for (int i = 1; i < length-1; i++)
     {
         double node = basis_.nodes(i);
         double weight = basis_.weights(i);
         // Transforming the node from [-1, 1] to [a, b]
         double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
         double L = LegendrePolynomialAndDerivative(j,node)[0];
-        //std::cout<<"j "<<j<<" weight"<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" func(trans) "<<func(transformedNode)<<" L: "<<L<<std::endl;
+        //std::cout<<"j "<<j<<" weight: "<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" func(trans) "<<func(transformedNode)<<" L: "<<L<<std::endl;
         sol += weight * func(transformedNode)*L;
     }
 
     // Scale by the length of the interval
     sol *= 0.5 * (b - a);
+    //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
 
@@ -52,7 +53,7 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
     
-    for (int k = 0; k < length; k++)
+    for (int k = 1; k < length-1; k++)
     {
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
@@ -63,11 +64,12 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
         {
             evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
-        //std::cout<<"Eval: "<<evaluation<<"i: "<<i<<std::endl;
+        //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
         sol += weight * func(evaluation)*L_prime;
     }
 
     // Scale by the length of the interval
     sol *= 0.5 * (b - a);
+    //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }

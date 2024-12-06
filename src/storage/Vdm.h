@@ -19,6 +19,8 @@ class Vandermonde: public Array2D
     protected:
         Array2D VdM_;
         Array2D VdM_t_;
+        Array2D VdM1_;
+        Array2D VdM2_;
         Array2D L_;
         Array2D L_prime_;
     friend class Computation;

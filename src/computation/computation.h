@@ -31,10 +31,15 @@ class Computation
         void fillX();
         void fillU();
         void fillUt();
+        void fillU1t();
+        void fillU2t();
         void initVdm();
         void eulerTimeStep();
+        void rungeKutta();
         void fillFaces();
         void calcUdt();
+        void calcU1dt();
+        void calcU2dt();        
         void fillNumFlux();
         double integralFlux( int i ,int j);
         double integralInit(double x, int j);
