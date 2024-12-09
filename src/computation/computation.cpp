@@ -79,7 +79,7 @@ void Computation::initialize(std::string filename)
         gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::downwind);
         std::cout<< "Choosing the numerical downwind flux function..."<<std::endl;
     } 
-    else if (settings_.RiemannSolver == "enquist") {
+    else if (settings_.RiemannSolver == "lax") {
         gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::lax);
         std::cout<< "Choosing the numerical Lax Friedrichs flux function..."<<std::endl;
     } 
@@ -104,6 +104,7 @@ void Computation::initialize(std::string filename)
     }else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
+    std::cout<<'-'<<std::flush;
     Timer timer;
     timer.start();
     double time_ = 0.0;
@@ -113,13 +114,14 @@ void Computation::initialize(std::string filename)
     fillX();
     initVdm();
     fillU();
+    double numberofIterations = settings_.endTime/dt_;
 
 while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
     {
-        calcUdt();
-        fillUt();
-        eulerTimeStep();
-        //rungeKutta();
+        // calcUdt(VdM_->VdM());
+        // fillUt();
+        // eulerTimeStep();
+        rungeKutta5();
         if(time_==0){
         outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
         outputWriterParaview_->writeFile(time_,settings_.OutputName);
@@ -132,6 +134,7 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
         if(iter % numberN ==0)
             outputWriterParaview_->writeFile(time_,settings_.OutputName);
         iter++;
+        std::cout<<"\rCurrent Iteration: "<<iter<<" End Iter: "<<numberofIterations<< std::flush;
     }
 
     
@@ -147,9 +150,6 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
     // std::cout<<"L: "<<std::endl;
     // VdM_->LprintValues();
     //std::cout<<grid_->x(4)<<std::endl;
-    //std::cout<<"Integral Value: "<<quad_->GaussLegendreQuad([&](double x) { return initialCond_.computeInitialCondition(grid_->x(3),-0,0); },a,b)<<std::endl;
-    //initialize output writer
-    // outputWriterText_ = std::make_unique<OutputWriterText>(discretization_);
     timer.stop();
     std::cout << "Elapsed time: " << timer.elapsedMilliseconds()/1000 << " s." << " nStates: "<<iter<< std::endl;
 
@@ -185,6 +185,7 @@ void Computation::fillUt()
             grid_->ut(i) = 0.0;
         for(int j=0;j<VdM_->VdM_.size()[1];j++){
                 grid_->ut(i) +=VdM_->L_(int((nNodes+2)/2),j) *VdM_-> VdM_t_(i,j);
+                //std::cout<<" IN FILL UT "<<VdM_->VdM_t_(i,j)<<std::endl;
             }
     }
 }
@@ -225,47 +226,35 @@ void Computation::eulerTimeStep()
 
 void Computation::rungeKutta()
 {
-    calcUdt();
+    calcUdt(VdM_->VdM_);
     fillUt();
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <VdM_->VdM_.size()[1]; j++) {
             VdM_->VdM1_(i,j) =VdM_->VdM_(i,j)+ dt_*VdM_->VdM_t_(i,j);
-            if(sqrt(VdM_->VdM1_(i,j)*VdM_->VdM1_(i,j))<1E-16)
-                VdM_->VdM1_(i,j)= 0.0;
         }
 
         //std::cout<<grid_->ut(i)<<dt_<<std::endl;
         grid_->u1(i) = grid_->u(i)+ dt_*grid_->ut(i);
-        if(sqrt(grid_->u1(i)*grid_->u1(i))<1E-12)
-            grid_->u1(i) = 0.0;
     }
-    calcU1dt();
+    calcUdt(VdM_->VdM1_);
     fillUt();
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <VdM_->VdM_.size()[1]; j++) {
-            VdM_->VdM2_(i,j) = VdM_->VdM1_(i,j)+dt_*-3/4*VdM_->VdM_t_(i,j);
-            if(sqrt(VdM_->VdM2_(i,j)*VdM_->VdM2_(i,j))<1E-16)
-                VdM_->VdM2_(i,j)= 0.0;
+            VdM_->VdM2_(i,j) = VdM_->VdM1_(i,j)-dt_*3/4*VdM_->VdM_t_(i,j);
         }
 
         //std::cout<<grid_->ut(i)<<dt_<<std::endl;
         grid_->u2(i) = grid_->u1(i)+dt_*-3/4*grid_->ut(i);
-        if(sqrt(grid_->u2(i)*grid_->u2(i))<1E-16)
-            grid_->u2(i) = 0.0;
     }
-    calcU2dt();
+    calcUdt(VdM_->VdM2_);
     fillUt();
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <VdM_->VdM_.size()[1]; j++) {
             VdM_->VdM_(i,j) =VdM_->VdM2_(i,j)+ dt_*1/3*VdM_->VdM_t_(i,j);
-            if(sqrt(VdM_->VdM_(i,j)*VdM_->VdM_(i,j))<1E-12)
-                VdM_->VdM_(i,j)= 0.0;
         }
 
         //std::cout<<grid_->ut(i)<<dt_<<std::endl;
         grid_->u(i) = grid_->u2(i)+ dt_*1/3*grid_->ut(i);
-        if(sqrt(grid_->u(i)*grid_->u(i))<1E-16)
-            grid_->u(i) = 0.0;
     }
 }
 
@@ -278,140 +267,52 @@ void Computation::fillFaces()
     
 }
 
-void Computation::calcUdt()
+void Computation::calcUdt(Array2D VdM)
 {
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        for (int j = 0; j <VdM_->VdM_.size()[1]; j++) {
+        for (int j = 0; j <VdM.size()[1]; j++) {
             double flux_term =0.0;
             // Wrap around the grid for periodic boundary conditions
             if(i==0){
-                double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM_(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus) ;
+                double ul_i = VdM(i,j)*VdM_->L_(0,j);
+                double ur_i = VdM(i,j)*VdM_->L_(nNodes,j);
+                double ur_iminus  = VdM(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
+                double ul_iplus = VdM(i+1,j)*VdM_->L_(0,j);
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,flux_)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus,flux_) ;
             }else if (i==grid_->faces_.size()[0] - 2)
             {
-                double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM_(0,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j)  + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
+                double ul_i = VdM(i,j)*VdM_->L_(0,j);
+                double ur_i = VdM(i,j)*VdM_->L_(nNodes,j);
+                double ur_iminus  = VdM(i-1,j)*VdM_->L_(nNodes,j);
+                double ul_iplus = VdM(0,j)*VdM_->L_(0,j);
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,flux_)* pow(-1, j)  + gFlux_.computeNumFlux(ur_i, ul_iplus,flux_);//* pow(-1, j) ;
             }else{
             // Compute the numerical flux
-                double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
+                double ul_i = VdM(i,j)*VdM_->L_(0,j);
+                double ur_i = VdM(i,j)*VdM_->L_(nNodes,j);
+                double ur_iminus  = VdM(i-1,j)*VdM_->L_(nNodes,j);
+                double ul_iplus = VdM(i+1,j)*VdM_->L_(0,j);
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,flux_)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus,flux_);//* pow(-1, j) ;
             }
-            //std::cout<<"flux  "<<flux_term<<std::endl;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            double integ =integralFlux(i, j);
-            // if(sqrt(flux_term*flux_term)<1E-16)
+            double integ =integralFlux(i, j,VdM);
+            // if(sqrt(flux_term*flux_term)<1E-12)
             //     flux_term=0.0;
             // if(sqrt(integ*integ)<1E-12)
             //     integ=0.0;
-            //std::cout<<"integral "<<integ<<" fluxTerm "<<flux_term<<" j: "<<j<<std::endl;
-            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)- (flux_term*1/(2 * j + 1))*1/meshWidth_[0];
-        }
-    }
-}
-
-void Computation::calcU1dt()
-{
-    for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        for (int j = 0; j <VdM_->VdM1_.size()[1]; j++) {
-            double flux_term =0.0;
-            // Wrap around the grid for periodic boundary conditions
-            if(i==0){
-                double ul_i = VdM_->VdM1_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM1_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM1_(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM1_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }else if (i==grid_->faces_.size()[0] - 2)
-            {
-                double ul_i = VdM_->VdM1_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM1_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM1_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM1_(0,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }else{
-            // Compute the numerical flux
-                double ul_i = VdM_->VdM1_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM1_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM1_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM1_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }
-            //std::cout<<"flux  "<<flux_term<<std::endl;
-            // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            double integ =integralFlux(i, j);
-            if(sqrt(flux_term*flux_term)<1E-16)
-                flux_term=0.0;
-            if(sqrt(integ*integ)<1E-12)
-                integ=0.0;
-            //std::cout<<"integral "<<integ<<" fluxTerm "<<flux_term<<" j: "<<j<<std::endl;
-            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)*meshWidth_[0]- flux_term*1/(2 * j + 1)*meshWidth_[0];
-        }
-    }
-}
-
-void Computation::calcU2dt()
-{
-    for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        for (int j = 0; j <VdM_->VdM2_.size()[1]; j++) {
-            double flux_term =0.0;
-            // Wrap around the grid for periodic boundary conditions
-            if(i==0){
-                double ul_i = VdM_->VdM2_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM2_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM2_(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM2_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }else if (i==grid_->faces_.size()[0] - 2)
-            {
-                double ul_i = VdM_->VdM2_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM2_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM2_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM2_(0,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }else{
-            // Compute the numerical flux
-                double ul_i = VdM_->VdM2_(i,j)*VdM_->L_(0,j);
-                double ur_i = VdM_->VdM2_(i,j)*VdM_->L_(nNodes,j);
-                double ur_iminus  = VdM_->VdM2_(i-1,j)*VdM_->L_(nNodes,j);
-                double ul_iplus = VdM_->VdM2_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus)* pow(-1, j) ;
-            }
-            //std::cout<<"flux  "<<flux_term<<std::endl;
-            // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            double integ =integralFlux(i, j);
-            if(sqrt(flux_term*flux_term)<1E-16)
-                flux_term=0.0;
-            if(sqrt(integ*integ)<1E-12)
-                integ=0.0;
-            //std::cout<<"integral "<<integ<<" fluxTerm "<<flux_term<<" j: "<<j<<std::endl;
-            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)*meshWidth_[0]- flux_term*1/(2 * j + 1)*meshWidth_[0];
+            VdM_->VdM_t_(i,j) = integ*(2 * j + 1)/meshWidth_[0]- flux_term*(2 * j + 1)/meshWidth_[0];
         }
     }
 }
 
 //TODO this is not RIGHT???
-double Computation::integralFlux(int i ,int j)
+double Computation::integralFlux(int i ,int j,Array2D VdM)
 {
     double a = grid_->faces(i),b = grid_->faces(i+1);
-    // double point = 0.0;
-    // for (int k = 0; k < VdM_->VdM_.size()[1]; k++)
-    // {
-    //     point += VdM_->VdM_(i,k)*quad_->LegendrePolynomialAndDerivative(j,quad_->basis_.nodes(k))[0];
-    // }
     
     return      quad_->IntFluxGaussLegendreQuad([&](double x) {
-        //0.5 * (b - a) * x + 0.5 * (b + a)
-            return flux_.compute(x);//grid_->u(i)*quad_->LegendrePolynomialAndDerivative(j,x)[0]);
-            },i,j ,a, b,VdM_->VdM());
+                        return flux_.compute(x);
+                             },i,j ,a, b,VdM);
 }
 
 double Computation::integralInit(double x, int j)
@@ -423,3 +324,64 @@ double Computation::integralInit(double x, int j)
     return init;
 }
 
+void Computation::rungeKutta5()
+{
+    // Coefficients for 5-stage RK
+    constexpr double a[5][5] = {
+        {0, 0, 0, 0, 0},
+        {1.0 / 5.0, 0, 0, 0, 0},
+        {3.0 / 40.0, 9.0 / 40.0, 0, 0, 0},
+        {44.0 / 45.0, -56.0 / 15.0, 32.0 / 9.0, 0, 0},
+        {19372.0 / 6561.0, -25360.0 / 2187.0, 64448.0 / 6561.0, -212.0 / 729.0, 0}
+    };
+    constexpr double b[5] = {9017.0 / 3168.0, -355.0 / 33.0, 46732.0 / 5247.0, 49.0 / 176.0, 5103.0 / 18656.0};
+    constexpr double c[5] = {0, 1.0 / 5.0, 3.0 / 10.0, 4.0 / 5.0, 8.0 / 9.0};
+
+    // Temporary storage for each stage
+    Array2D VdM_temp = Array2D(VdM_->VdM_.size());
+    Array3D k = Array3D({5,VdM_->VdM_.size()[0], VdM_->VdM_.size()[1]}); // Stage derivatives
+    Array1D u_temp = Array1D(grid_->u_.size());    
+
+    // Loop through stages
+    for (int stage = 0; stage < 5; ++stage) {
+        // Compute intermediate state
+        for (int i = 0; i < grid_->faces_.size()[0] - 1; ++i) {
+            for (int j = 0; j < VdM_->VdM_.size()[1]; ++j) {
+                double increment = 0.0;
+                for (int s = 0; s < stage; ++s) {
+                    increment += dt_ * a[stage][s] * k(s, i, j);  // Use k for stage derivatives
+                }
+                VdM_temp(i, j) = VdM_->VdM_(i, j) + increment;
+            }
+            double increment_u = 0.0;
+            for (int s = 0; s < stage; ++s) {
+                increment_u += dt_ * a[stage][s] * k(s, i, 0);  // Use k for u_t if applicable
+            }
+            u_temp(i) = grid_->u(i) + increment_u;
+        }
+        calcUdt(VdM_temp);
+        fillUt();  // Ensure these are updating time derivatives
+        for (int i = 0; i < grid_->faces_.size()[0] - 1; ++i) {
+            for (int j = 0; j < VdM_->VdM_.size()[1]; ++j) {
+                k(stage, i, j) = VdM_->VdM_t_(i, j);  // Store the time derivative for this stage
+            }
+            grid_->ut(i) = grid_->ut(i);  // Store u's time derivative appropriately
+        }
+    }
+
+    for (int i = 0; i < grid_->faces_.size()[0] - 1; ++i) {
+        for (int j = 0; j < VdM_->VdM_.size()[1]; ++j) {
+            double update = 0.0;
+            for (int stage = 0; stage < 5; ++stage) {
+                update += b[stage] * k(stage, i, j);  // Use stage time derivatives
+            }
+            VdM_->VdM_(i, j) += dt_ * update;  // Final update
+        }
+        double update_u = 0.0;
+        for (int stage = 0; stage < 5; ++stage) {
+            update_u += b[stage] * grid_->ut(i);
+        }
+        grid_->u(i) += dt_ * update_u;
+    }
+
+}

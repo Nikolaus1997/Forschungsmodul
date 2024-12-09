@@ -1,4 +1,5 @@
 #pragma once
+#include "flux.h"
 #include <stdexcept>
 #include <functional>
 
@@ -13,13 +14,13 @@ class NumericalFlux
     void setNumFluxFunction(FunctionType type);
 
     // Compute the flux based on the selected function
-    double computeNumFlux(double x_l, double x_r);
+    double computeNumFlux(double x_l, double x_r,Flux flux_);
 
     // Individual flux functions
-    double upwind(double x_l, double x_r);
-    double downwind(double x_l, double x_r);
-    double lax(double x_l, double x_r);
-    double enquist(double x_l, double x_r);
+    double upwind(double x_l, double x_r, Flux flux_);
+    double downwind(double x_l, double x_r, Flux flux_);
+    double lax(double x_l, double x_r, Flux flux_);
+    double enquist(double x_l, double x_r, Flux flux_);
 
 private:
     FunctionType selectedFunction; // Stores the currently selected function

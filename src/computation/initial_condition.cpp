@@ -45,5 +45,5 @@ double InitialCondition::negativeUnitStep(double x, double a, double b)
 
 double InitialCondition::sinusFunc(double x, double a, double b)
 {
-    return sin(x);
+    return sin(2*x);
 }

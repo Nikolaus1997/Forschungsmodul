@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
    computation/initial_condition.cpp
 
    storage/array1d.cpp 
+   storage/array3d.cpp
    storage/variable.cpp 
    storage/basis_storage.cpp
 

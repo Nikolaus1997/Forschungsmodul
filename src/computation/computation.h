@@ -10,11 +10,15 @@
 #include "output_writer/output_writer_paraview.h"
 #include "dg/num_flux.h"
 #include "analyze/timer.cpp"
+#include "storage/array3d.h"
 
 #include <memory>
+#include <vector>
 #include <cmath>
 #include <algorithm>
 #include <array>
+#include <unistd.h>
+#include <thread> 
 
 /**
  * This class contains the main loop over all time steps of the simulation and all methods that are called in this loop.
@@ -36,12 +40,13 @@ class Computation
         void initVdm();
         void eulerTimeStep();
         void rungeKutta();
+        void rungeKutta5();
         void fillFaces();
-        void calcUdt();
+        void calcUdt(Array2D VdM);
         void calcU1dt();
         void calcU2dt();        
         void fillNumFlux();
-        double integralFlux( int i ,int j);
+        double integralFlux( int i ,int j, Array2D VdM);
         double integralInit(double x, int j);
     
     private:

@@ -70,6 +70,6 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
 
     // Scale by the length of the interval
     sol *= 0.5 * (b - a);
-    //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
+    // std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }

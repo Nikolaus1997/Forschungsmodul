@@ -1,4 +1,4 @@
-# Install script for directory: /media/nikolaus/PortableDrive/Studium/Forschungsmodul/src
+# Install script for directory: /home/nikolaus/Studium/Forschungsmodul/src
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -37,30 +37,35 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  if(EXISTS "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM")
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
+  if(EXISTS "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM")
     file(RPATH_CHECK
-         FILE "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM"
+         FILE "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM"
          RPATH "")
   endif()
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM")
+   "/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-file(INSTALL DESTINATION "/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build" TYPE EXECUTABLE FILES "/media/nikolaus/PortableDrive/Studium/Forschungsmodul/build/src/DG_FM")
-  if(EXISTS "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM" AND
-     NOT IS_SYMLINK "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM")
+  file(INSTALL DESTINATION "/home/nikolaus/Studium/Forschungsmodul/src/../build" TYPE EXECUTABLE FILES "/home/nikolaus/Studium/Forschungsmodul/build/src/DG_FM")
+  if(EXISTS "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM" AND
+     NOT IS_SYMLINK "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM")
     file(RPATH_CHANGE
-         FILE "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM"
+         FILE "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM"
          OLD_RPATH "/usr/local/lib:"
          NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
-      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM")
+      execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM")
     endif()
   endif()
 endif()
