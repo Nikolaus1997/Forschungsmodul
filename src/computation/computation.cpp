@@ -289,21 +289,21 @@ void Computation::calcUdt()
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(nCells_[0]-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus) ;
             }else if (i==grid_->faces_.size()[0] - 2)
             {
                 double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(0,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)  + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j)  + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
             }else{
             // Compute the numerical flux
                 double ul_i = VdM_->VdM_(i,j)*VdM_->L_(0,j);
                 double ur_i = VdM_->VdM_(i,j)*VdM_->L_(nNodes,j);
                 double ur_iminus  = VdM_->VdM_(i-1,j)*VdM_->L_(nNodes,j);
                 double ul_iplus = VdM_->VdM_(i+1,j)*VdM_->L_(0,j);
-                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
+                flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i)* pow(-1, j) + gFlux_.computeNumFlux(ur_i, ul_iplus);//* pow(-1, j) ;
             }
             //std::cout<<"flux  "<<flux_term<<std::endl;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
@@ -313,7 +313,7 @@ void Computation::calcUdt()
             // if(sqrt(integ*integ)<1E-12)
             //     integ=0.0;
             //std::cout<<"integral "<<integ<<" fluxTerm "<<flux_term<<" j: "<<j<<std::endl;
-            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)*meshWidth_[0]- flux_term*1/(2 * j + 1)*meshWidth_[0];
+            VdM_->VdM_t_(i, j) = integ*1/(2 * j + 1)- (flux_term*1/(2 * j + 1))*1/meshWidth_[0];
         }
     }
 }
