@@ -175,6 +175,12 @@ void Settings::loadFromFile(std::string filename)
     if(parameterName=="initCondB"){
       initCondB = atof(parameterValue.c_str());
     }
+    if(parameterName=="BarenblattM"){
+      BarenblattM = atoi(parameterValue.c_str());
+    }
+    if(parameterName=="BarenblattTime"){
+      BarenblattTime = atof(parameterValue.c_str());
+    }
   }
 }
 

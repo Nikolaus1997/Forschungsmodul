@@ -21,6 +21,9 @@ struct Settings
   double initCondA = 0.0;                     //< Starting point of the initial Condition
   double initCondB = 0.0;                     //< End point of the initial Condition
 
+  int BarenblattM = 2;
+  double BarenblattTime= 1.0;
+
   std::array<double,2> dirichletBcBottom;  //< prescribed values of u,v at bottom of domain
   std::array<double,2> dirichletBcTop;     //< prescribed values of u,v at top of domain
   std::array<double,2> dirichletBcLeft;    //< prescribed values of u,v at left of domain

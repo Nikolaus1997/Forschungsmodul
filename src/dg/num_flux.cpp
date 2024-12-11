@@ -9,47 +9,47 @@ void NumericalFlux::setNumFluxFunction(FunctionType type)
 }
 
 // Compute the numerical flux based on the selected function
-double NumericalFlux::computeNumFlux(double x_l, double x_r,Flux flux_)
+double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_)
 {
     switch (selectedFunction)
     {
     case FunctionType::upwind:
-        return upwind(x_l, x_r,flux_);
+        return upwind(u_l, u_r,flux_);
     case FunctionType::downwind:
-        return downwind(x_l, x_r,flux_);
+        return downwind(u_l, u_r,flux_);
     case FunctionType::lax:
-        return lax(x_l, x_r,flux_);
+        return lax(u_l, u_r,flux_);
     case FunctionType::enquist:
-        return enquist(x_l, x_r,flux_);
+        return enquist(u_l, u_r,flux_);
     default:
         throw std::invalid_argument("Unknown numerical flux function type.");
     }
 }
 
 // Upwind flux function
-double NumericalFlux::upwind(double x_l, double x_r,Flux flux_)
+double NumericalFlux::upwind(double u_l, double u_r,Flux flux_)
 {
     // Example implementation: use left flux value
-    return flux_.compute(x_l);
+    return flux_.compute(u_l);
 }
 
 // Downwind flux function
-double NumericalFlux::downwind(double x_l, double x_r, Flux flux_)
+double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 {
     // Example implementation: use right flux value
-    return flux_.compute(x_r);
+    return flux_.compute(u_r);
 }
 
 // Lax flux function
-double NumericalFlux::lax(double x_l, double x_r, Flux flux_)
+double NumericalFlux::lax(double u_l, double u_r, Flux flux_)
 {
     // Example implementation: average of left and right
-    return 0.5 * (flux_.compute(x_l) + flux_.compute(x_r))+0.5*(x_l-x_r);
+    return 0.5 * (flux_.compute(u_l) + flux_.compute(u_r))+0.5*(u_l-u_r);
 }
 
 // Enquist flux function
-double NumericalFlux::enquist(double x_l, double x_r, Flux flux_)
+double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
 {
 
-    return (x_l > x_r) ? x_l : x_r;
+    return (u_l > u_r) ? u_l : u_r;
 }

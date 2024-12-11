@@ -101,6 +101,10 @@ void Computation::initialize(std::string filename)
     {
         initialCond_.setInitialCondType(InitialCondition::InitialCondType::Sinus);
         std::cout<< "Choosing the sinus as initial condition..."<<std::endl;
+    }else if (settings_.initialCondition == "barenblatt")
+    {
+        initialCond_.setInitialCondType(InitialCondition::InitialCondType::Barenblatt);
+        std::cout<< "Choosing the barenblatt function as initial condition..."<<std::endl;        
     }else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
@@ -115,17 +119,17 @@ void Computation::initialize(std::string filename)
     initVdm();
     fillU();
     double numberofIterations = settings_.endTime/dt_;
+    if(time_<dt_){
+        outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
+        outputWriterParaview_->writeFile(time_,settings_.OutputName);
+    }
 
 while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
     {
-        // calcUdt(VdM_->VdM());
-        // fillUt();
-        // eulerTimeStep();
-        rungeKutta5();
-        if(time_==0){
-        outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
-        outputWriterParaview_->writeFile(time_,settings_.OutputName);
-        }
+         calcUdt(VdM_->VdM());
+         fillUt();
+         eulerTimeStep();
+        //rungeKutta5();
 
         //fillU();
 
@@ -195,9 +199,17 @@ void Computation::initVdm()
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <VdM_->VdM_.size()[1]; j++) {
             // Iterate over Gauss-Legendre nodes for accuracy
-            VdM_->VdM_(i,j) = quad_->IntGaussLegendreQuad([&](double x) {
-                                return initialCond_.computeInitialCondition(x,initCondA_,initCondB_);
+            if(InitialCondition::InitialCondType::Barenblatt==initialCond_.selectedFunction){
+                VdM_->VdM_(i,j) = quad_->IntGaussLegendreQuad([&](double x) {
+                            return initialCond_.computeInitialCondition(x,initCondA_,initCondB_,settings_.BarenblattTime,settings_.BarenblattM);
+                            },j ,grid_->faces(i), grid_->faces(i+1))*(2*j+1)/meshWidth_[0]; 
+            }else{
+                VdM_->VdM_(i,j) = quad_->IntGaussLegendreQuad([&](double x) {
+                            return initialCond_.computeInitialCondition(x,initCondA_,initCondB_);
                             },j ,grid_->faces(i), grid_->faces(i+1))*(2*j+1)/meshWidth_[0];  
+
+            }
+
 
             for (int p = 0; p <quad_->basis_.nodes_.size()[0]; p++) {     
                         double L = quad_->LegendrePolynomialAndDerivative(j,quad_->basis_.nodes(p))[0] ;

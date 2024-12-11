@@ -64,6 +64,33 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
         {
             evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
+        double intermediate_sol= GaussLegendreQuad(func,0,evaluation);
+        //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
+        sol += weight * intermediate_sol*L_prime;
+    }
+
+    // Scale by the length of the interval
+    sol *= 0.5 * (b - a);
+    // std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
+    return sol;
+}
+
+double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, double a, double b, Array2D Vdm)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int k = 1; k < length-1; k++)
+    {
+        double node = basis_.nodes(k);
+        double weight = basis_.weights(k);
+        double evaluation=0.0;
+        // Transforming the node from [-1, 1] to [a, b]
+        double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
+        for(int p = 0;p<Vdm.size()[1];p++)
+        {
+            evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
+        }
         //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
         sol += weight * func(evaluation)*L_prime;
     }
@@ -73,3 +100,5 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
     // std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
+//TODO IntFluxU
+//TODO implement numerical fluxes
