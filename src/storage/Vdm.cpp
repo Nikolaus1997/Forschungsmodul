@@ -1,7 +1,7 @@
 #include "Vdm.h"
 
 Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
-VdM_(size),VdM1_(size),VdM2_(size),L_({nNodes,size[1]}),L_prime_({nNodes,size[1]}),VdM_t_(size)
+VdM_(size),VdMQ_(size),VdM1_(size),VdM2_(size),L_({nNodes,size[1]}),L_prime_({nNodes,size[1]}),VdM_t_(size)
 {
 }
 
@@ -52,6 +52,11 @@ Array2D &Vandermonde::VdMt()
     return VdM_t_;
 }
 
+Array2D &Vandermonde::VdMQ()
+{
+    return VdMQ_;
+}
+
 double Vandermonde::VdM(int i, int j) const
 {
     return VdM_(i,j);
@@ -60,6 +65,16 @@ double Vandermonde::VdM(int i, int j) const
 double &Vandermonde::VdM(int i, int j)
 {
     return VdM_(i,j);
+}
+
+double Vandermonde::VdMQ(int i, int j) const
+{
+    return VdMQ_(i,j);
+}
+
+double &Vandermonde::VdMQ(int i, int j)
+{
+    return VdMQ_(i,j);
 }
 
 double Vandermonde::VdMt(int i, int j) const

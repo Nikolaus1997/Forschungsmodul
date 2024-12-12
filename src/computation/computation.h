@@ -35,14 +35,17 @@ class Computation
         void fillX();
         void fillU();
         void fillUt();
-        void calcQ();
+        void calcQ(const Array2D& VdM);
+        double integralQ(int i, int j,double m, const Array2D& Vdm);
+        double integralU(int i, int j,double m, const Array2D& Vdm, const Array2D& VdmQ);
         void initVdm();
         void eulerTimeStep();
         void rungeKutta();
         void rungeKutta5();
         void fillFaces();
-        void calcUdt(Array2D VdM);
-        double integralFlux( int i ,int j, Array2D VdM);
+        void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
+        void calcUdt(const Array2D& Vdm);
+        double integralFlux( int i ,int j, const Array2D& Vdm);
         double integralInit(double x, int j);
     
     private:

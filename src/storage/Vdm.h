@@ -11,11 +11,17 @@ class Vandermonde: public Array2D
         void LprimePrintValues();
         
         Array2D &VdM();
-        Array2D &VdMt();        
+        Array2D &VdMt();      
+        Array2D &VdMQ();    
 
         double VdM(int i, int j) const;
 
         double &VdM(int i, int j);
+
+
+        double VdMQ(int i, int j) const;
+
+        double &VdMQ(int i, int j);
 
         double VdMt(int i, int j) const;
 
@@ -24,6 +30,7 @@ class Vandermonde: public Array2D
     protected:
         Array2D VdM_;
         Array2D VdM_t_;
+        Array2D VdMQ_;
         Array2D VdM1_;
         Array2D VdM2_;
         Array2D L_;

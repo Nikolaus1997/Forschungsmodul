@@ -59,7 +59,7 @@ double InitialCondition::negativeUnitStep(double x, double a, double b)
 
 double InitialCondition::sinusFunc(double x, double a, double b)
 {
-    return sin(2*x);
+    return sin(x);
 }
 //like in the papaer from ZhangWu
 // never ever just use an int as multiplicator

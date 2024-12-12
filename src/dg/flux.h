@@ -30,6 +30,7 @@ public:
 private:
     FunctionType selectedFunction; // Stores the currently selected function
     friend class OutputWriterParaview;
+    friend class Computation;
 };
 
 
