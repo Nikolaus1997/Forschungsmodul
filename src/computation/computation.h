@@ -11,6 +11,7 @@
 #include "dg/num_flux.h"
 #include "analyze/timer.cpp"
 #include "storage/array3d.h"
+#include "limiter/limiter.h"
 
 #include <memory>
 #include <vector>
@@ -45,6 +46,7 @@ class Computation
         void fillFaces();
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
         void calcUdt(const Array2D& Vdm);
+        void applyLimiter(const Array2D& Vdm);
         double integralFlux( int i ,int j, const Array2D& Vdm);
         double integralInit(double x, int j);
     
@@ -64,6 +66,7 @@ class Computation
         double initCondB_;
         int PP_N_;
         Flux flux_;
+        Limiter limiter_;
         NumericalFlux gFlux_;
         InitialCondition initialCond_;
         std::shared_ptr<Vandermonde> VdM_;

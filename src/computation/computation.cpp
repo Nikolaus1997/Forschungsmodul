@@ -43,7 +43,10 @@ void Computation::initialize(std::string filename)
         quad_ = std::make_unique<Quadrature>(nNodes);
         quad_->LegendreGaussNodesAndWeights(nNodes);
     }
-
+    //TODO flesh out
+    if(true){
+        limiter_.setLimiterFunction(Limiter::FunctionType::minmod);
+    }
 
     quad_->basis_.weights_.printValues();
     quad_->basis_.nodes_.printValues();
@@ -137,9 +140,12 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
             //eulerTimeStep();
             rungeKutta5();
         }else{
-            //  calcQ(VdM_->VdM());
-            //  calcUdt(VdM_->VdM(),VdM_->VdMQ());
-            rungeKutta5();
+            // calcQ(VdM_->VdM());
+            // calcUdt(VdM_->VdM(),VdM_->VdMQ());
+            // applyLimiter(VdM_->VdMt());
+            rungeKutta();
+            //eulerTimeStep();
+            //
         }
 
 
@@ -147,8 +153,11 @@ while (time_<settings_.endTime and iter<settings_.maximumNumberOfIterations)
 
         time_=time_+dt_;
         //std::cout<<"CalcTimestep: "<<dt_<<std::endl;
-        if(iter % numberN ==0)
+        if(iter % numberN ==0){
+            std::cout<<" TIME: "<<time_<<std::endl;
             outputWriterParaview_->writeFile(time_,settings_.OutputName);
+        }
+
         iter++;
         std::cout<<"\rCurrent Iteration: "<<iter<<" End Iter: "<<numberofIterations<< std::flush;
     }
@@ -385,7 +394,14 @@ void Computation::eulerTimeStep()
 
 void Computation::rungeKutta() {
     // Step 1: Compute the intermediate stage u^(1)
-    calcUdt(VdM_->VdM_); // Compute the time derivative for u^n
+    if(settings_.BarenblattM==0){
+        calcUdt(VdM_->VdM_); // Compute the time derivative for u^n
+    }else
+    {
+        calcQ(VdM_->VdM_);
+        calcUdt(VdM_->VdM(),VdM_->VdMQ());
+    }
+
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
             // u^(1) = u^n + Δt * L_h(u^n)
@@ -405,7 +421,13 @@ void Computation::rungeKutta() {
     }
 
     // Step 2: Compute the intermediate stage u^(2)
-    calcUdt(VdM_->VdM1_); // Compute the time derivative for u^(1)
+    if(settings_.BarenblattM==0){
+        calcUdt(VdM_->VdM1_); // Compute the time derivative for u^n
+    }else
+    {
+        calcQ(VdM_->VdM1_);
+        calcUdt(VdM_->VdM1_,VdM_->VdMQ());
+    }// Compute the time derivative for u^(1)
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
@@ -426,8 +448,14 @@ void Computation::rungeKutta() {
         grid_->u2(i) *= 1.0 / nNodes;
     }
 
-    // Step 3: Compute the final stage u^(n+1)
-    calcUdt(VdM_->VdM2_); // Compute the time derivative for u^(2)
+    // Step 2: Compute the intermediate stage u^(2)
+    if(settings_.BarenblattM==0){
+        calcUdt(VdM_->VdM2_); // Compute the time derivative for u^n
+    }else
+    {
+        calcQ(VdM_->VdM1_);
+        calcUdt(VdM_->VdM2_,VdM_->VdMQ());
+    } // Compute the time derivative for u^(2)
     fillUt(); // Ensure all updates to time derivatives are reflected
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
@@ -496,6 +524,46 @@ void Computation::calcUdt(const Array2D& VdM){
             // if(sqrt(integ*integ)<1E-12)
             //     integ=0.0;
             VdM_->VdM_t_(i,j) = integ*(2 * j + 1)/meshWidth_[0]- flux_term*(2 * j + 1)/meshWidth_[0];
+        }
+    }
+}
+
+void Computation::applyLimiter(const Array2D &Vdm)
+{
+    for(int i=0;i<grid_->u_.size()[0];i++){
+        double limit_l=0.0, limit_r=0.0;
+        double u_r =0.0, u_l =0.0;
+        if(i==0){
+            for(int j = 0;j<VdM_->VdM_.size()[1];j++){
+                u_l = Vdm(i,j)*VdM_->L_(0,j);
+                u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
+            }
+            limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->u(i)-grid_->ut(nCells_[0]-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
+            limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->u(i)-grid_->ut(nCells_[0]-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
+        }else if(i==nCells_[0]-1){
+            for(int j = 0;j<VdM_->VdM_.size()[1];j++){
+                u_l = Vdm(i,j)*VdM_->L_(0,j);
+                u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
+            }
+            limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->ut(i)-grid_->ut(nCells_[0]-1),grid_->ut(0)-grid_->ut(i),meshWidth_[0]);
+            limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->ut(i)-grid_->ut(nCells_[0]-1),grid_->ut(0)-grid_->ut(i),meshWidth_[0]);
+        }else{
+            for(int j = 0;j<VdM_->VdM_.size()[1];j++){
+                u_l = Vdm(i,j)*VdM_->L_(0,j);
+                u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
+            }
+            limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->ut(i)-grid_->ut(i-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
+            limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->ut(i)-grid_->ut(i-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
+        }
+        if(limit_l!=u_l or limit_r!=u_r){
+            double u_temp=0.0;
+            for(int p=1; p<quad_->basis_.nodes_.size()[0]-1;p++){
+                for(int k = 0;k<2;k++){
+                    u_temp+=Vdm(i,k)*VdM_->L_(p,k);
+                }
+                u_temp*=1/nNodes;
+            }
+            grid_->ut(i) = u_temp;
         }
     }
 }
