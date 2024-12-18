@@ -48,5 +48,5 @@ double Flux::buckleyLeverett(double x) {
 
 std::array<double, 2> Flux::barenBlattFlux(double u, double q, double m)
 {
-    return {(m*pow(u,m-1)-sqrt(m*pow(u,m-1))*q),(-sqrt(m*pow(u,m-1)))};
+    return {(-sqrt(m*pow(u,m-1))*q),(-sqrt(double(m*pow(u,m-1))))};
 }

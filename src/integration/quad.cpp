@@ -92,6 +92,7 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         }
         double intermediate_sol= GaussLegendreQuad(func,0,evaluation);
         //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
+        //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
         sol += weight * intermediate_sol*L_prime;
     }
 
@@ -124,7 +125,8 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
             evaluationU += Vdm(i, p) * legendreValues[p];
             evaluationQ += VdmQ(i, p) * legendreValues[p];
         }
-
+        // std::cout<<"EvalU: "<<evaluationU<<" EvalQ: "<<evaluationQ<<std::endl;
+        // std::cout<<"Weight: "<<weight<<" L_prime: "<<L_prime<<std::endl;
         double intermediate_sol = func(evaluationU, evaluationQ);
         sol += weight * intermediate_sol * L_prime;
     }

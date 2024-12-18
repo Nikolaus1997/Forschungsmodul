@@ -62,18 +62,18 @@ double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
 std::array<double,2> NumericalFlux::porousMedia(double u_l, double u_r, double q_l, double q_r, double m, Flux flux_,const std::unique_ptr<Quadrature>& quad_)
 {   
     double g_plus =0.0,g_minus =0.0;
-    double g_mean = 0.5*(g_plus+g_minus);
     double u_diff = u_r-u_l;
     double q_diff = q_r-q_l;
     double q_mean = 0.5*(q_r+q_l);
     double fraction_term =0.0;
-    if(sqrt(pow(u_diff,2))<1e16){
-        fraction_term = flux_.compute(u_l,0,m)[1];
+    if(sqrt(pow(u_diff,2))<1e-18){
+        fraction_term = -1.0*flux_.compute(u_l,0,m)[1];
     }else{
-        g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0,u_r);
-        g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0,u_l);
+        g_plus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        g_minus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
         fraction_term = (g_plus-g_minus)/u_diff;
     }
+    double g_mean = 0.5*(g_plus+g_minus);
     double gamma = 0.5*fraction_term;
     return {-fraction_term*q_mean-gamma*q_diff,-g_mean+gamma*u_diff};
 }
