@@ -44,6 +44,8 @@ class Computation
         void rungeKutta();
         void rungeKutta5();
         void fillFaces();
+        void calcDt();
+        void calcError(double currenTime);
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
         void calcUdt(const Array2D& Vdm);
         void applyLimiter(const Array2D& Vdm);

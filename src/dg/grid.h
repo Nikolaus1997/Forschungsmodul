@@ -53,6 +53,18 @@ public:
 
     double &faces(int i);
 
+    const Variable &l2_error() const;
+    
+    double l2_error(int i) const;
+    
+    double &l2_error(int i);
+
+    const Variable &linf_error() const;
+
+    double linf_error(int i) const;
+
+    double &linf_error(int i);
+
 
     const Variable &rhs() const;
 
@@ -72,6 +84,8 @@ protected:
     Variable ut_;
     Variable x_;
     Variable faces_;
+    Variable l2_error_;
+    Variable linf_error_;
     Variable rhs_;
     friend class Computation;
     friend class OutputWriterParaview;

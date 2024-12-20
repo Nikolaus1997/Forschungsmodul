@@ -8,7 +8,9 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({nCells_[0]},   meshWidth_),
                                         u2_     ({nCells_[0]},   meshWidth_),
                                         x_      ({nCells_[0]},   meshWidth_),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
-                                        rhs_    (nCells_,   meshWidth_)
+                                        rhs_    (nCells_,   meshWidth_),
+                                        l2_error_({1},   meshWidth_),
+                                        linf_error_({1},   meshWidth_)
 {
 }
 const std::array<double,1> Grid::meshWidth() const
@@ -111,6 +113,37 @@ double &Grid::faces(int i)
 
     return faces_(i);
 }
+
+const Variable &Grid::l2_error() const
+{
+    return l2_error_;
+}
+
+double Grid::l2_error(int i) const
+{
+    return l2_error_(i);
+}
+
+double &Grid::l2_error(int i)
+{
+    return l2_error_(i);
+}
+
+const Variable &Grid::linf_error() const
+{
+    return linf_error_;
+}
+
+double Grid::linf_error(int i) const
+{
+    return linf_error_(i);
+}
+
+double &Grid::linf_error(int i)
+{
+    return linf_error_(i);
+}
+
 
 const Variable &Grid::rhs() const
 {

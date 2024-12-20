@@ -122,23 +122,25 @@ void Computation::initialize(std::string filename)
     double time_ = 0.0;
     int iter = 0.0;
     fillFaces();
-    int numberN = 1/dt_*0.001;
     fillX();
     initVdm();
     fillU();
+    // calcDt();
     double numberofIterations = settings_.endTime/dt_;
+    dt_ = settings_.CFL*1/(nCells_[0]*nCells_[0])*1/double(settings_.BarenblattM);
+    int numberN = 1/dt_*0.001;
     if(time_<dt_){
         outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
         outputWriterParaview_->writeFile(time_,settings_.OutputName);
     }
-
+double errorTime = 0.0;
 while (time_<settings_.endTime)
     {
         if(settings_.BarenblattM==0){
-            //calcUdt(VdM_->VdM());
+            calcUdt(VdM_->VdM());
             //
-            //eulerTimeStep();
-            rungeKutta5();
+            eulerTimeStep();
+            //rungeKutta5();
         }else{
             calcQ(VdM_->VdM());
             calcUdt(VdM_->VdM(),VdM_->VdMQ());
@@ -152,19 +154,20 @@ while (time_<settings_.endTime)
 
 
         //fillU();
-
+        errorTime=time_+1.0;
         time_=time_+dt_;
         //std::cout<<"CalcTimestep: "<<dt_<<std::endl;
         if(iter % numberN ==0){
             std::cout<<" TIME: "<<time_<<std::endl;
             outputWriterParaview_->writeFile(time_,settings_.OutputName);
+            calcError(errorTime);
         }
-
+        // calcDt();
         iter++;
         std::cout<<"\rCurrent Iteration: "<<iter<<" End Iter: "<<numberofIterations<< std::flush;
     }
 
-    
+    calcError(errorTime);
 
     // std::cout<<"x: "<<std::endl;
     // grid_->x_.printValues();
@@ -207,6 +210,25 @@ void Computation::fillU() {
         grid_->u(i)*=1/(nNodes);
     }
 
+}
+
+void Computation::calcDt(){
+    double max = 0.0;
+    double dx =0.0;
+    double c = 0.0;
+    for(int i=0;i<grid_->u_.size()[0];i++){
+        double u = grid_->u(i);
+        if(u==0)
+            continue;
+        dx = grid_->faces(i+1)-grid_->faces(i);
+        c = flux_.compute(u,0.0,double(settings_.BarenblattM))[1]*flux_.compute(u,0.0,double(settings_.BarenblattM))[1];
+        double dt = settings_.CFL*dx*dx/c*0.5;
+        if(dt>max){
+            max = dt;
+        }
+    }
+    dt_ = max;
+    //std::cout<<" DT "<<dt_<<std::endl;
 }
 
 void Computation::fillUt()
@@ -502,6 +524,38 @@ void Computation::fillFaces()
         grid_->faces(i) = a_+i*meshWidth_[0];
     }
     
+}
+
+void Computation::calcError(double currentTime)
+{
+    if(settings_.BarenblattM!=0){
+        grid_->l2_error(0) = 0.0;
+        for(int i =0;i<grid_->u_.size()[0];i++){
+            if(fabs(grid_->x(i))>=1.5)
+                grid_->l2_error(0) += (grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_,currentTime, settings_.BarenblattM))
+                                    *(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i), initCondA_, initCondB_,currentTime, settings_.BarenblattM));
+        }
+        
+        grid_->linf_error(0) = 0.0;
+        for(int i =0;i<grid_->u_.size()[0];i++){
+            if(grid_->linf_error(0)<fabs(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_,currentTime, settings_.BarenblattM))and fabs(grid_->x(i))>=1.5) 
+                grid_->linf_error(0) = fabs(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_,currentTime, settings_.BarenblattM));
+        }
+    }else{
+        grid_->l2_error(0) = 0.0;
+        for(int i =0;i<grid_->u_.size()[0];i++){
+            grid_->l2_error(0) += (grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_))
+                                *(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i), initCondA_, initCondB_));
+        }
+        
+        grid_->linf_error(0) = 0.0;
+        for(int i =0;i<grid_->u_.size()[0];i++){
+            if(grid_->linf_error(0)<fabs(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_))) 
+                grid_->linf_error(0) = fabs(grid_->u(i)-initialCond_.computeInitialCondition(grid_->x(i),initCondA_,initCondB_));
+        }
+    }
+
+    std::cout<<"L2 Error: "<<grid_->l2_error(0)<<" Linf Error: "<<grid_->linf_error(0)<<std::endl;
 }
 
 void Computation::calcUdt(const Array2D& VdM){
