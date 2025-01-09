@@ -32,10 +32,10 @@ void Vandermonde::LprintValues()
 
 void Vandermonde::LprimePrintValues()
 {
-    for (int i = 0; i < VdM_.size()[1]; i++)
+    for (int i = 0; i < L_prime_.size()[1]; i++)
     {
         std::cout<<"PP_N "<<i<<" :";
-        for(int j= 0; j<VdM_.size()[0];j++){
+        for(int j= 0; j<L_prime_.size()[0];j++){
             std::cout<<L_prime_(j,i)<<" ";
         }
         std::cout<<";"<<std::endl;

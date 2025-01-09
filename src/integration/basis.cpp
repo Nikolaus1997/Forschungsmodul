@@ -45,7 +45,7 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
         {
             basis_.weights(1) = 1.0;
             basis_.weights(2) = 1.0;
-            basis_.nodes(1) = -std::sqrt(1/3);
+            basis_.nodes(1) = -std::sqrt(1.0 / 3.0);
             basis_.nodes(2) = - basis_.nodes(1);
         }else if(N!=0)
         {

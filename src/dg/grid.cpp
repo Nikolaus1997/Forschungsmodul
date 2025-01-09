@@ -2,11 +2,11 @@
 #include "grid.h"
 
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
-nCells_(nCells), meshWidth_(meshWidth), u_      ({nCells_[0]},   meshWidth_),
-                                        ut_      ({nCells_[0]},   meshWidth_),
-                                        u1_     ({nCells_[0]},   meshWidth_),
-                                        u2_     ({nCells_[0]},   meshWidth_),
-                                        x_      ({nCells_[0]},   meshWidth_),
+nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        ut_      ({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        u1_     ({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        u2_     ({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        x_      ({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_),
                                         l2_error_({1},   meshWidth_),

@@ -47,7 +47,7 @@ double Quadrature::IntGaussLegendreQuad(std::function<double(double)> func,int j
     //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
-
+// int i is the position index j is the polynomial index
 double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& Vdm)
 {
     int length = basis_.weights_.size()[0];
@@ -64,7 +64,7 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
         {
             evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
-        //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
+        std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
         sol += weight * func(evaluation)*L_prime;
     }
 
