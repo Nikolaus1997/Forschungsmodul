@@ -32,7 +32,8 @@ class Computation
         void initialize(std::string filename);
 
         //run the whole simulation until tend 
-        //void runSimulation();
+        void runSimulation();
+
         void fillX();
         void fillU();
         void fillUt();
@@ -49,7 +50,7 @@ class Computation
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
         void calcUdt(const Array2D& Vdm);
         void applyLimiter(const Array2D& Vdm);
-        double integralFlux( int i ,int j, const Array2D& Vdm);
+        double integralFlux( int i ,int j, const std::shared_ptr<Vandermonde> Vdm);
         double integralInit(double x, int j);
     
     private:

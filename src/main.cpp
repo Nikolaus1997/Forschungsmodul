@@ -43,7 +43,7 @@ std::cout <<R"(=================================================================
   
   auto computation = Computation();
   computation.initialize(filename);
-  //computation.runSimulation();
+  computation.runSimulation();
 
   return EXIT_SUCCESS;
 }

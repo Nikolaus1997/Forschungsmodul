@@ -1,1 +1,1 @@
-/media/nikolaus/PortableDrive/Studium/Forschungsmodul/src/../build/DG_FM
+/home/nikolaus/Studium/Forschungsmodul/src/../build/DG_FM

@@ -21,7 +21,7 @@ const std::array<int,1> Grid::nCells() const
 {
 return nCells_;
 }
-const Variable &Grid::u() const
+Variable &Grid::u()
 {
     return u_;
 }
@@ -36,7 +36,7 @@ double &Grid::u(int i)
     return u_(i);
 }
 
-const Variable &Grid::ut() const
+Variable &Grid::ut()
 {
     return ut_;
 }
@@ -164,4 +164,28 @@ double &Grid::rhs(int i)
 double Grid::dx() const
 {
     return meshWidth_[0];
+}
+
+void Grid::fillSolution(Variable& x,const std::shared_ptr<Vandermonde> VdM)
+{
+    for(int i=0;i<VdM->size()[0];i++){
+        for(int j=1;j<VdM->size()[1];j++){
+                x(i*(VdM->size()[1]-1)+j-1) =0.0;
+                for(int p=0;p<VdM->size()[1];p++){
+                    x(i*(VdM->size()[1]-1)+j-1) +=VdM->VdM(i,p)*VdM->L(j,p);
+                }
+            }
+    }
+}
+
+void Grid::fillDerivative(Variable& x,const std::shared_ptr<Vandermonde> VdM)
+{
+    for(int i=0;i<VdM->size()[0];i++){
+        for(int j=1;j<VdM->size()[1];j++){
+                x(i*(VdM->size()[1]-1)+j-1) =0.0;
+                for(int p=0;p<VdM->size()[1];p++){
+                    x(i*(VdM->size()[1]-1)+j-1) +=VdM->VdMt(i,p)*VdM->L(j,p);
+                }
+            }
+    }
 }

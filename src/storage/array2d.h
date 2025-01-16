@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <array>
+#include <iostream>
 
 /** This class represents a 2D array of double values.
  *  Internally they are stored consecutively in memory.
@@ -13,6 +14,8 @@ class Array2D
 public:
   //! constructor
   Array2D(std::array<int,2> size);
+
+  void printValues();
 
   //! get the size
   std::array<int,2> size() const;

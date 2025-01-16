@@ -1,7 +1,13 @@
 #include "Vdm.h"
 
 Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
-VdM_(size),VdMQ_(size),VdM1_(size),VdM2_(size),L_({nNodes,size[1]}),L_prime_({nNodes,size[1]}),VdM_t_(size)
+                    VdM_(size),
+                    VdMQ_(size),    
+                    VdM1_(size),
+                    VdM2_(size),
+                    L_({nNodes,size[1]}),
+                    L_prime_({nNodes,size[1]}), 
+                    VdM_t_(size)
 {
 }
 
@@ -24,7 +30,7 @@ void Vandermonde::LprintValues()
     {
         std::cout<<"PP_N "<<i<<" :";
         for(int j= 0; j<L_.size()[0];j++){
-            std::cout<<L_(j,i)<<" ";
+            std::cout<<L(j,i)<<" ";
         }
         std::cout<<";"<<std::endl;
     }
@@ -36,7 +42,7 @@ void Vandermonde::LprimePrintValues()
     {
         std::cout<<"PP_N "<<i<<" :";
         for(int j= 0; j<L_prime_.size()[0];j++){
-            std::cout<<L_prime_(j,i)<<" ";
+            std::cout<<L_prime(j,i)<<" ";
         }
         std::cout<<";"<<std::endl;
     }
@@ -85,4 +91,28 @@ double Vandermonde::VdMt(int i, int j) const
 double &Vandermonde::VdMt(int i, int j)
 {
     return VdM_t_(i,j);
+}
+
+double Vandermonde::L(int i, int j) const
+{
+    return L_(i,j);
+}
+
+double &Vandermonde::L(int i, int j)
+{
+    // TODO: insert return statement here
+    return L_(i,j);
+}
+
+
+
+double Vandermonde::L_prime(int i, int j) const
+{
+    return L_prime_(i,j);
+}
+
+double &Vandermonde::L_prime(int i, int j)
+{
+    // TODO: insert return statement here
+    return L_prime_(i,j);
 }

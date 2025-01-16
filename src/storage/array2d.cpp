@@ -1,5 +1,6 @@
 #include "storage/array2d.h"
 #include <cassert>
+#include "array2d.h"
 
 
 Array2D::Array2D(std::array<int,2> size) :
@@ -9,7 +10,17 @@ Array2D::Array2D(std::array<int,2> size) :
   data_.resize(size_[0]*size_[1], 0.0);
 }
 
-
+void Array2D::printValues()
+{
+  for (int j = 0; j < size_[1]; j++)
+  {
+    for (int i = 0; i < size_[0]; i++)
+    {
+      std::cout << operator()(i, j) << " ";
+    }
+    std::cout << std::endl;
+  }
+}
 //! get the size
 std::array<int,2> Array2D::size() const
 {

@@ -27,6 +27,14 @@ class Vandermonde: public Array2D
 
         double &VdMt(int i, int j);
 
+        double L(int i, int j) const;
+
+        double &L(int i, int j);
+
+        double L_prime(int i, int j) const;
+
+        double &L_prime(int i, int j);
+
     protected:
         Array2D VdM_;
         Array2D VdM_t_;

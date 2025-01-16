@@ -1,6 +1,8 @@
 #pragma once
 
 #include <storage/variable.h>
+#include <memory>   
+#include <storage/Vdm.h>
 
 
 class Grid
@@ -15,7 +17,7 @@ public:
     const std::array<int, 1> nCells() const;
 
 
-    const Variable &u() const;
+    Variable &u();
 
     double u(int i) const;
 
@@ -33,7 +35,7 @@ public:
 
     double &u1(int i);
 
-    const Variable &ut() const;
+    Variable &ut();
 
     double ut(int i) const;
 
@@ -74,6 +76,9 @@ public:
     
 
     double dx() const;
+
+    void fillSolution(Variable& x, std::shared_ptr<Vandermonde> VdM);
+    void fillDerivative(Variable& x, std::shared_ptr<Vandermonde> VdM);
 
 protected:
     const std::array<int, 1>        nCells_;

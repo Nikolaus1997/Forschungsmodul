@@ -78,6 +78,7 @@ std::array<double,2> NumericalFlux::porousMedia(double u_l, double u_r, double q
     }
     double g_mean = 0.5*(g_plus+g_minus);
     double gamma = 0.5*fraction_term;
-    std::cout<<" IN NUMERICAL FLUX"<<" u_l "<<u_l<<" u_r "<<u_r <<" udiff " << u_diff<<" g_mean "<<g_mean<<std::endl;
+    //std::cout<<" IN NUMERICAL FLUX"<<" u_l "<<u_l<<" u_r "<<u_r <<" udiff " << u_diff<<" g_mean "<<g_mean<<std::endl;
+    //std::cout<<" IN NUMERICAL FLUX"<<" q_diff "<<q_diff<<" q_mean "<<q_mean<<" g_mean "<<g_mean<<" gamma "<<gamma<<std::endl;
     return {-fraction_term*q_mean-gamma*q_diff,-g_mean+gamma*u_diff};
 }
