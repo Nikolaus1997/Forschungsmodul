@@ -45,3 +45,15 @@ cmake-build-debug
 # VSCode
 .vscode/
 out
+build/cmake_install.cmake
+build/cmake_install.cmake
+build/cmake_install.cmake
+build/cmake_install.cmake
+build/cmake_install.cmake
+build/cmake_install.cmake
+build/CMakeCache.txt
+build/cmake_install.cmake
+build/CMakeCache.txt
+build/DG_FM
+build/install_manifest.txt
+build/*

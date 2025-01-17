@@ -68,7 +68,7 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
     }
 
     // Scale by the length of the interval
-    sol *= 0.5 * (b - a);
+    //sol *= 0.5 * (b - a);
     return sol;
 }
 
@@ -84,10 +84,10 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         double evaluation=0.0;
         // Transforming the node from [-1, 1] to [a, b]
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
-        // for(int p = 0;p<Vdm.size()[1];p++)
-        // {
-        evaluation += Vdm(i,j)*LegendrePolynomialAndDerivative(j,node)[0];
-        //}
+        for(int p = 0;p<Vdm.size()[1];p++)
+        {
+        evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
+        }
         double intermediate_sol= GaussLegendreQuad(func,0,evaluation);
         //std::cout<<"Eval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
         //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
@@ -95,7 +95,7 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
     }
 
     // Scale by the length of the interval
-    sol *= 0.5 * (b - a);
+    //sol *= 0.5 * (b - a);
     // std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
@@ -115,14 +115,14 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
 
         // Precompute Legendre polynomial values for efficiency
         std::vector<double> legendreValues(Vdm.size()[1]);
-        //for (int p = 0; p < Vdm.size()[1]; p++) {
-            //legendreValues[p] = LegendrePolynomialAndDerivative(p, node)[0];
-        //}
+        for (int p = 0; p < Vdm.size()[1]; p++) {
+            legendreValues[p] = LegendrePolynomialAndDerivative(p, node)[0];
+        }
 
-        //for (int p = 0; p < Vdm.size()[1]; p++) {
-            evaluationU += Vdm(i, j) * LegendrePolynomialAndDerivative(j, node)[0];
-            evaluationQ += VdmQ(i, j) * LegendrePolynomialAndDerivative(j, node)[0];
-        //}
+        for (int p = 0; p < Vdm.size()[1]; p++) {
+            evaluationU += Vdm(i, p) * legendreValues[p];
+            evaluationQ += VdmQ(i, p) * legendreValues[p];
+        }
         // std::cout<<"EvalU: "<<evaluationU<<" EvalQ: "<<evaluationQ<<std::endl;
         // std::cout<<"Weight: "<<weight<<" L_prime: "<<L_prime<<std::endl;
         double intermediate_sol = func(evaluationU, evaluationQ);
@@ -130,7 +130,7 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
     }
 
     // Scale by the length of the interval
-    sol *= 0.5 * (b - a);
+    //sol *= 0.5 * (b - a);
     return sol;
 }
 
