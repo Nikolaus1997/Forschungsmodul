@@ -258,7 +258,7 @@ void Computation::calcQ(const Array2D& VdM)
                 flux_term=0.0;
             if(std::abs(integ)<1E-12)
                 integ=0.0;
-            VdM_->VdMQ_(i,j) = integ*(2.0 * double(j) + 1.0)/meshWidth_[0]- flux_term*(2.0 * double(j) + 1.0)/meshWidth_[0];
+            VdM_->VdMQ_(i,j) = (integ- flux_term)*(2.0 * double(j) + 1.0)/meshWidth_[0];
             //std::cout<<" IN CALCQ I "<<" Face i "<<grid_->faces(i)<<" Face i+1 "<<grid_->faces(i+1)<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
             //std::cout<<" IN CALCQ I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
         }
@@ -532,7 +532,6 @@ void Computation::calcUdt(const Array2D& VdM,const Array2D& VdMQ)
 {
 
     double m = double(settings_.BarenblattM);
-    double integ=0.0;
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <VdM.size()[1]; j++) {
             double flux_term =0.0;
@@ -544,6 +543,7 @@ void Computation::calcUdt(const Array2D& VdM,const Array2D& VdMQ)
             double qr_i = 0.0;
             double qr_iminus =0.0;
             double ql_iplus = 0.0;
+            double integ=0.0;
             // Wrap around the grid for periodic boundary conditions
             if(i==0){
                 for(int p = 0;p<=PP_N_;p++){
@@ -590,9 +590,8 @@ void Computation::calcUdt(const Array2D& VdM,const Array2D& VdMQ)
                 flux_term=0.0;
             if(std::abs(integ)<1E-12)
                 integ=0.0;
-            VdM_->VdM_t_(i,j) = integ*(2.0 * double(j) + 1.0)/meshWidth_[0]- flux_term*(2.0 * double(j) + 1.0)/meshWidth_[0];
+            VdM_->VdM_t_(i,j) = (integ- flux_term)*(2.0 * double(j) + 1.0)/meshWidth_[0];
             // std::cout<<"IN CALC UDT "<<" VdM_t"<< VdM_->VdM_t_(i,j)<<std::endl;
-            std::cout
         }
     }   
 }
