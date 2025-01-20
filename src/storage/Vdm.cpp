@@ -53,6 +53,16 @@ Array2D &Vandermonde::VdM()
     return VdM_;
 }
 
+Array2D &Vandermonde::VdM1() 
+{
+    return VdM1_;
+}
+
+Array2D &Vandermonde::VdM2() 
+{
+    return VdM2_;
+}
+
 Array2D &Vandermonde::VdMt()
 {
     return VdM_t_;
@@ -71,6 +81,26 @@ double Vandermonde::VdM(int i, int j) const
 double &Vandermonde::VdM(int i, int j)
 {
     return VdM_(i,j);
+}
+
+double Vandermonde::VdM1(int i, int j) const
+{
+    return VdM1_(i,j);
+}
+
+double &Vandermonde::VdM1(int i, int j)
+{
+    return VdM1_(i,j);
+}
+
+double Vandermonde::VdM2(int i, int j) const
+{
+    return VdM2_(i,j);
+}
+
+double &Vandermonde::VdM2(int i, int j)
+{
+    return VdM2_(i,j);
 }
 
 double Vandermonde::VdMQ(int i, int j) const

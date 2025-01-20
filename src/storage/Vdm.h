@@ -11,13 +11,20 @@ class Vandermonde: public Array2D
         void LprimePrintValues();
         
         Array2D &VdM();
+        Array2D &VdM1();
+        Array2D &VdM2();
         Array2D &VdMt();      
         Array2D &VdMQ();    
 
         double VdM(int i, int j) const;
 
         double &VdM(int i, int j);
+        double VdM1(int i, int j) const;
 
+        double &VdM1(int i, int j);
+        double VdM2(int i, int j) const;
+
+        double &VdM2(int i, int j);
 
         double VdMQ(int i, int j) const;
 

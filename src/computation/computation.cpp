@@ -254,43 +254,17 @@ void Computation::calcQ(const Array2D& VdM)
             double a = grid_->faces(i);
             double b = grid_->faces(i + 1);
             double integ =quad_->IntFluxQ([&](double x) {return flux_.compute(x, 0.0, m)[1];},i, j, a, b, VdM);
-            // if(std::abs(flux_term)<1E-12)
-            //     flux_term=0.0;
-            // if(std::abs(integ)<1E-12)
-            //     integ=0.0;
-            VdM_->VdMQ_(i,j) = integ*(2.0 * double(j) + 1.0)/meshWidth_[0]- flux_term*(2.0 * double(j) + 1,0)/meshWidth_[0];
+            if(std::abs(flux_term)<1E-12)
+                flux_term=0.0;
+            if(std::abs(integ)<1E-12)
+                integ=0.0;
+            VdM_->VdMQ_(i,j) = integ*(2.0 * double(j) + 1.0)/meshWidth_[0]- flux_term*(2.0 * double(j) + 1.0)/meshWidth_[0];
             //std::cout<<" IN CALCQ I "<<" Face i "<<grid_->faces(i)<<" Face i+1 "<<grid_->faces(i+1)<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
             //std::cout<<" IN CALCQ I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
         }
     }
 }
 
-double Computation::integralQ(int i, int j, double m, const Array2D& VdM) {
-    // Validate grid_ and indices
-    if (!grid_) {
-        throw std::runtime_error("grid_ is null");
-    }
-    if (i < 0 || i + 1 >= grid_->faces().size()[0]) {
-        throw std::out_of_range("Index out of bounds for grid_->faces");
-    }
-
-    // Get integration bounds
-    double a = grid_->faces(i);
-    double b = grid_->faces(i + 1);
-
-    // Validate quad_ pointer
-    if (!quad_) {
-        throw std::runtime_error("quad_ is null");
-    }
-
-    // Validate VdM dimensions
-    if (VdM.size()[0] <= i || VdM.size()[1] <= j) {
-        throw std::invalid_argument("VdM dimensions are invalid for indices i and j");
-    }
-
-    // Compute the integral
-    return 0.0;
-}
 
 double Computation::integralU(int i, int j,double m, const Array2D &Vdm, const Array2D &VdmQ) {
     // Validate grid_ and indices
@@ -383,27 +357,27 @@ void Computation::rungeKutta() {
         calcUdt(VdM_->VdM_); // Compute the time derivative for u^n
     }else
     {
-        calcQ(VdM_->VdM_);
+        calcQ(VdM_->VdM());
         calcUdt(VdM_->VdM(),VdM_->VdMQ());
     }
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <=PP_N_; j++) {
             // u^(1) = u^n + Δt * L_h(u^n)
-            VdM_->VdM1_(i, j) = VdM_->VdM_(i, j) + dt_ * VdM_->VdM_t_(i, j);
+            VdM_->VdM1(i, j) = VdM_->VdM_(i, j) + dt_ * VdM_->VdM_t_(i, j);
         }
     }
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
-        calcUdt(VdM_->VdM1_); // Compute the time derivative for u^n
+        calcUdt(VdM_->VdM1()); // Compute the time derivative for u^n
     }else
     {
-        calcQ(VdM_->VdM1_);
-        calcUdt(VdM_->VdM1_,VdM_->VdMQ());
+        calcQ(VdM_->VdM1());
+        calcUdt(VdM_->VdM1(),VdM_->VdMQ());
     }// Compute the time derivative for u^(1)
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         for (int j = 0; j <=PP_N_; j++) {
             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
-            VdM_->VdM2_(i, j) = (3.0 / 4.0) * VdM_->VdM_(i, j) +
+            VdM_->VdM2(i, j) = (3.0 / 4.0) * VdM_->VdM_(i, j) +
                                 (1.0 / 4.0) * VdM_->VdM1_(i, j) +
                                 (1.0 / 4.0) * dt_ * VdM_->VdM_t_(i, j);
         }
@@ -414,8 +388,8 @@ void Computation::rungeKutta() {
         calcUdt(VdM_->VdM2_); // Compute the time derivative for u^n
     }else
     {
-        calcQ(VdM_->VdM1_);
-        calcUdt(VdM_->VdM2_,VdM_->VdMQ());
+        calcQ(VdM_->VdM1());
+        calcUdt(VdM_->VdM2(),VdM_->VdMQ());
     } // Compute the time derivative for u^(2)
     // Ensure all updates to time derivatives are reflected
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
@@ -505,10 +479,10 @@ void Computation::calcUdt(const Array2D& VdM){
             flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,flux_)*VdM_->L_(0,j)  + gFlux_.computeNumFlux(ur_i, ul_iplus,flux_);
             double integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return flux_.compute(x);}
                                                             ,i,j ,grid_->faces(i),grid_->faces(i+1),VdM);
-            // if(std::abs(flux_term)<1E-12)
-            //     flux_term=0.0;
-            // if(std::abs(integ)<1E-12)
-            //     integ=0.0;
+            if(std::abs(flux_term)<1E-12)
+                flux_term=0.0;
+            if(std::abs(integ)<1E-12)
+                integ=0.0;
             VdM_->VdM_t_(i,j) =integ*(2.0*double(j)+1.0)*1/meshWidth_[0]
                                 - flux_term*1/meshWidth_[0]*(2.0*double(j)+1.0);
         }
@@ -612,11 +586,13 @@ void Computation::calcUdt(const Array2D& VdM,const Array2D& VdMQ)
             integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
                                             grid_->faces(i), grid_->faces(i+1), VdM, VdMQ);
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            // if(std::abs(flux_term)<1E-12)
-            //     flux_term=0.0;
-            // if(std::abs(integ)<1E-12)
-            //     integ=0.0;
+            if(std::abs(flux_term)<1E-12)
+                flux_term=0.0;
+            if(std::abs(integ)<1E-12)
+                integ=0.0;
             VdM_->VdM_t_(i,j) = integ*(2.0 * double(j) + 1.0)/meshWidth_[0]- flux_term*(2.0 * double(j) + 1.0)/meshWidth_[0];
+            // std::cout<<"IN CALC UDT "<<" VdM_t"<< VdM_->VdM_t_(i,j)<<std::endl;
+            std::cout
         }
     }   
 }

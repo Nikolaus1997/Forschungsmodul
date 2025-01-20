@@ -114,15 +114,11 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         // Transform the node from [-1, 1] to [a, b]
         double L_prime = LegendrePolynomialAndDerivative(j, node)[1];
 
-        // Precompute Legendre polynomial values for efficiency
-        std::vector<double> legendreValues(Vdm.size()[1]);
-        for (int p = 0; p < Vdm.size()[1]; p++) {
-            legendreValues[p] = LegendrePolynomialAndDerivative(p, node)[0];
-        }
 
-        for (int p = 0; p < Vdm.size()[1]; p++) {
-            evaluationU += Vdm(i, p) * legendreValues[p];
-            evaluationQ += VdmQ(i, p) * legendreValues[p];
+        for (int p = 0; p < Vdm.size()[1]; p++) { 
+            double L = LegendrePolynomialAndDerivative(p, node)[0];
+            evaluationU += Vdm(i, p) *L;
+            evaluationQ += VdmQ(i, p) * L;
         }
         // std::cout<<"EvalU: "<<evaluationU<<" EvalQ: "<<evaluationQ<<std::endl;
         // std::cout<<"Weight: "<<weight<<" L_prime: "<<L_prime<<std::endl;
