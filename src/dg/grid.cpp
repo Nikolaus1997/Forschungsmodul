@@ -178,6 +178,7 @@ void Grid::fillSolution(Variable& x,const std::shared_ptr<Vandermonde> VdM)
     }
 }
 
+
 void Grid::fillDerivative(Variable& x,const std::shared_ptr<Vandermonde> VdM)
 {
     for(int i=0;i<VdM->size()[0];i++){

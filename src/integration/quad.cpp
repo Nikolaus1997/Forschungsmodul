@@ -48,7 +48,7 @@ double Quadrature::IntGaussLegendreQuad(std::function<double(double)> func,int j
     return sol;
 }
 // int i is the position index j is the polynomial index
-double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const std::shared_ptr<Vandermonde> Vdm)
+double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& Vdm)
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
@@ -58,13 +58,13 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
         double evaluation=0.0;
-        // Transforming the node from [-1, 1] to [a, b]
-        for(int p = 0;p<Vdm->VdM().size()[1];p++)
+        double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
+        for(int p = 0;p<Vdm.size()[1];p++)
         {
-           evaluation += Vdm->VdM(i,p)*Vdm->L(k,p);
+            evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
         //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
-        sol += weight * func(evaluation)*Vdm->L_prime(k,j);
+        sol += weight * func(evaluation)*L_prime;
     }
 
     // Scale by the length of the interval
@@ -86,9 +86,10 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
         for(int p = 0;p<Vdm.size()[1];p++)
         {
-        evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
+            evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
-        double intermediate_sol= GaussLegendreQuad(func,0,evaluation);
+        double intermediate_sol= GaussLegendreQuad(func,0.0,evaluation);
+        
         //std::cout<<"Eval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
         //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
         sol += weight * intermediate_sol*L_prime;
