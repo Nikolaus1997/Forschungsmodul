@@ -181,6 +181,10 @@ void Settings::loadFromFile(std::string filename)
     if(parameterName=="BarenblattTime"){
       BarenblattTime = atof(parameterValue.c_str());
     }
+    if(parameterName=="nWriteState")
+    {
+      nWriteState = atof(parameterValue.c_str());
+    }
   }
 }
 

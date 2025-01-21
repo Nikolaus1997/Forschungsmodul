@@ -14,7 +14,7 @@ struct Settings
   double dt = 0.1;                      //< maximum time step width
   double CFL = 0.9;                     //< CFL number
   int PP_N = 5;                         //< Polynomial degree of the basis functions
-
+  double nWriteState =1.0;
   std::string fluxFunction = "linear";        //< Flux function 
   std::string initialCondition = "unitStep";  //< Initial condition
   std::string RiemannSolver = "upwind";  //< Initial condition

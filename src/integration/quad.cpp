@@ -82,7 +82,7 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
         double evaluation=0.0;
-        // Transforming the node from [-1, 1] to [a, b]
+
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
         for(int p = 0;p<Vdm.size()[1];p++)
         {
@@ -97,7 +97,6 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
 
     // Scale by the length of the interval
     //sol *= 0.5 * (b - a);
-    // std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
 double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, int j, double a, double b, 
