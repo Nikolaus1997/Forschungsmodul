@@ -89,14 +89,15 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
             evaluation += Vdm(i,p)*LegendrePolynomialAndDerivative(p,node)[0];
         }
         double intermediate_sol= GaussLegendreQuad(func,0.0,evaluation);
-        
-        //std::cout<<"Eval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
+    
+        //std::cout<<"FUNCEval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
         //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
         sol += weight * intermediate_sol*L_prime;
     }
 
     // Scale by the length of the interval
     //sol *= 0.5 * (b - a);
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     return sol;
 }
 double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, int j, double a, double b, 
@@ -119,12 +120,12 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
             evaluationU += Vdm(i, p) *L;
             evaluationQ += VdmQ(i, p) * L;
         }
-        // std::cout<<"EvalU: "<<evaluationU<<" EvalQ: "<<evaluationQ<<std::endl;
+        //std::cout<<"EvalU: "<<evaluationU<<" EvalQ: "<<evaluationQ<<std::endl;
         // std::cout<<"Weight: "<<weight<<" L_prime: "<<L_prime<<std::endl;
         double intermediate_sol = func(evaluationU, evaluationQ);
         sol += weight * intermediate_sol * L_prime;
     }
-
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
     //sol *= 0.5 * (b - a);
     return sol;

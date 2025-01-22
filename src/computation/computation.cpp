@@ -154,6 +154,7 @@ void Computation::runSimulation()
             }else{
                 calcQ(VdM_->VdM_);
                 calcUdt(VdM_->VdM_,VdM_->VdMQ_);
+
                 //grid_->fillDerivative(grid_->ut_,VdM_);
                 //applyLimiter(VdM_->VdMt());
                 //rungeKutta();
@@ -166,6 +167,7 @@ void Computation::runSimulation()
                 outputWriterParaview_->writeFile(time_,settings_.OutputName);
                 calcError(errorTime);
             }
+
             // calcDt();
             iter++;
             std::cout<<"\rCurrent Iteration: "<<iter<<" End Iter: "<<numberofIterations<< std::flush;
@@ -249,17 +251,18 @@ void Computation::calcQ(const Array2D& VdM)
         for (int j = 0; j <=PP_N_; j++) {
             double l = j;
             // Compute the numerical flux
-            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,0.,0.,m,flux_,quad_)[1]* pow(-1.0, l)
+            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,0.,0.,m,flux_,quad_)[1]*VdM_->L_(0,j)
                     + gFlux_.computeNumFlux(ur_i, ul_iplus,0.,0.,m,flux_,quad_)[1] ;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
             double a = grid_->faces(i);
             double b = grid_->faces(i + 1);
             double integ =quad_->IntFluxQ([&](double x) {return flux_.compute(x, 0.0, m)[1];},i, j, a, b, VdM);
+            std::cout<<quad_->IntFluxQ([&]{return flux_.compute(0.5, 0.0, m)[1];},i, j, a, b, VdM)<<std::endl;
             // if(std::abs(flux_term)<1E-12)
             //     flux_term=0.0;
             // if(std::abs(integ)<1E-12)
             //     integ=0.0;
-            VdM_->VdMQ_(i,j) = (integ- flux_term)*(2. * l + 1.)/meshWidth_[0];
+            VdM_->VdMQ_(i,j) = (integ-flux_term)*(2. * l + 1.)/meshWidth_[0];
             //std::cout<<" IN CALCQ I "<<" Face i "<<grid_->faces(i)<<" Face i+1 "<<grid_->faces(i+1)<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
             //std::cout<<" IN CALCQ I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
         }
@@ -596,12 +599,12 @@ void Computation::calcUdt(const Array2D& VdM,const Array2D& VdMQ)
             integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
                                             grid_->faces(i), grid_->faces(i+1), VdM, VdMQ);
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            // if(std::abs(flux_term)<1E-12)
-            //     flux_term=0.0;
-            // if(std::abs(integ)<1E-12)
-            //     integ=0.0;
-            VdM_->VdM_t_(i,j) = (integ- flux_term)*(2.0 * l + 1.0)/meshWidth_[0];///(meshWidth_[0]);
-            // std::cout<<"IN CALC UDT "<<" VdM_t"<< VdM_->VdM_t_(i,j)<<std::endl;
+            if(std::abs(flux_term)<1E-12)
+                flux_term=0.0;
+            if(std::abs(integ)<1E-12)
+                integ=0.0;
+            VdM_->VdMt(i,j) = (integ- flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);///(meshWidth_[0]);
+            //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" direct "<<double(meshWidth_[0])<<std::endl;
         }
     }   
 }
