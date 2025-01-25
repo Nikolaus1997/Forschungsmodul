@@ -18,25 +18,22 @@ public:
     const std::array<int, 1> nCells() const;
 
 
-    Variable &u();
+    Array2D &u();
 
-    double u(int i) const;
 
-    double &u(int i);
+    const Array2D &u2() const;
 
-    const Variable &u2() const;
+    double u2(int i, int j) const;
 
-    double u2(int i) const;
+    double &u2(int i, int j);
 
-    double &u2(int i);
+    const Array2D &u1() const;
 
-    const Variable &u1() const;
+    double u1(int i, int j) const;
 
-    double u1(int i) const;
+    double &u1(int i, int j);
 
-    double &u1(int i);
-
-    Variable &ut();
+    Array2D &ut();
 
     double ut(int i) const;
 
@@ -78,16 +75,20 @@ public:
 
     double dx() const;
 
-    void fillSolution(Variable& x, std::shared_ptr<Vandermonde> VdM);
+    void fillArray(Array2D& x, const Array2D& VdM, const Array2D& L);
     void fillDerivative(Variable& x, std::shared_ptr<Vandermonde> VdM);
+    void fillSolution(Variable& x,const Array2D& u);
 
 protected:
     const std::array<int, 1>        nCells_;
     const std::array<double, 1>     meshWidth_;
-    Variable u_;
-    Variable u2_;
-    Variable u1_;
-    Variable ut_;
+    Variable solution_;
+    Variable derivative_;
+    Array2D u_;
+    Array2D q_;
+    Array2D u2_;
+    Array2D u1_;
+    Array2D ut_;
     Variable x_;
     Variable faces_;
     Variable l2_error_;

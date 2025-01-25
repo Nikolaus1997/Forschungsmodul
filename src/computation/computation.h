@@ -11,6 +11,7 @@
 #include "dg/num_flux.h"
 #include "analyze/timer.cpp"
 #include "storage/array3d.h"
+#include "storage/array2d.h"
 #include "limiter/limiter.h"
 
 #include <memory>
@@ -35,23 +36,16 @@ class Computation
         void runSimulation();
 
         void fillX();
-        void fillU();
-        void fillUt();
-        void calcQ(const Array2D& VdM);
-        double integralQ(int i, int j,double m, const Array2D& Vdm);
-        double integralU(int i, int j,double m, const Array2D& Vdm, const Array2D& VdmQ);
+        void calcQ(const Array2D& u);
         void initVdm();
         void eulerTimeStep();
         void rungeKutta();
-        void rungeKutta5();
         void fillFaces();
         void calcDt();
         void calcError(double currenTime);
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
-        void calcUdt(const Array2D& Vdm);
+        void calcUdt(const Array2D& u);
         void applyLimiter(const Array2D& Vdm);
-        double integralFlux( int i ,int j, const std::shared_ptr<Vandermonde> Vdm);
-        double integralInit(double x, int j);
     
     private:
         std::array<double,1> meshWidth_;

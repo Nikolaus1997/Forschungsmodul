@@ -185,6 +185,10 @@ void Settings::loadFromFile(std::string filename)
     {
       nWriteState = atof(parameterValue.c_str());
     }
+    if(parameterName=="timeStepping")
+    {
+      timeStepping = parameterValue;
+    }
   }
 }
 

@@ -15,6 +15,8 @@ public:
     // Set the function type
     void setFluxFunction(FunctionType type);
 
+    FunctionType getFluxFunction();
+
     // Compute the flux based on the selected function
     double compute(double x);
 

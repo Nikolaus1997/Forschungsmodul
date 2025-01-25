@@ -4,6 +4,11 @@ void Flux::setFluxFunction(FunctionType type) {
     selectedFunction = type;
 }
 
+Flux::FunctionType Flux::getFluxFunction()
+{
+    return selectedFunction;
+}
+
 double Flux::compute(double u) {
 
     switch (selectedFunction) {

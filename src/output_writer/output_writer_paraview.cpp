@@ -37,7 +37,7 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   dataSet->SetSpacing(dx, dy, dz);
 
   // set number of points in each dimension, 1 cell in z direction
-  int nCells = grid_->u_.size()[0];
+  int nCells = grid_->solution_.size()[0];
   dataSet->SetDimensions(nCells, 1, 1);  // we want to have points at each corner of each cell
   
   // add solution field variable
@@ -62,7 +62,7 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arraySolution->SetValue(index,grid_->u(i));
+    arraySolution->SetValue(index,grid_->solution_(i));
   }
 
   // now, we should have added as many values as there are points in the vtk data structure
@@ -115,13 +115,13 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
   index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  nCells = grid_->ut_.size()[0];
+  nCells = grid_->derivative_.size()[0];
   for (int i = 0; i < nCells; i++, index++)
   {
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arrayUt->SetValue(index,grid_->ut(i));
+    arrayUt->SetValue(index,grid_->derivative_(i));
   }
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());

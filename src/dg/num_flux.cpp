@@ -67,17 +67,17 @@ std::array<double,2> NumericalFlux::porousMedia(double u_l, double u_r, double q
     double q_mean = 0.5*(q_r+q_l);
     double fraction_term =0.0;
     double gamma = 0.0;
-    if(std::abs(u_diff)<1e-8){
+    if(std::abs(u_diff)<1e-15){
         //std::cout<<"IM IN THE IF"<<std::endl;
         fraction_term = -1.0*flux_.compute(u_l,0,m)[1];
         g_plus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
         g_minus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
-        gamma = fraction_term;
+        gamma =0.;//5*fraction_term;
     }else{
         g_plus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
         g_minus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
         fraction_term = (g_plus-g_minus)/u_diff;
-        gamma = 0.5*fraction_term;
+        gamma = 0.;//5*fraction_term;
     }
     double g_mean = 0.5*(g_plus+g_minus);
 

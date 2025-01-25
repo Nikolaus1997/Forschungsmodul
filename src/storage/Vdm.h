@@ -51,4 +51,5 @@ class Vandermonde: public Array2D
         Array2D L_;
         Array2D L_prime_;
     friend class Computation;
+    friend class Grid;
 };

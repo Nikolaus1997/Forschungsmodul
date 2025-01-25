@@ -21,6 +21,9 @@ struct Settings
   double initCondA = 0.0;                     //< Starting point of the initial Condition
   double initCondB = 0.0;                     //< End point of the initial Condition
 
+
+  std::string timeStepping = "euler";  //< Time stepping scheme
+
   int BarenblattM = 0;
   double BarenblattTime= 1.0;
 
