@@ -10,6 +10,7 @@ class Quadrature: public Basis
 {
 public:
     Quadrature(int N);
+    double G(double u,double m);
     double GaussLegendreQuad(std::function<double(double)> func, double a, double b);
     double IntGaussLegendreQuad(std::function<double(double)> func,int j ,double a, double b);
     double IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);

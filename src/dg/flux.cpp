@@ -23,6 +23,7 @@ double Flux::compute(double u) {
     }
 }
 
+
 std::array<double, 2> Flux::compute(double u, double q, double m)
 {
 

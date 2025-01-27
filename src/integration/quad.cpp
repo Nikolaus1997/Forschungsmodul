@@ -80,7 +80,7 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         double evaluation=0.0;
 
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
-        double intermediate_sol= GaussLegendreQuad(func,0.0,u(i,k));
+        double intermediate_sol= -G(u(i,k),2);//GaussLegendreQuad(func,0.0,u(i,k));
     
         //std::cout<<"FUNCEval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
         //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
@@ -114,4 +114,7 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
     return sol;
 }
 
-
+double Quadrature::G(double u, double m)
+{
+    return sqrt(m)*2.0/(m+1.0)*sqrt(pow(u,m-1.0))*u;
+}

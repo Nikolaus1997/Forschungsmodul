@@ -156,12 +156,18 @@ void Computation::runSimulation()
             if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
                     eulerTimeStep();
+
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
                     rungeKutta();
                 }
             }else{
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
                     eulerTimeStep();
+                    std::cout<<"U"<<std::endl;
+                    grid_->u_.printValues();
+                    std::cout<<"Q"<<std::endl;
+                    grid_->q_.printValues();
+                    //applyLimiter(grid_->u());
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
                     rungeKutta();
                 }
@@ -213,11 +219,8 @@ void Computation::calcQ(const Array2D& u)
 {
     double m = double(settings_.BarenblattM);
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        double flux_term =0.0;
-        double ul_i = 0.0;
-        double ur_i = 0.0;
-        double ur_iminus  = 0.0;
-        double ul_iplus =0.0;
+        double flux_term =0.0,ul_i = 0.0,ur_i = 0.0,ur_iminus  = 0.0,ul_iplus =0.0;
+        double u_mean = 0.0,u_mean_plus = 0.0;
         // Wrap around the grid for periodic boundary conditions
         if(i==0){
                 ul_i = u(i,0);
@@ -236,16 +239,27 @@ void Computation::calcQ(const Array2D& u)
                 ur_i = u(i,nNodes+1);
                 ur_iminus  = u(i-1,nNodes+1);
                 ul_iplus = u(i,0);
+                for(int k = 1; k<u.size()[1]-1;k++){
+                    u_mean += u(i,k);
+                    u_mean_plus += u(i+1,k);
+                }
+                u_mean = u_mean/(u.size()[1]-2);
+                u_mean_plus = u_mean_plus/(u.size()[1]-2);  
         }
+
         for (int j = 0; j <=PP_N_; j++) {
             double l = j;
             // Compute the numerical flux
-            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,0.,0.,m,flux_,quad_)[1]*VdM_->L_(0,j)
-                    + gFlux_.computeNumFlux(ur_i, ul_iplus,0.,0.,m,flux_,quad_)[1] ;
+            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,0.,0.,m,flux_,quad_,u_mean,u_mean_plus)[1]*VdM_->L_(0,j)
+                    + gFlux_.computeNumFlux(ur_i, ul_iplus,0.,0.,m,flux_,quad_,u_mean,u_mean_plus)[1] ;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
             double a = grid_->faces(i);
             double b = grid_->faces(i + 1);
             double integ =quad_->IntFluxQ([&](double x) {return flux_.compute(x, 0.0, m)[1];},i, j, a, b, u);
+            // if(std::abs(flux_term)<1E-6)
+            //     flux_term=0.0;
+            // if(std::abs(integ)<1E-6)
+            //     integ=0.0;
             VdM_->VdMQ_(i,j) = (integ-flux_term)*(2. * l + 1.)/meshWidth_[0];
             //std::cout<<" IN CALCQ I "<<" Face i "<<grid_->faces(i)<<" Face i+1 "<<grid_->faces(i+1)<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
             //std::cout<<" IN CALCQ I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMQ "<<VdM_->VdMQ_(i,j)<<std::endl;
@@ -368,58 +382,89 @@ void Computation::calcUdt(const Array2D& u_){
     }
 }
 
-void Computation::applyLimiter(const Array2D &Vdm)
+void Computation::applyLimiter(const Array2D &u)
 {
-    // for(int i=0;i<grid_->u_.size()[0];i++){
-    //     double limit_l=0.0, limit_r=0.0;
-    //     double u_r =0.0, u_l =0.0;
-    //     if(i==0){
-    //         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-    //             u_l = Vdm(i,j)*VdM_->L_(0,j);
-    //             u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
-    //         }
-    //         limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->u(i)-grid_->ut(nCells_[0]-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
-    //         limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->u(i)-grid_->ut(nCells_[0]-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
-    //     }else if(i==nCells_[0]-1){
-    //         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-    //             u_l = Vdm(i,j)*VdM_->L_(0,j);
-    //             u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
-    //         }
-    //         limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->ut(i)-grid_->ut(nCells_[0]-1),grid_->ut(0)-grid_->ut(i),meshWidth_[0]);
-    //         limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->ut(i)-grid_->ut(nCells_[0]-1),grid_->ut(0)-grid_->ut(i),meshWidth_[0]);
-    //     }else{
-    //         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-    //             u_l = Vdm(i,j)*VdM_->L_(0,j);
-    //             u_r = Vdm(i,j)*VdM_->L_(nNodes,j);
-    //         }
-    //         limit_l = grid_->ut(i)-limiter_.computeLimiter(grid_->ut(i)-u_l,grid_->ut(i)-grid_->ut(i-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
-    //         limit_r = grid_->ut(i)+limiter_.computeLimiter(u_r-grid_->ut(i),grid_->ut(i)-grid_->ut(i-1),grid_->ut(i+1)-grid_->ut(i),meshWidth_[0]);
-    //     }
-    //     if(limit_l!=u_l or limit_r!=u_r){
-    //         double u_temp=0.0;
-    //         for(int k = 0;k<2;k++){
-    //         for(int p=1; p<quad_->basis_.nodes_.size()[0]-1;p++){
-    //                 u_temp+=Vdm(i,k)*VdM_->L_(p,k);
-    //             }
-    //         }
-    //         grid_->ut(i) = u_temp;
-    //     }
-    // }
+    for(int i=0;i<grid_->u_.size()[0];i++){
+        double limit_l=0.0, limit_r=0.0;
+        double u_r =0.0, u_l =0.0,u_mean = 0.0,u_mean_plus = 0.0,u_mean_minus = 0.0;
+        if(i==0){
+            u_r = u(i,nNodes+1);
+            u_l = u(i,0);
+            for(int k = 1; k<u.size()[1]-1;k++){
+                u_mean += u(i,k);
+                u_mean_plus += u(i+1,k);
+                u_mean_minus += u(nCells_[0]-1,k);
+            }
+                u_mean = u_mean/(u.size()[1]-2);
+                u_mean_plus = u_mean_plus/(u.size()[1]-2); 
+                u_mean_minus = u_mean_minus/(u.size()[1]-2);
+            double a = u_r -u_mean;
+            double b = u_mean - u_mean_minus;
+            double c = u_mean_plus - u_mean;    
+            limit_r = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+            a = u_mean_plus - u_l;
+            b = u_mean - u_mean_minus;
+            c = u_mean_plus - u_mean;
+            limit_l = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+        }else if(i==nCells_[0]-1){
+            u_r = u(i,nNodes+1);
+            u_l = u(i,0);
+            for(int k = 1; k<u.size()[1]-1;k++){
+                u_mean += u(i,k);
+                u_mean_plus += u(0,k);
+                u_mean_minus += u(i-1,k);
+            }
+                u_mean = u_mean/(u.size()[1]-2);
+                u_mean_plus = u_mean_plus/(u.size()[1]-2); 
+                u_mean_minus = u_mean_minus/(u.size()[1]-2);
+            double a = u_r -u_mean;
+            double b = u_mean - u_mean_minus;
+            double c = u_mean_plus - u_mean;    
+            limit_r = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+            a = u_mean_plus - u_l;
+            b = u_mean - u_mean_minus;
+            c = u_mean_plus - u_mean;
+            limit_l = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+            }else{
+                            u_r = u(i,nNodes+1);
+            u_l = u(i,0);
+            for(int k = 1; k<u.size()[1]-1;k++){
+                u_mean += u(i,k);
+                u_mean_plus += u(i+1,k);
+                u_mean_minus += u(i-1,k);
+            }
+                u_mean = u_mean/(u.size()[1]-2);
+                u_mean_plus = u_mean_plus/(u.size()[1]-2); 
+                u_mean_minus = u_mean_minus/(u.size()[1]-2);
+            double a = u_r -u_mean;
+            double b = u_mean - u_mean_minus;
+            double c = u_mean_plus - u_mean;    
+            limit_r = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+            a = u_mean_plus - u_l;
+            b = u_mean - u_mean_minus;
+            c = u_mean_plus - u_mean;
+            limit_l = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
+                    }
+        if(limit_r!=u_r){
+            for(int k = 0; k<u.size()[1];k++){
+                grid_->u_(i,k) = u_mean;
+            }
+        }
+        if(limit_l!=u_l){
+            for(int k = 0; k<u.size()[1];k++){
+                grid_->u_(i,k) = u_mean;
+            }
+        }
+    }
 }
 
 void Computation::calcUdt(const Array2D& u,const Array2D& q)
 {
-    double flux_term =0.0;
-    double ul_i =0.0;
-    double ur_i =0.0;
-    double ur_iminus  = 0.0;
-    double ul_iplus = 0.0;
-    double ql_i =0.0;
-    double qr_i = 0.0;
-    double qr_iminus =0.0;
-    double ql_iplus = 0.0;
-    double integ=0.0;
+    double flux_term =0.0,integ=0.0;
+    double ul_i =0.0,ur_i =0.0,ur_iminus  = 0.0,ul_iplus = 0.0;
+    double ql_i =0.0, qr_i = 0.0, qr_iminus =0.0, ql_iplus = 0.0;
     double m = double(settings_.BarenblattM);
+    double u_mean = 0.0, u_mean_plus = 0.0;
     for (int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
             ul_i =0.0;
             ur_i =0.0;
@@ -459,18 +504,40 @@ void Computation::calcUdt(const Array2D& u,const Array2D& q)
                 qr_i        =  q(i,nNodes+1);
                 qr_iminus   = q(i-1,nNodes+1);
                 ql_iplus    = q(i+1,0); 
+                for(int k = 1; k<u.size()[1]-1;k++){
+                    u_mean += u(i,k);
+                    u_mean_plus += u(i+1,k);
+                }
+                u_mean = u_mean/(u.size()[1]-2);
+                u_mean_plus = u_mean_plus/(u.size()[1]-2);  
             }
+            // if(ul_i<0.000001)
+            //     ul_i = 0.0;
+            // if(ur_i<0.000001) 
+            //     ur_i = 0.0;
+            // if(ur_iminus<0.00001)
+            //     ur_iminus = 0.0;
+            // if(ul_iplus<0.00001) 
+            //     ul_iplus = 0.0; 
+            // if(ql_i<0.000001)
+            //     ql_i = 0.0;
+            // if(qr_i<0.000001) 
+            //     qr_i = 0.0;
+            // if(qr_iminus<0.00001)
+            //     qr_iminus = 0.0;
+            // if(ql_iplus<0.00001) 
+            //     ql_iplus = 0.0; 
         for (int j = 0; j <=PP_N_; j++) {
             double l = double(j);
-            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_)[0]*VdM_->L_(0,j)
-                                            +gFlux_.computeNumFlux(ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_)[0]   ;
+            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_,u_mean,u_mean_plus)[0]*VdM_->L_(0,j)
+                                            +gFlux_.computeNumFlux(ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_,u_mean,u_mean_plus)[0]   ;
             integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
                                             grid_->faces(i), grid_->faces(i+1),u, q);
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            // if(std::abs(flux_term)<1E-12)
-            //     flux_term=0.0;
-            // if(std::abs(integ)<1E-12)
-            //     integ=0.0;
+            if(std::abs(flux_term)<1E-6)
+                flux_term=0.0;
+            if(std::abs(integ)<1E-6)
+                integ=0.0;
             VdM_->VdM_t_(i,j) = (integ- flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);///(meshWidth_[0]);
             //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" direct "<<double(meshWidth_[0])<<std::endl;
         }
