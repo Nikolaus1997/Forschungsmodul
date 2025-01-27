@@ -45,7 +45,7 @@ class Computation
         void calcError(double currenTime);
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
         void calcUdt(const Array2D& u);
-        void applyLimiter(const Array2D& Vdm);
+        void applyLimiter(Array2D& u);
     
     private:
         std::array<double,1> meshWidth_;
