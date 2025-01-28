@@ -438,7 +438,7 @@ void Computation::applyLimiter(Array2D &u)
             }
         if(u_r<0) {
 
-            for(int k = 0; k<grid_->u_.size()[1];k++){
+            for(int k = 1; k<grid_->u_.size()[1]-1;k++){
                 if(k<midpoint){
                     u(i,k) = (1+2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
                 }else if(k>midpoint){
@@ -449,7 +449,7 @@ void Computation::applyLimiter(Array2D &u)
               }
         }
         if(u_l<0){
-            for(int k = 0; k<grid_->u_.size()[1];k++){
+            for(int k = 1; k<grid_->u_.size()[1]-1;k++){
                 if(k<midpoint){
                     u(i,k) =(1-2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
                 }else if(k>midpoint){
