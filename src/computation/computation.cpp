@@ -179,7 +179,7 @@ void Computation::runSimulation()
                     // }
 
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
-                    rungeKutta();
+                    rungeKutta();                 
                 }
             }
             errorTime+=dt_;
@@ -321,7 +321,7 @@ void Computation::rungeKutta() {
         calcQ(grid_->u1_);
         calcUdt(grid_->u1_,grid_->q_);
     }// Compute the time derivative for u^(1)
-    applyLimiter(grid_->u2_);
+
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
     for (int i = 0; i < grid_->u_.size()[0]; i++) {
         for (int j = 0; j <grid_->u_.size()[1]; j++) {
@@ -331,7 +331,7 @@ void Computation::rungeKutta() {
                                 (1.0 / 4.0) * dt_ * grid_->ut_(i, j);
         }
     }
-
+    applyLimiter(grid_->u2_);
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
         calcUdt(grid_->u2_); // Compute the time derivative for u^n
@@ -360,105 +360,83 @@ void Computation::applyLimiter(Array2D &u)
     for(int i=0;i<grid_->u_.size()[0];i++){
         double limit_l=0.0, limit_r=0.0;
         double u_r =0.0, u_l =0.0,u_mean = 0.0,u_mean_plus = 0.0,u_mean_minus = 0.0;
+        u_r = u(i,nNodes+1);
+        u_l = u(i,0);
         if(i==0){
-            u_r = u(i,nNodes+1);
-            u_l = u(i,0);
             for(int k = 0; k<u.size()[1];k++){
                 u_mean += u(i,k);
                 u_mean_plus += u(i+1,k);
                 u_mean_minus += u(nCells_[0]-1,k);
             }
-                u_mean = u_mean/(u.size()[1]);
-                u_mean_plus = u_mean_plus/(u.size()[1]); 
-                u_mean_minus = u_mean_minus/(u.size()[1]);
-            double a = u_r -u_mean;
-            double b = u_mean - u_mean_minus;
-            double c = u_mean_plus - u_mean;    
-            limit_r = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
-            a = u_mean - u_l;
-            b = u_mean - u_mean_minus;
-            c = u_mean_plus - u_mean;
-            limit_l = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
         }else if(i==nCells_[0]-1){
-            u_r = u(i,nNodes+1);
-            u_l = u(i,0);
             for(int k = 0; k<u.size()[1];k++){
                 u_mean += u(i,k);
                 u_mean_plus += u(0,k);
                 u_mean_minus += u(i-1,k);
             }
-                u_mean = u_mean/(u.size()[1]);
-                u_mean_plus = u_mean_plus/(u.size()[1]); 
-                u_mean_minus = u_mean_minus/(u.size()[1]);
-            double a = u_r -u_mean;
-            double b = u_mean - u_mean_minus;
-            double c = u_mean_plus - u_mean;    
-            limit_r = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
-            a = u_mean - u_l;
-            b = u_mean - u_mean_minus;
-            c = u_mean_plus - u_mean;
-            limit_l = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
             }else{
-            u_r = u(i,nNodes+1);
-            u_l = u(i,0);
-            for(int k = 1; k<u.size()[1]-1;k++){
+            for(int k = 0; k<u.size()[1];k++){
                 u_mean += u(i,k);
                 u_mean_plus += u(i+1,k);
                 u_mean_minus += u(i-1,k);
             }
-                u_mean = u_mean/(u.size()[1]-2);
-                u_mean_plus = u_mean_plus/(u.size()[1]-2); 
-                u_mean_minus = u_mean_minus/(u.size()[1]-2);
-            double a = u_r -u_mean;
-            double b = u_mean - u_mean_minus;
-            double c = u_mean_plus - u_mean;    
-            limit_r = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
-            a = u_mean - u_l;
-            b = u_mean - u_mean_minus;
-            c = u_mean_plus - u_mean;
-            limit_l = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
                     }
-        if(std::abs(limit_r-u_r)>1E-12){
-            for(int k = 0; k<u.size()[1];k++){
+        u_mean = u_mean/(u.size()[1]);
+        u_mean_plus = u_mean_plus/(u.size()[1]); 
+        u_mean_minus = u_mean_minus/(u.size()[1]);
+        
+        int midpoint = 0;
+        if(PP_N_==1){
+            midpoint = 1;
+        }else if(PP_N_%2==0){
+            midpoint = int(PP_N_/2);
+        }else{
+            midpoint = int(PP_N_/2)+1;
+        }
+
+        for(int k = 0; k<u.size()[1];k++){
+            if(u(i,k)<0 ){
+                if(k>=0){
+                    u(i,k) = (1.0-2.0/meshWidth_[0]*innerMeshWidth_[0])*u(i,k);
+                }else if(k<midpoint){
+                    u(i,k) = (1.0+2.0/meshWidth_[0]*innerMeshWidth_[0])*u(i,k);
+                }else{
+                    u(i,k) = 0;    
+                }
+            }
+            // }else if(u(i,k)<0 and u_mean>0){
+            //     if(k<midpoint){
+            //         u(i,k) = (1-2/meshWidth_[0]*innerMeshWidth_[0]*(k-midpoint))*u_mean;
+            //     }else{
+            //         u(i,k) = (1+2/meshWidth_[0]*innerMeshWidth_[0]*(k-midpoint))*u_mean;
+            //     }
+            // }  
+        }           
+        double a = u_r -u_mean;
+        double b = u_mean - u_mean_minus;
+        double c = u_mean_plus - u_mean;    
+        limit_r = u_mean+limiter_.computeLimiter(a,b,c,innerMeshWidth_[0]);
+        a = u_mean - u_l;
+        b = u_mean - u_mean_minus;
+        c = u_mean_plus - u_mean;
+        limit_l = u_mean-limiter_.computeLimiter(a,b,c,innerMeshWidth_[0]);
+        
+        if(std::abs(limit_r-u_r)>1E-8){
+            for(int k = 1; k<u.size()[1]-1;k++){
                 u(i,k) = u_mean;
             }
         }
-        if(std::abs(limit_l-u_l)>1E-12){
-            for(int k = 0; k<u.size()[1];k++){
+        if(std::abs(limit_l-u_l)>1E-8){
+            for(int k = 1; k<u.size()[1]-1;k++){
                 u(i,k) = u_mean;
             }
         }    
-        int midpoint = 0;
-            if(PP_N_==1){
-                midpoint = 1;
-            }else if(PP_N_%2==0){
-                midpoint = int(PP_N_/2);
-            }else{
-                midpoint = int(PP_N_/2)+1;
-            }
         if(u_r<0) {
-
-            for(int k = 1; k<grid_->u_.size()[1]-1;k++){
-                if(k<midpoint){
-                    u(i,k) = (1+2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
-                }else if(k>midpoint){
-                    u(i,k) = (1-2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
-                }else{
-                    u(i,k) =u_mean;
+                u(i,nNodes+1) = (1-2)*u_mean;
                 }
-              }
-        }
         if(u_l<0){
-            for(int k = 1; k<grid_->u_.size()[1]-1;k++){
-                if(k<midpoint){
-                    u(i,k) =(1-2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
-                }else if(k>midpoint){
-                    u(i,k) =(1+2/meshWidth_[0]*(innerMeshWidth_[0]))*u_mean;
-                }else{
-                    u(i,k) =u_mean;
+                u(i,0) =(1-2)*u_mean;
                 }
-            }
-        }
     }
 
 }
