@@ -12,12 +12,16 @@ Array2D::Array2D(std::array<int,2> size) :
 
 void Array2D::printValues()
 {
-  for (int j = 0; j < size_[1]; j++)
+  for (int i = 0; i < size_[0]; i++)
   {
-    for (int i = 0; i < size_[0]; i++)
+    for (int j = 0; j < size_[1]; j++)
     {
-      std::cout << operator()(i, j) << " ";
-    }
+      if(operator()(i,j)<0){
+        std::cout << operator()(i, j) <<"|";
+      }else{
+        std::cout << operator()(i, j) << " "<<"|";
+      }
+      }
     std::cout << std::endl;
   }
 }

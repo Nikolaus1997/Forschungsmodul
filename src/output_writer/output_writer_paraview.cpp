@@ -64,7 +64,6 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
     //solutionVector[0] = grid_->u(i);
     arraySolution->SetValue(index,grid_->solution_(i));
   }
-
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());
 
@@ -87,13 +86,12 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
   index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  nCells = grid_->x_.size()[0];
-  for (int i = 0; i < nCells; i++, index++)
+  for (int i = 0; i <grid_->x_.size()[0]; i++)
   {
-    //std::array<double,1> solutionVector;
-    //solutionVector[0] =grid_->x(i);
-    //solutionVector[0] = grid_->u(i);
-    arrayXaxis->SetValue(index,grid_->x(i));
+    for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
+    {
+      arrayXaxis->SetValue(index,grid_->x_(i,j));
+    }
   }
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());

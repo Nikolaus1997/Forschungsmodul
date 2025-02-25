@@ -29,6 +29,8 @@ void Computation::initialize(std::string filename)
     std::array<int,2> t  ={nCells_[0],PP_N_+1};
     VdM_ = std::make_shared<Vandermonde>(t,nNodes+2);
 
+    //initialize Projection Operator
+    Projection proj_ = Projection();
 
     //initialize the flux function;
     flux_ = Flux();
@@ -120,6 +122,13 @@ void Computation::initialize(std::string filename)
     }else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
+
+    // Array2D x_ = Array2D({1,3});
+    // Array2D u_ = Array2D({1,3});
+    // x_(0,0) = 0.0; x_(0,1) = 1.0; x_(0,2) = 2.0;// x_(0,3) = 3.0;
+    // u_(0,0) = 6.0; u_(0,1) = 0.0; u_(0,2) = 0.0;// u_(0,3) = 20.0;
+    // proj_.makeProjection(u_,x_,0,2);
+    
 }
 
 void Computation::runSimulation()
@@ -130,7 +139,9 @@ void Computation::runSimulation()
     double time_ = 0.0;
     int iter = 0.0;
     fillFaces();
+    std::cout<<" FACES FILLED "<<std::endl;
     fillX();
+    std::cout<<" X FILLED "<<std::endl;
     initVdm();
     grid_->fillArray(grid_->u(),VdM_->VdM_,VdM_->L_);
     grid_->fillSolution(grid_->solution_,grid_->u());
@@ -162,23 +173,13 @@ void Computation::runSimulation()
                 }
             }else{
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
-                    // if(iter<80){
-                    //     std::cout<<"U"<<std::endl;
-                    //     grid_->u_.printValues();
-                    //     std::cout<<"Q"<<std::endl;
-                    //     grid_->q_.printValues();
-                    // }
+                    calcDt();
                     eulerTimeStep();
-
-                    applyLimiter(grid_->u());
-                    // if(iter<80){
-                    //     std::cout<<" AFTER LIMIT U"<<std::endl;
-                    //     grid_->u_.printValues();
-                    //     std::cout<<" AFTER LIMIT Q"<<std::endl;
-                    //     grid_->q_.printValues();
-                    // }
+                    secondLimiter(grid_->u());
+                    firstLimiter(grid_->u());
 
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
+                    calcDt();
                     rungeKutta();                 
                 }
             }
@@ -193,7 +194,7 @@ void Computation::runSimulation()
 
             // calcDt();
             iter++;
-            std::cout<<"\rCurrent Iteration: "<<iter<<" End Iter: "<<numberofIterations<< std::flush;
+            std::cout<<"\rCurrent Time: "<<time_<<" End Time: "<<settings_.endTime<< std::flush;
     }
     std::cout<<" TIME: "<<time_<<std::endl;
     grid_->fillSolution(grid_->solution_,grid_->u_);
@@ -209,18 +210,23 @@ void Computation::calcDt(){
     double max = 0.0;
     double dx =0.0;
     double c = 0.0;
-    // for(int i=0;i<grid_->u_.size()[0];i++){
-    //     double u = grid_->u(i);
-    //     if(u==0)
-    //         continue;
-    //     dx = grid_->faces(i+1)-grid_->faces(i);
-    //     c = flux_.compute(u,0.0,double(settings_.BarenblattM))[1]*flux_.compute(u,0.0,double(settings_.BarenblattM))[1];
-    //     double dt = settings_.CFL*dx*dx/c*0.5;
-    //     if(dt>max){
-    //         max = dt;
-    //     }
-    // }
-    // dt_ = max;
+    for(int i=0;i<grid_->u_.size()[0];i++){
+        for(int j = 0; j<grid_->u_.size()[1];j++){
+            double u_temp = grid_->u_(i,j);
+            if(abs(u_temp)<1E-12)
+                continue;
+            c = settings_.BarenblattM*pow(u_temp,settings_.BarenblattM-1.0);
+            //std::cout<<" C "<<c<<std::endl;
+            double dt = settings_.CFL*dx*dx/c*0.5;
+            if(c>max){
+                max = c;
+                }
+        }
+    }
+    dx = innerMeshWidth_[0];    
+    dt_ = settings_.CFL*dx*dx/max*0.5;
+    // if(max>settings_.dt)
+    //     dt_ = settings_.dt;
     //std::cout<<" DT "<<dt_<<std::endl;
 }
 
@@ -249,12 +255,12 @@ void Computation::calcQ(const Array2D& u)
                 ur_i = u(i,nNodes+1);
                 ur_iminus  = u(i-1,nNodes+1);
                 ul_iplus = u(i,0);
-                for(int k = 1; k<u.size()[1]-1;k++){
+                for(int k =0; k<u.size()[1];k++){
                     u_mean += u(i,k);
                     u_mean_plus += u(i+1,k);
                 }
-                u_mean = u_mean/(u.size()[1]-2);
-                u_mean_plus = u_mean_plus/(u.size()[1]-2);  
+                u_mean = u_mean/(u.size()[1]);
+                u_mean_plus = u_mean_plus/(u.size()[1]);  
         }
 
         for (int j = 0; j <=PP_N_; j++) {
@@ -312,7 +318,9 @@ void Computation::rungeKutta() {
             grid_->u1_(i, j)  = grid_->u_(i,j)+ dt_ * grid_->ut_(i, j);
         }
     }
-    applyLimiter(grid_->u1_);
+
+    secondLimiter(grid_->u1_);
+    firstLimiter(grid_->u1_);
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
         calcUdt(grid_->u1_); // Compute the time derivative for u^n
@@ -331,7 +339,10 @@ void Computation::rungeKutta() {
                                 (1.0 / 4.0) * dt_ * grid_->ut_(i, j);
         }
     }
-    applyLimiter(grid_->u2_);
+  
+    
+    secondLimiter(grid_->u2_);
+    firstLimiter(grid_->u2_);  
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
         calcUdt(grid_->u2_); // Compute the time derivative for u^n
@@ -350,16 +361,18 @@ void Computation::rungeKutta() {
                                (2.0 / 3.0) * dt_ *  grid_->ut_(i, j);
         }
     }
-    applyLimiter(grid_->u_);
+    secondLimiter(grid_->u_);
+    firstLimiter(grid_->u_);
 }
 
 
 
-void Computation::applyLimiter(Array2D &u)
+void Computation::firstLimiter(Array2D &u)
 {
     for(int i=0;i<grid_->u_.size()[0];i++){
         double limit_l=0.0, limit_r=0.0;
         double u_r =0.0, u_l =0.0,u_mean = 0.0,u_mean_plus = 0.0,u_mean_minus = 0.0;
+        bool check = false;
         u_r = u(i,nNodes+1);
         u_l = u(i,0);
         if(i==0){
@@ -384,60 +397,93 @@ void Computation::applyLimiter(Array2D &u)
         u_mean = u_mean/(u.size()[1]);
         u_mean_plus = u_mean_plus/(u.size()[1]); 
         u_mean_minus = u_mean_minus/(u.size()[1]);
-        
-        int midpoint = 0;
-        if(PP_N_==1){
-            midpoint = 1;
-        }else if(PP_N_%2==0){
-            midpoint = int(PP_N_/2);
-        }else{
-            midpoint = int(PP_N_/2)+1;
-        }
-
-        for(int k = 0; k<u.size()[1];k++){
-            if(u(i,k)<0 ){
-                if(k>=0){
-                    u(i,k) = (1.0-2.0/meshWidth_[0]*innerMeshWidth_[0])*u(i,k);
-                }else if(k<midpoint){
-                    u(i,k) = (1.0+2.0/meshWidth_[0]*innerMeshWidth_[0])*u(i,k);
-                }else{
-                    u(i,k) = 0;    
-                }
-            }
-            // }else if(u(i,k)<0 and u_mean>0){
-            //     if(k<midpoint){
-            //         u(i,k) = (1-2/meshWidth_[0]*innerMeshWidth_[0]*(k-midpoint))*u_mean;
-            //     }else{
-            //         u(i,k) = (1+2/meshWidth_[0]*innerMeshWidth_[0]*(k-midpoint))*u_mean;
-            //     }
-            // }  
-        }           
+              
         double a = u_r -u_mean;
         double b = u_mean - u_mean_minus;
         double c = u_mean_plus - u_mean;    
-        limit_r = u_mean+limiter_.computeLimiter(a,b,c,innerMeshWidth_[0]);
+        limit_r = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
         a = u_mean - u_l;
         b = u_mean - u_mean_minus;
         c = u_mean_plus - u_mean;
-        limit_l = u_mean-limiter_.computeLimiter(a,b,c,innerMeshWidth_[0]);
+        limit_l = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
         
         if(std::abs(limit_r-u_r)>1E-8){
-            for(int k = 1; k<u.size()[1]-1;k++){
-                u(i,k) = u_mean;
-            }
+            // for(int k = 1; k<u.size()[1]-1;k++){
+            //     u(i,k) = u_mean;
+            // }
+            proj_.makeProjection(u,grid_->x_,i,2);
+            check = true;
         }
         if(std::abs(limit_l-u_l)>1E-8){
-            for(int k = 1; k<u.size()[1]-1;k++){
-                u(i,k) = u_mean;
-            }
+            // for(int k = 1; k<u.size()[1]-1;k++){
+            //     u(i,k) = u_mean;
+            // }
+            proj_.makeProjection(u,grid_->x_,i,2);
+            check = true;
         }    
-        if(u_r<0) {
-                u(i,nNodes+1) = (1-2)*u_mean;
-                }
-        if(u_l<0){
-                u(i,0) =(1-2)*u_mean;
-                }
+        if(check){
+            double mean_i= 0.0,mean_iminus = 0.0,mean_iplus = 0.0;   
+            for(int j = 0;j<u.size()[1];j++){
+                mean_i += u(i,j);
+                if((i>0))   
+                    mean_iminus += u(i-1,j);
+                if((i<nCells_[0]-1))
+                    mean_iplus += u(i+1,j);
+            }
+            mean_i = mean_i/(u.size()[1]);
+            for(int j = 0;j<u.size()[1];j++){
+                u(i,j)= mean_i+(grid_->x_(i,j)-(grid_->faces(i)+grid_->faces(i+1))/2.0)
+                            *limiter_.computeLimiter(u(i,j),(mean_i-mean_iminus)*2/meshWidth_[0],(mean_iplus-mean_i)*2/meshWidth_[0],meshWidth_[0]);
+                    }
+        }
+        // if(u_r<0) {
+        //         u(i,nNodes+1) = (1-2)*u_mean;
+        //         }
+        // if(u_l<0){
+        //         u(i,0) =(1-2)*u_mean;
+        //         }
     }
+
+}
+
+void Computation::secondLimiter(Array2D &u)
+{
+    for(int i=0;i<u.size()[0];i++){
+        for(int j=0;j<u.size()[1];j++){
+            if(u(i,j)<0){
+              proj_.makeProjection(u,grid_->x_,i,2);
+              double x_j = (grid_->faces(i)+grid_->faces(i+1))/2.0;
+              double mean = 0.0;
+
+                for(int k = 0;k<u.size()[1];k++){
+                    mean += u(i,k);
+                }
+                mean = mean/(u.size()[1]);
+                if(false){//grid_->x(i,j)>0){
+                    for(int k = 0;k<u.size()[1];k++){
+                        if(u(i,nNodes+1)<0){
+                                u(i,k)=(1.0+2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
+                        }
+                        if(u(i,0)<0){
+                                u(i,k)=(1.0-2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
+                        }
+                    }
+                }else{
+                    for(int k = 0;k<u.size()[1];k++){
+                        if(u(i,nNodes+1)<0){
+                                u(i,k)=(1.0-2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
+                        }
+                        if(u(i,0)<0){
+                            u(i,k)=(1.0+2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+
 
 }
 
@@ -487,12 +533,12 @@ void Computation::calcUdt(const Array2D& u,const Array2D& q)
                 qr_i        =  q(i,nNodes+1);
                 qr_iminus   = q(i-1,nNodes+1);
                 ql_iplus    = q(i+1,0); 
-                for(int k = 1; k<u.size()[1]-1;k++){
+                for(int k = 0; k<u.size()[1];k++){
                     u_mean += u(i,k);
                     u_mean_plus += u(i+1,k);
                 }
-                u_mean = u_mean/(u.size()[1]-2);
-                u_mean_plus = u_mean_plus/(u.size()[1]-2);  
+                u_mean = u_mean/(u.size()[1]);
+                u_mean_plus = u_mean_plus/(u.size()[1]);  
             }
         for (int j = 0; j <=PP_N_; j++) {
             double l = double(j);
@@ -552,11 +598,11 @@ void Computation::fillX()
     double mean = 0.0, diff  =0.0;
     for (int i = 0; i < grid_->faces_.size()[0]-1; i++)
     {
-        mean = 0.5 * (grid_->faces_(i+1) + grid_->faces_(i));
-        diff = 0.5 * (grid_->faces_(i+1) - grid_->faces_(i));
-        for(int j = 1; j<=nNodes;j++){
+        for(int j=0 ; j<grid_->x_.size()[1];j++){
+            mean = 0.5 * (grid_->faces_(i+1) + grid_->faces_(i));
+            diff = 0.5 * (grid_->faces_(i+1) - grid_->faces_(i));
             transformedNode = mean + diff*quad_->basis_.nodes(j);
-            grid_->x(i*(nNodes)+j-1) = transformedNode;
+            grid_->x(i,j) = transformedNode;
         }
     }   
 }

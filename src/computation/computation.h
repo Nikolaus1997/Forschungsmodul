@@ -13,6 +13,7 @@
 #include "storage/array3d.h"
 #include "storage/array2d.h"
 #include "limiter/limiter.h"
+#include "limiter/projection.h"
 
 #include <memory>
 #include <vector>
@@ -45,7 +46,8 @@ class Computation
         void calcError(double currenTime);
         void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
         void calcUdt(const Array2D& u);
-        void applyLimiter(Array2D& u);
+        void firstLimiter(Array2D& u);
+        void secondLimiter(Array2D& u);
     
     private:
         std::array<double,1> meshWidth_;
@@ -62,6 +64,7 @@ class Computation
         double initCondA_;
         double initCondB_;
         int PP_N_;
+        Projection proj_;
         Flux flux_;
         Limiter limiter_;
         NumericalFlux gFlux_;

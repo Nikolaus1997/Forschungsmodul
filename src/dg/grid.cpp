@@ -9,7 +9,7 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2
                                         u2_    ({int(nCells_[0]),(numberNodes+2)}),
                                         solution_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         derivative_({int(nCells_[0]*(numberNodes))},   meshWidth_),
-                                        x_      ({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        x_      ({int(nCells_[0]),(numberNodes+2)}),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_),
                                         l2_error_({1},   meshWidth_),
@@ -67,19 +67,19 @@ double &Grid::u2(int i, int j)
 }
 
 
-const Variable &Grid::x() const
+const Array2D &Grid::x() const
 {
     return x_;
 }
 
-double Grid::x(int i) const
+double Grid::x(int i, int j) const
 {
-    return x_(i);
+    return x_(i,j);
 }
 
-double &Grid::x(int i)
+double &Grid::x(int i,int j)
 {
-    return x_(i);
+    return x_(i,j);
 }
 
 const Variable &Grid::faces() const

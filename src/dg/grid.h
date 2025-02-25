@@ -40,11 +40,11 @@ public:
     double &ut(int i);
 
 
-    const Variable &x() const;
+    const Array2D &x() const;
 
-    double x(int i) const;
+    double x(int i, int j) const;
 
-    double &x(int i);
+    double &x(int i, int j);
 
 
     const Variable &faces() const;
@@ -89,7 +89,7 @@ protected:
     Array2D u2_;
     Array2D u1_;
     Array2D ut_;
-    Variable x_;
+    Array2D x_;
     Variable faces_;
     Variable l2_error_;
     Variable linf_error_;
