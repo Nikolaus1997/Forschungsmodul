@@ -171,12 +171,6 @@ void Computation::runSimulation()
 
     // std::cout<<" AFTER LIMITER U "<<std::endl;
     // grid_->u_.printValues();
-    // for(int i = 0; i<grid_->u_.size()[0];i++){
-    //     for(int j = 0; j<grid_->u_.size()[1];j++){
-    //         if(grid_->u_(i,j)<0)
-    //             grid_->u_(i,j) = 0.0;
-    //     }
-    // }
     while (time_<settings_.endTime)
         {
             if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
@@ -204,7 +198,7 @@ void Computation::runSimulation()
                 grid_->fillSolution(grid_->solution_,grid_->u_);
                 grid_->fillSolution(grid_->derivative_,grid_->ut_);
                 outputWriterParaview_->writeFile(time_,settings_.OutputName);
-                calcError(time_); 
+                //calcError(time_); 
             }
 
             // calcDt();
@@ -341,20 +335,15 @@ void Computation::rungeKutta() {
             grid_->u1_(i, j)  = grid_->u_(i,j)+ dt_ * grid_->ut_(i, j);
         }
     }
-    // std::cout<<" U1 "<<std::endl;
-    // grid_->u1_.printValues();
+    //  std::cout<<" U1 "<<std::endl;
+    //  grid_->u1_.printValues();
     firstLimiter(grid_->u1_);
+    //  std::cout<<" AFTER first LIMITER U1 "<<std::endl;
+    //  grid_->u1_.printValues();
     secondLimiter(grid_->u1_);
 
-    // 
-    // for(int i = 0; i<grid_->u_.size()[0];i++){
-    //     for(int j = 0; j<grid_->u_.size()[1];j++){
-    //         if(grid_->u1_(i,j)<0)
-    //             grid_->u1_(i,j) = 0.0;
-    //     }
-    // }
-    // std::cout<<" AFTER LIMITER U1 "<<std::endl;
-    // grid_->u1_.printValues();
+    //  std::cout<<" AFTER LIMITER U1 "<<std::endl;
+    //  grid_->u1_.printValues();
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
         calcUdt(grid_->u1_); // Compute the time derivative for u^n
@@ -374,20 +363,13 @@ void Computation::rungeKutta() {
         }
     }
   
-    // std::cout<<" U2 "<<std::endl;
-    // grid_->u2_.printValues();
+    //  std::cout<<" U2 "<<std::endl;
+    //  grid_->u2_.printValues();
     firstLimiter(grid_->u2_);
     secondLimiter(grid_->u2_); 
   
-    // 
-    for(int i = 0; i<grid_->u_.size()[0];i++){
-        for(int j = 0; j<grid_->u_.size()[1];j++){
-            if(grid_->u2_(i,j)<0)
-                grid_->u2_(i,j) = 0.0;
-        }
-    }
-    // std::cout<<" AFTER LIMITER U2 "<<std::endl;
-    // grid_->u2_.printValues();
+    //  std::cout<<" AFTER LIMITER U2 "<<std::endl;
+    //  grid_->u2_.printValues();
     // Step 2: Compute the intermediate stage u^(2)
     if(settings_.BarenblattM==0){
         calcUdt(grid_->u2_); // Compute the time derivative for u^n
@@ -406,20 +388,13 @@ void Computation::rungeKutta() {
                                (2.0 / 3.0) * dt_ *  grid_->ut_(i, j);
         }
     }
-    // std::cout<<" U "<<std::endl;
-    // grid_->u_.printValues();
+    //  std::cout<<" U "<<std::endl;
+    //  grid_->u_.printValues();
     firstLimiter(grid_->u_);
     secondLimiter(grid_->u_);
 
-    // 
-    for(int i = 0; i<grid_->u_.size()[0];i++){
-        for(int j = 0; j<grid_->u_.size()[1];j++){
-            if(grid_->u_(i,j)<0)
-                grid_->u_(i,j) = 0.0;
-        }
-    }
-    // std::cout<<" AFTER LIMITER U "<<std::endl;
-    // grid_->u_.printValues();    
+    //  std::cout<<" AFTER LIMITER U "<<std::endl;
+    //  grid_->u_.printValues();    
 }
 
 
@@ -464,14 +439,14 @@ void Computation::firstLimiter(Array2D &u)
         c = u_mean_plus - u_mean;
         limit_l = u_mean-limiter_.computeLimiter(a,b,c,meshWidth_[0]);
         
-        if(std::abs(limit_r-u_r)>1E-12){
+        if(std::abs(limit_r-u_r)>1E-17){
             // for(int k = 1; k<u.size()[1]-1;k++){
             //     u(i,k) = u_mean;
             // }
             proj_.makeProjection(u,grid_->x_,i,2);
             check = true;
         }
-        if(std::abs(limit_l-u_l)>1E-12){
+        if(std::abs(limit_l-u_l)>1E-17){
             // for(int k = 1; k<u.size()[1]-1;k++){
             //     u(i,k) = u_mean;
             // }
@@ -490,18 +465,12 @@ void Computation::firstLimiter(Array2D &u)
             mean_i = mean_i/(u.size()[1]);
             mean_iminus = mean_iminus/(u.size()[1]);
             mean_iplus = mean_iplus/(u.size()[1]);
-            double slope = u(i,nNodes+1)-u(i,0)/meshWidth_[0];
+            double slope = (u(i,nNodes+1)-u(i,0))/meshWidth_[0];
             for(int j = 0;j<u.size()[1];j++){
-                u(i,j)= mean_i+(grid_->x_(i,j)-(grid_->faces(i)+grid_->faces(i+1))/2.0)
+                u(i,j)= mean_i+(grid_->x_(i,j)-(grid_->x(i,0)+grid_->x(i,nNodes+1))/2.0)
                             *limiter_.computeLimiter(slope,(mean_i-mean_iminus)*2/meshWidth_[0],(mean_iplus-mean_i)*2/meshWidth_[0],meshWidth_[0]);
                     }
         }
-        // if(u_r<0) {
-        //         u(i,nNodes+1) = (1-2)*u_mean;
-        //         }
-        // if(u_l<0){
-        //         u(i,0) =(1-2)*u_mean;
-        //         }
     }
 
 }
@@ -512,14 +481,15 @@ void Computation::secondLimiter(Array2D &u)
         for(int j=0;j<u.size()[1];j++){
             if(u(i,j)<0){
                 proj_.makeProjection(u,grid_->x_,i,2);
-              double x_j = (grid_->faces(i)+grid_->faces(i+1))/2.0;
+
+              double x_j = (grid_->x_(i,0)+grid_->x_(i,nNodes+1))/2.0;
               double mean = 0.0;
 
                 for(int k = 0;k<u.size()[1];k++){
                     mean += u(i,k);
                 }
                 mean = mean/(u.size()[1]);
-
+                //std::cout<<" PROJECTION i "<<i<<" "<<u(i,0)<<" "<<u(i,1)<<" "<<u(i,2)<<" "<<u(i,3)<<" mean "<<mean<<" x_j "<<x_j<<std::endl;
                 if(false){//grid_->x(i,j)>0){
                     for(int k = 0;k<u.size()[1];k++){
                         if(u(i,nNodes+1)<0){
@@ -530,15 +500,24 @@ void Computation::secondLimiter(Array2D &u)
                         }
                     }
                 }else{
-                    for(int k = 0;k<u.size()[1];k++){
+
                         if(u(i,nNodes+1)<0){
+                            for(int k = 0;k<u.size()[1];k++){
                                 u(i,k)=(1.0-2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
+                                if(u(i,k)<0 and abs(u(i,k))<1E-12)
+                                    u(i,k) = 0.0;
+                            }
+                            break;
                         }
                         if(u(i,0)<0){
+                            for(int k = 0;k<u.size()[1];k++){
                             u(i,k)=(1.0+2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
-                        }
+                                if(u(i,k)<0 and abs(u(i,k))<1E-12)
+                                    u(i,k) = 0.0;
+                            }
+                            break;
                     }
-                    break;
+
                 }
             }
         }
@@ -634,13 +613,13 @@ void Computation::calcError(double currentTime)
         grid_->l2_error(0) = 0.0;
         for(int i =0;i<grid_->u_.size()[0];i++){
             for(int j = 0; j<grid_->u_.size()[1];j++){
-                if(abs(grid_->x(i,j))<=1.5)
-                    grid_->l2_error(0) += pow((grid_->u_(i,j)-initialCond_.computeInitialCondition(grid_->x(i,j),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM)),2);        }
+                grid_->true_solution_(i,j)= initialCond_.computeInitialCondition(grid_->x(i,j),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM);
+                grid_->l2_error(0) += pow((grid_->u_(i,j)- grid_->true_solution_(i,j)),2);        }
             }
         grid_->linf_error(0) = 0.0;
         for(int i =0;i<grid_->u_.size()[0];i++){
             for(int j=1; j<grid_->u_.size()[1]-1;j++){
-            if(grid_->linf_error(0)<abs(grid_->u_(i,j)-initialCond_.computeInitialCondition(grid_->x(i,j),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM))and abs(grid_->x(i,j))<=1.5) 
+            if(grid_->linf_error(0)<abs(grid_->u_(i,j)-initialCond_.computeInitialCondition(grid_->x(i,j),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM))) 
                 grid_->linf_error(0) = abs(grid_->u_(i,j)-initialCond_.computeInitialCondition(grid_->x(i,j),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM));
         
                 }    

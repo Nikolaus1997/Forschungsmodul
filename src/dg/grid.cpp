@@ -3,6 +3,7 @@
 
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
 nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2)}),
+                                        true_solution_({int(nCells_[0]),(numberNodes+2)}),
                                         q_      ({int(nCells_[0]),(numberNodes+2)}),
                                         ut_      ({int(nCells_[0]),(numberNodes+2)}),
                                         u1_     ({int(nCells_[0]),(numberNodes+2)}),

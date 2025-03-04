@@ -85,6 +85,7 @@ protected:
     Variable solution_;
     Variable derivative_;
     Array2D u_;
+    Array2D true_solution_;
     Array2D q_;
     Array2D u2_;
     Array2D u1_;

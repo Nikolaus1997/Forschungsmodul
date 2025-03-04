@@ -73,7 +73,7 @@ std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, doub
     double u_mean_diff = u_mean_plus-u_mean;
     double g_mean_plus = 0.0,g_mean_minus = 0.0;
     double g_diff=0.0;
-    if((std::abs(u_diff))<1E-32 or  (std::abs(u_mean_diff))<1E-32 ){
+    if((std::abs(u_diff))<1E-12 or  (std::abs(u_mean_diff))<1E-12 ){
         //std::cout<<"IM IN THE IF"<<std::endl;
         fraction_term = -1.0*flux_.compute(u_l,0,m)[1];
         g_plus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
@@ -118,9 +118,9 @@ std::array<double, 2> NumericalFlux::porousMediaMinus(double u_l, double u_r, do
     double u_mean_diff = u_mean_plus-u_mean;
     double g_mean_plus = 0.0,g_mean_minus = 0.0;
     double g_diff=0.0;
-    if((std::abs(u_diff))<1E-32 or  (std::abs(u_mean_diff))<1E-32 ){
+    if((std::abs(u_diff))<1E-12 or  (std::abs(u_mean_diff))<1E-12){
         //std::cout<<"IM IN THE IF"<<std::endl;
-        fraction_term = -1.0*flux_.compute(u_l,0,m)[1];
+        fraction_term = -1.0*flux_.compute(u_r,0,m)[1];
         g_plus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
         g_minus= -1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
         gamma = 0.5*flux_.compute(u_mean_plus,0,m)[1];

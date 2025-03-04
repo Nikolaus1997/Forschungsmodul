@@ -50,7 +50,7 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
   arraySolution->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arraySolution->SetName("solution");
+  arraySolution->SetName("u");
 
   // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
@@ -96,6 +96,32 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());
   dataSet->GetPointData()->AddArray(arrayXaxis);
+// add solution field variable
+  // ---------------------------
+  vtkSmartPointer<vtkDoubleArray> arrayTrueSolution = vtkDoubleArray::New();
+
+  // the pressure is a scalar which means the number of components is 1
+  arrayTrueSolution->SetNumberOfComponents(1);
+
+  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+  arrayTrueSolution->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+  
+  arrayTrueSolution->SetName("true solution");
+
+  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+
+  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+  for (int i = 0; i <grid_->x_.size()[0]; i++)
+  {
+    for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
+    {
+      arrayTrueSolution->SetValue(index,grid_->true_solution_(i,j));
+    }
+  }
+  // now, we should have added as many values as there are points in the vtk data structure
+  assert(index == dataSet->GetNumberOfPoints());
+  dataSet->GetPointData()->AddArray(arrayTrueSolution);
 
   // add solution field variable
   // ---------------------------
