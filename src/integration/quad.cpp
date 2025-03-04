@@ -86,9 +86,6 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
         //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
         sol += weight * intermediate_sol*L_prime;
     }
-
-    // Scale by the length of the interval
-    //sol *= 0.5 * (b - a);
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     return sol;
 }

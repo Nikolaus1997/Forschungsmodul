@@ -27,14 +27,16 @@ double Limiter::minmod(double a, double b, double c, double h) {
     double sign_a = (a > 0) ? 1.0 : ((a < 0) ? -1.0 : 0.0);
     double sign_b = (b > 0) ? 1.0 : ((b < 0) ? -1.0 : 0.0);
     double sign_c = (c > 0) ? 1.0 : ((c < 0) ? -1.0 : 0.0);
-    if(std::abs(a)>pow(h,2) and (sign_a == sign_b) and (sign_b == sign_c)){
+    double mu = 1.0;
+
+    if(std::abs(a)>mu*pow(h,2) and (sign_a == sign_b) and (sign_b == sign_c)){
         double sol = std::min({std::abs(a), std::abs(b), std::abs(c)});
-        if(sol = std::abs(a))
-            return sign_a*sol;
-        if(sol = std::abs(b))
+        if(sol == std::abs(a)){
+            return sign_a*sol;}
+        if(sol == std::abs(b))
             return sign_b*sol;
         return sign_c*sol;
-    }else if(std::abs(a)<=pow(h,2)){
+    }else if(std::abs(a)<=mu*pow(h,2)){ 
         return a;
     }else{
         return 0.0;
