@@ -83,6 +83,7 @@ void Projection::makeProjection(Array2D &u, const Array2D x, int i, int order)
         u(i,j) = 0.0;
         for(int k = 0;k<order;k++){
         u(i,j) += pow(x(i,j),k)*coeff_(k,0);
+        //std::cout<<" ij"<<i<<" "<<j<<" U "<<u(i,j)<<" pow "<<pow(x(i,j),k)<<" coeff "<< coeff_(k,0)<<std::endl;
         }
     }
     // u.printValues();

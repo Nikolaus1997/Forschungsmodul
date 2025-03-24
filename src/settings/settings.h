@@ -20,7 +20,7 @@ struct Settings
   std::string RiemannSolver = "upwind";  //< Initial condition
   double initCondA = 0.0;                     //< Starting point of the initial Condition
   double initCondB = 0.0;                     //< End point of the initial Condition
-
+  std::string useLimiter = "false";
 
   std::string timeStepping = "euler";  //< Time stepping scheme
 

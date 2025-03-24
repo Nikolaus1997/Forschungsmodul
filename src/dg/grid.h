@@ -84,13 +84,13 @@ protected:
     const std::array<double, 1>     meshWidth_;
     Variable solution_;
     Variable derivative_;
-    Array2D u_;
+    Array2D u_,u_analyze_;
     Array2D true_solution_;
     Array2D q_;
     Array2D u2_;
     Array2D u1_;
     Array2D ut_;
-    Array2D x_;
+    Array2D x_, x_analyze_;
     Variable faces_;
     Variable l2_error_;
     Variable linf_error_;

@@ -189,6 +189,10 @@ void Settings::loadFromFile(std::string filename)
     {
       timeStepping = parameterValue;
     }
+    if(parameterName=="useLimiter")
+    {
+      useLimiter =parameterValue;
+    }
   }
 }
 

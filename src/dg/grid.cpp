@@ -11,6 +11,8 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2
                                         solution_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         derivative_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         x_      ({int(nCells_[0]),(numberNodes+2)}),
+                                        x_analyze_    ({1000,1}),
+                                        u_analyze_    ({1000,1}),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_),
                                         l2_error_({1},   meshWidth_),
@@ -159,6 +161,8 @@ void Grid::fillArray(Array2D& x,const Array2D& VdM, const Array2D& L)
                 x(i,j) =0.0;
                 for(int p=0;p<VdM.size()[1];p++){
                     x(i,j) +=VdM(i,p)*L(j,p);
+                    // if(abs(x(i,j))<1E-12)
+                    //     x(i,j) = 0.0;
                 }
             }
     }

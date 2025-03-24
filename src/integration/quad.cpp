@@ -113,5 +113,5 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
 
 double Quadrature::G(double u, double m)
 {
-    return sqrt(m)*2/(m+1)*sqrt(pow(u,m-1))*u;
+    return sqrt(m)*2./(m+1.)*sqrt(pow(u,m-1.))*u;
 }

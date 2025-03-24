@@ -4,6 +4,7 @@
 #include <functional>
 #include <array>
 #include <cmath>
+#include <iostream>
 
 class Flux {
 public:

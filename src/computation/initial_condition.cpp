@@ -66,9 +66,12 @@ double InitialCondition::sinusFunc(double x, double a, double b)
 double InitialCondition::barenBlatt(double x, double a, double b, double t, int m)
 {
     double r = double(m);
-    double k = 1/(r+1), factor = k*(r-1)/(2*r), timefactor = 1/(pow(t,2.0*k));
-    double t_k = pow(t,-k), absx = pow(x,2);
-    double brack = pow(std::max(1.0-absx*factor*timefactor,0.0),1/(r-1.0));
+    double k = 1./(r+1.), factor = k*(r-1.)/(2.*r), timefactor = 1./(pow(t,2.0*k));
+    double t_k = pow(t,-k), absx = pow(x,2.);
+    double brack = pow(std::max(1.0-absx*factor*timefactor,0.0),1./(r-1.0));
     //std::cout<<" k: "<<k<<" factor: "<<factor<<" absx: "<<absx<<" timefactor: "<<timefactor<<" brack: "<<brack<<"  "<<t_k <<std::endl;
-    return t_k*brack;
+    if(m>1)
+        return t_k*brack;
+    else
+        return 1.0;
 }

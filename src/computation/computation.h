@@ -48,6 +48,8 @@ class Computation
         void calcUdt(const Array2D& u);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
+        void fillXanalyze(Array2D& x);
+        void fillUanalyze(Array2D& u_analyze,const Array2D& x,const Array2D& Vdm);
     
     private:
         std::array<double,1> meshWidth_;
@@ -56,7 +58,9 @@ class Computation
         Settings settings_;
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;
-        std::unique_ptr<OutputWriterParaview> outputWriterParaview_;        
+        std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
+        bool useLimiter_;  
+        int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_;
         double a_;
