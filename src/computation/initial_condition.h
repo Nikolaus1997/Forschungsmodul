@@ -16,7 +16,7 @@ public:
     void setInitialCondType(InitialCondType type);
 
 
-    double computeInitialCondition(double x, double a, double b, double time = 0 , int m = 0);
+    double computeInitialCondition(double x, double a, double b, double time = 0 , double m = 0.);
 
     // Destructor (optional, for cleanup if needed)
     double unitStep(double x, double a, double b);
@@ -25,7 +25,7 @@ public:
 
     double sinusFunc(double x, double a, double b);
 
-    double barenBlatt(double x, double a, double b, double time, int m);
+    double barenBlatt(double x, double a, double b, double time, double m);
 
     // Other member functions and data members can be added here
 private:

@@ -147,7 +147,7 @@ void Computation::runSimulation()
     Timer timer;
     timer.start();
     double time_ = 0.0;
-    int iter = 0.0;
+    int iter = 0;
     fillFaces();
     fillX();
     //grid_->x_.printValues();
@@ -200,6 +200,8 @@ void Computation::runSimulation()
 
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
                     calcDt();
+                    if(time_+dt_>settings_.endTime)
+                        dt_ = settings_.endTime-time_;
                     rungeKutta();                
                 }
             }
@@ -665,7 +667,7 @@ void Computation::calcError(double currentTime)
         }
         grid_->l2_error(0) = 0.0;
         for(int i =0;i<grid_->u_analyze_.size()[0];i++){
-            grid_->l2_error(0) += pow((grid_->u_analyze_(i,0)- initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM)),2);     
+            grid_->l2_error(0) += pow((grid_->u_analyze_(i,0)- initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+1.0, settings_.BarenblattM)),2.);     
         }
         
         grid_->linf_error(0) = 0.0;

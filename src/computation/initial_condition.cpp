@@ -6,7 +6,7 @@ void InitialCondition::setInitialCondType(InitialCondType type){
 }
 
 
-double InitialCondition::computeInitialCondition(double x, double a, double b, double t, int m)
+double InitialCondition::computeInitialCondition(double x, double a, double b, double t, double m)
 {
     if(m==0 and t ==0){
         switch (selectedFunction){
@@ -63,11 +63,11 @@ double InitialCondition::sinusFunc(double x, double a, double b)
 }
 //like in the papaer from ZhangWu
 // never ever just use an int as multiplicator
-double InitialCondition::barenBlatt(double x, double a, double b, double t, int m)
+double InitialCondition::barenBlatt(double x, double a, double b, double t, double m)
 {
-    double r = double(m);
+    double r = m;
     double k = 1./(r+1.), factor = k*(r-1.)/(2.*r), timefactor = 1./(pow(t,2.0*k));
-    double t_k = pow(t,-k), absx = pow(x,2.);
+    double t_k = pow(t,-k), absx = pow(fabs(x),2.);
     double brack = pow(std::max(1.0-absx*factor*timefactor,0.0),1./(r-1.0));
     //std::cout<<" k: "<<k<<" factor: "<<factor<<" absx: "<<absx<<" timefactor: "<<timefactor<<" brack: "<<brack<<"  "<<t_k <<std::endl;
     if(m>1)

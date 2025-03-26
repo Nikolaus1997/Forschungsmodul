@@ -176,7 +176,7 @@ void Settings::loadFromFile(std::string filename)
       initCondB = atof(parameterValue.c_str());
     }
     if(parameterName=="BarenblattM"){
-      BarenblattM = atoi(parameterValue.c_str());
+      BarenblattM = atof(parameterValue.c_str());
     }
     if(parameterName=="BarenblattTime"){
       BarenblattTime = atof(parameterValue.c_str());
@@ -200,7 +200,7 @@ void Settings::loadFromFile(std::string filename)
 void Settings::printSettings()
 {
   std::cout << "Settings: " << std::endl
-    <<"PP_N: "<<PP_N<<std::endl
+    <<"PP_N: "<<PP_N<<" BBM "<<BarenblattM<<" BBTime "<<BarenblattTime<<std::endl
     << "  Interval: [" << physicalSize[0] << " , " << physicalSize[1] << "] , nCells: " << nCells[0]  << std::endl
     << "  endTime: " << endTime <<  ", maximum dt: " << dt << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
 }

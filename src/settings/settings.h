@@ -24,7 +24,7 @@ struct Settings
 
   std::string timeStepping = "euler";  //< Time stepping scheme
 
-  int BarenblattM = 0;
+  double BarenblattM = 0;
   double BarenblattTime= 1.0;
 
   std::array<double,2> dirichletBcBottom;  //< prescribed values of u,v at bottom of domain
