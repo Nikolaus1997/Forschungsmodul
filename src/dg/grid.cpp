@@ -13,6 +13,7 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2
                                         x_      ({int(nCells_[0]),(numberNodes+2)}),
                                         x_analyze_    ({300,1}),
                                         u_analyze_    ({300,1}),
+                                        u_analyze_true_    ({300,1}),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_),
                                         l2_error_({1},   meshWidth_),

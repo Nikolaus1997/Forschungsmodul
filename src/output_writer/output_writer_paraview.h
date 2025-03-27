@@ -24,7 +24,9 @@ public:
   //! write current velocities to file, filename is output_<count>.vti
   void writeFile(double currentTime,std::string OutputName);
 
-private:
+  void writeFileTrueSolution(double currentTime, std::string OutputName);
+
+  private:
 
   vtkSmartPointer<vtkXMLImageDataWriter> vtkWriter_;   //< vtk writer to write ImageData
 };

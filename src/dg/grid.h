@@ -84,7 +84,7 @@ protected:
     const std::array<double, 1>     meshWidth_;
     Variable solution_;
     Variable derivative_;
-    Array2D u_,u_analyze_;
+    Array2D u_,u_analyze_, u_analyze_true_;
     Array2D true_solution_;
     Array2D q_;
     Array2D u2_;
