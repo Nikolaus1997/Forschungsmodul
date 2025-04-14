@@ -90,9 +90,9 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
     return sol;
 }
 double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, int j, double a, double b, 
-                            const Array2D& u, const Array2D& q) {
+                            const Array2D& u, const Array2D& q,const Array2D& source) {
     int length = basis_.weights_.size()[0];
-    double sol = 0.0;
+    double sol1 = 0.0,sol2 = 0.0;
 
     for (int k = 1; k < length - 1; k++) {
         double node = basis_.nodes(k);
@@ -101,13 +101,14 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         double evaluationQ = 0.0;
 
         // Transform the node from [-1, 1] to [a, b]
-        double L_prime = LegendrePolynomialAndDerivative(j, node)[1];
+        std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
-        sol += weight * intermediate_sol * L_prime;
+        sol1 += weight * (-source(i,k)*L[0]);
+        sol2 += weight * (intermediate_sol * L[1]);
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
-    //sol *= 0.5 * (b - a);
+    double sol = 0.5 * (b - a)*sol1 + sol2;
     return sol;
 }
 

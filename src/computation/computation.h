@@ -45,7 +45,7 @@ class Computation
         void fillFaces();
         void calcDt();
         void calcError(double currenTime);
-        void calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t);
+        void calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t, double epsilon = 1.0);
         void calcUdt(const Array2D& u, Array2D& VdM_t);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
@@ -68,6 +68,7 @@ class Computation
         double nNodes;
         double initCondA_;
         double initCondB_;
+        double epsilon_;
         int PP_N_;
         Projection proj_;
         Flux flux_;

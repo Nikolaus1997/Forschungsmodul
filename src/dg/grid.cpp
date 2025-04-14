@@ -4,6 +4,7 @@
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
 nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2)}),
                                         j_      ({int(nCells_[0]),(numberNodes+2)}),
+                                        jt_     ({int(nCells_[0]),(numberNodes+2)}),
                                         j_1_    ({int(nCells_[0]),(numberNodes+2)}),
                                         j_2_    ({int(nCells_[0]),(numberNodes+2)}),
                                         true_solution_({int(nCells_[0]),(numberNodes+2)}),

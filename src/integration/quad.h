@@ -16,5 +16,5 @@ public:
     double IntGaussLegendreQuad(std::function<double(double)> func,int j ,double a, double b);
     double IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);
     double IntFluxQ(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);
-    double IntFluxU(std::function<double(double,double)> func,int i,int j ,double a, double b,const Array2D& u, const Array2D& q);
+    double IntFluxU(std::function<double(double,double)> func,int i,int j ,double a, double b,const Array2D& u, const Array2D& q, const Array2D& source);
 };

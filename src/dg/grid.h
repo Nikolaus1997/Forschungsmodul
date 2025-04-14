@@ -90,7 +90,7 @@ protected:
     Variable solution_,solutionJ_;
     Variable derivative_;
     Array2D u_,u_analyze_, u_analyze_true_;
-    Array2D j_,j_1_,j_2_;
+    Array2D j_,j_1_,j_2_,jt_;
     Array2D true_solution_;
     Array2D q_;
     Array2D u2_;

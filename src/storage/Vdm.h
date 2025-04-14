@@ -45,9 +45,9 @@ class Vandermonde: public Array2D
         Array2D VdM_t_;
         Array2D VdMJ_t_;
         Array2D VdMQ_;
-        Array2D VdM_J;
-        Array2D VdM1_;
-        Array2D VdM2_;
+        Array2D VdMJ_;
+        Array2D VdM1_, VdMJ1_;
+        Array2D VdM2_, VdMJ2_;
         Array2D L_;
         Array2D L_prime_;
     friend class Computation;

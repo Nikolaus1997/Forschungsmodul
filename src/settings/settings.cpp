@@ -193,6 +193,10 @@ void Settings::loadFromFile(std::string filename)
     {
       useLimiter =parameterValue;
     }
+    if(parameterName=="Epsilon")
+    {
+      Epsilon = atof(parameterValue.c_str());
+    }
   }
 }
 

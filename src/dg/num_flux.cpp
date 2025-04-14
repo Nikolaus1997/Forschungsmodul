@@ -9,7 +9,7 @@ void NumericalFlux::setNumFluxFunction(FunctionType type)
 }
 
 // Compute the numerical flux based on the selected function
-double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_)
+double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_, double dt, double meshWidth)
 {
     switch (selectedFunction)
     {
@@ -18,7 +18,7 @@ double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_)
     case FunctionType::downwind:
         return downwind(u_l, u_r,flux_);
     case FunctionType::lax:
-        return lax(u_l, u_r,flux_);
+        return lax(u_l, u_r,flux_, dt, meshWidth);
     case FunctionType::enquist:
         return enquist(u_l, u_r,flux_);
     default:
@@ -49,10 +49,10 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 }
 
 // Lax flux function
-double NumericalFlux::lax(double u_l, double u_r, Flux flux_)
+double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    return 0.5 * (flux_.compute(u_l) + flux_.compute(u_r))+0.5*(u_l-u_r);
+    return 0.5*dt/meshWidth * (flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l) * dt / meshWidth;
 }
 
 // Enquist flux function
