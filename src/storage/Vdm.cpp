@@ -5,6 +5,8 @@ Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
                     VdMQ_(size),    
                     VdM1_(size),
                     VdM2_(size),
+                    VdM_J(size),
+                    VdMJ_t_(size),
                     L_({nNodes,size[1]}),
                     L_prime_({nNodes,size[1]}), 
                     VdM_t_(size)
@@ -81,6 +83,17 @@ double Vandermonde::VdM(int i, int j) const
 double &Vandermonde::VdM(int i, int j)
 {
     return VdM_(i,j);
+}
+
+double Vandermonde::VdMJ(int i, int j) const
+{
+    return VdM_J(i,j);
+}
+
+double &Vandermonde::VdMJ(int i, int j)
+{
+    // TODO: insert return statement here
+    return VdM_J(i,j);
 }
 
 double Vandermonde::VdM1(int i, int j) const

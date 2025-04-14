@@ -115,3 +115,25 @@ double Quadrature::G(double u, double m)
 {
     return sqrt(m)*2./(m+1.)*sqrt(pow(u,m-1.))*u;
 }
+
+double Quadrature::IntJ_0(const Array2D& u, double m, int i, int j)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int k = 1; k < length-1; k++)
+    {
+        double node = basis_.nodes(k);
+        double weight = basis_.weights(k);
+        double evaluation=0.0;
+
+        double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
+        double intermediate_sol= pow(u(i,k),m);
+    
+        //std::cout<<"FUNCEval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
+        //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
+        sol += weight * intermediate_sol*L_prime;
+    }
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
+    return sol;
+}

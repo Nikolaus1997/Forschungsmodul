@@ -8,7 +8,7 @@ void InitialCondition::setInitialCondType(InitialCondType type){
 
 double InitialCondition::computeInitialCondition(double x, double a, double b, double t, double m)
 {
-    if(m==0 and t ==0){
+    if(selectedFunction != InitialCondType::Barenblatt){
         switch (selectedFunction){
             case InitialCondType::UnitStep:
                 return unitStep( x, a, b);
@@ -23,8 +23,6 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
         switch (selectedFunction)
         {
         case InitialCondType::Barenblatt:
-        if(m==0)
-            throw std::invalid_argument("The parameter m of the barenblatt function cant be 0");
             return barenBlatt(x,a,b,t,m);
         default:
             throw std::invalid_argument("Invalid initial condition type");

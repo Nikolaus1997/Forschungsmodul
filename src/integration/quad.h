@@ -11,6 +11,7 @@ class Quadrature: public Basis
 public:
     Quadrature(int N);
     double G(double u,double m);
+    double IntJ_0(const Array2D& u,double m, int i, int j);
     double GaussLegendreQuad(std::function<double(double)> func, double a, double b);
     double IntGaussLegendreQuad(std::function<double(double)> func,int j ,double a, double b);
     double IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);

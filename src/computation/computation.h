@@ -39,13 +39,14 @@ class Computation
         void fillX();
         void calcQ(const Array2D& u);
         void initVdm();
+        void initVdmJ();
         void eulerTimeStep();
         void rungeKutta();
         void fillFaces();
         void calcDt();
         void calcError(double currenTime);
-        void calcUdt(const Array2D& Vdm,const Array2D& VdmQ);
-        void calcUdt(const Array2D& u);
+        void calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t);
+        void calcUdt(const Array2D& u, Array2D& VdM_t);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
         void fillXanalyze(Array2D& x);
@@ -62,7 +63,7 @@ class Computation
         bool useLimiter_;  
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
-        double b_;
+        double b_,m_;
         double a_;
         double nNodes;
         double initCondA_;
