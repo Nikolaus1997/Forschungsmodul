@@ -104,7 +104,7 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
         sol1 += weight * (-source(i,k)*L[0]);
-        sol2 += weight * (intermediate_sol * L[1]);
+        sol2 += weight * (-intermediate_sol * L[1]);
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
