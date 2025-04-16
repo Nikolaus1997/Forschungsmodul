@@ -200,9 +200,9 @@ void Computation::runSimulation()
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
                     calcDt();
                     eulerTimeStep();
-
-                    secondLimiter(grid_->u());
                     firstLimiter(grid_->u());
+                    secondLimiter(grid_->u());
+
 
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
                     calcDt();
@@ -834,9 +834,32 @@ void Computation::initVdm() {
 }
 
 void Computation::initVdmJ(){
+    NumericalFlux lflux;
+    Flux rflux_;
+    rflux_.setFluxFunction(Flux::FunctionType::Linear);
+    double flux_term_left = 0;
+    double flux_term_right = 0;
+    lflux.setNumFluxFunction(NumericalFlux::FunctionType::lax);
+    // for(int i = 0; i<grid_->j_.size()[0];i++){
+    //     for(int j = 0; j<grid_->j_.size()[1];j++){
+    //         if(j>0 and j<nNodes+1){
+    //             grid_->j_(i,j) = (grid_->u_(i,j)-grid_->u_(i,j-1))/innerMeshWidth_[0];
+    //         }
+    //     }
+    // }
     for(int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        double flux_term_left = pow(grid_->u_(i,0),m_);
-        double flux_term_right = pow(grid_->u_(i,nNodes+1),m_);
+        if(i>0 and i<grid_->faces_.size()[0]-2){
+            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,nNodes+1),m_),pow(grid_->u_(i,0),m_),rflux_);
+            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,nNodes+1),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
+        }else if(i==0){
+            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(nCells_[0]-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
+            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
+        }else if(i==grid_->faces_.size()[0]-2){
+            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
+            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(0,0),m_),rflux_);;
+        }
+
+
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
             // Compute the integral for the j-th polynomial degree
             double integral = quad_->IntJ_0(grid_->u_,m_,i,j);
