@@ -848,24 +848,25 @@ void Computation::initVdmJ(){
     //     }
     // }
     for(int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
-        if(i>0 and i<grid_->faces_.size()[0]-2){
-            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,nNodes+1),m_),pow(grid_->u_(i,0),m_),rflux_);
-            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,nNodes+1),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
-        }else if(i==0){
-            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(nCells_[0]-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
-            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
-        }else if(i==grid_->faces_.size()[0]-2){
-            flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
-            flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(0,0),m_),rflux_);;
-        }
-
-
+        // if(i>0 and i<grid_->faces_.size()[0]-2){
+        //     flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,nNodes+1),m_),pow(grid_->u_(i,0),m_),rflux_);
+        //     flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,nNodes+1),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
+        // }else if(i==0){
+        //     flux_term_left = lflux.computeNumFlux(pow(grid_->u_(nCells_[0]-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
+        //     flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(i+1,0),m_),rflux_);;
+        // }else if(i==grid_->faces_.size()[0]-2){
+        //     flux_term_left = lflux.computeNumFlux(pow(grid_->u_(i-1,0),m_),pow(grid_->u_(i,0),m_),rflux_);
+        //     flux_term_right = lflux.computeNumFlux(pow(grid_->u_(i,0),m_),pow(grid_->u_(0,0),m_),rflux_);;
+        // }
+        
+        flux_term_left = pow(grid_->u_(i,0),m_);
+        flux_term_right = pow(grid_->u_(i,nNodes+1),m_);
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
             // Compute the integral for the j-th polynomial degree
             double integral = quad_->IntJ_0(grid_->u_,m_,i,j);
             double flux_term = -flux_term_left*VdM_->L(0,j) + flux_term_right;
 
-            VdM_->VdMJ_(i,j) = (-integral + flux_term) * (2.0 * double(j) + 1.0) / meshWidth_[0];
+            VdM_->VdMJ_(i,j) = (integral - flux_term) * (2.0 * double(j) + 1.0) / meshWidth_[0];
             }
         }
 }
@@ -900,7 +901,7 @@ void Computation::calcUdt(const Array2D& u_, Array2D& VdM_t){
                 ul_iplus    = u_(i+1,0);
             }
             for (int j = 0; j <=PP_N_; j++) {
-            flux_term = -guFlux_.computeNumFlux(ur_iminus,ul_i,uflux_)*VdM_->L_(0,j)  + guFlux_.computeNumFlux(ur_i, ul_iplus,uflux_);
+            flux_term = -guFlux_.computeNumFlux(ur_iminus,ul_i,uflux_,dt_,meshWidth_[0])*VdM_->L_(0,j)  + guFlux_.computeNumFlux(ur_i, ul_iplus,uflux_,dt_,meshWidth_[0]);
             double integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return uflux_.compute(x);}
                                                                 ,i,j ,grid_->faces(i),grid_->faces(i+1),u_);
             VdM_->VdM_t_(i,j) =integ*(2.0*double(j)+1.0)*1/meshWidth_[0] - flux_term*1/meshWidth_[0]*(2.0*double(j)+1.0);
