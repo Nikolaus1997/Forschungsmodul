@@ -52,7 +52,7 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    return 0.5*dt/meshWidth * (flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l) * dt / meshWidth;
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l);
 }
 
 // Enquist flux function

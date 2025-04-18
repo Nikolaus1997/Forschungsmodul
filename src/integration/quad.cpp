@@ -132,7 +132,8 @@ double Quadrature::IntJ_0(const Array2D& u, double m, int i, int j)
         double intermediate_sol= pow(u(i,k),m);
     
         //std::cout<<"FUNCEval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
-        //std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
+        // if(i==8 or i ==9)
+        //     std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
         sol += weight * intermediate_sol*L_prime;
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
