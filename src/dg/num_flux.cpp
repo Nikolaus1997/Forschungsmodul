@@ -59,7 +59,12 @@ double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double 
 double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
 {
 
-    return (u_l > u_r) ? u_l : u_r;
+    if(u_l > u_r) 
+        return u_l;
+    if(u_l<u_r) 
+        return u_r;
+    else
+        return 0.5*(u_l+u_r);
 }
 
 std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, double q_l, double q_r, double m, Flux flux_,const std::unique_ptr<Quadrature>& quad_, double u_mean, double u_mean_plus)
