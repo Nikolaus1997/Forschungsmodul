@@ -21,6 +21,8 @@ double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_, double d
         return lax(u_l, u_r,flux_, dt, meshWidth);
     case FunctionType::enquist:
         return enquist(u_l, u_r,flux_);
+    case FunctionType::central:
+        return 0.5*(flux_.compute(u_l) + flux_.compute(u_r));
     default:
         throw std::invalid_argument("Unknown numerical flux function type.");
     }
@@ -52,19 +54,19 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l);
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l);
+    //return 0.0;
 }
 
 // Enquist flux function
 double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
 {
 
-    if(u_l > u_r) 
+    if(abs(u_l) > abs(u_r)) 
         return u_l;
-    if(u_l<u_r) 
-        return u_r;
     else
-        return 0.5*(u_l+u_r);
+        return u_r;
+    return 0.0;
 }
 
 std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, double q_l, double q_r, double m, Flux flux_,const std::unique_ptr<Quadrature>& quad_, double u_mean, double u_mean_plus)

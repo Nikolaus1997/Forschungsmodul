@@ -5,10 +5,12 @@
 #include <functional>
 #include <array>
 #include <memory>
+#include <cmath>
+#include <iostream>
 
 class NumericalFlux
 {
-    enum class FunctionType { upwind, downwind, lax, enquist, porousMedia };
+    enum class FunctionType { upwind, downwind, lax, enquist, porousMedia, central };
 
     // Constructor
     NumericalFlux() : selectedFunction(FunctionType::upwind) {}

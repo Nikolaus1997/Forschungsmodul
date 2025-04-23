@@ -100,6 +100,18 @@ void Computation::initialize(std::string filename)
         gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::lax);
         std::cout<< "Choosing the numerical Lax Friedrichs flux function..."<<std::endl;
     } 
+    else if (settings_.RiemannSolver == "enquist") {
+        gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::enquist);
+        std::cout<< "Choosing the numerical EnquistOsher flux function..."<<std::endl;
+    } 
+    else if (settings_.RiemannSolver == "barenblatt") {
+        gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::porousMedia);
+        std::cout<< "Choosing the numerical BarenBlattFlux flux function..."<<std::endl;
+    } 
+    else if (settings_.RiemannSolver == "central") {
+        gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::central);
+        std::cout<< "Choosing the numerical Central flux function..."<<std::endl;
+    } 
     else {
         std::cout << "Numerical flux function not found!" << std::endl;
         gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::upwind);
@@ -183,6 +195,7 @@ void Computation::runSimulation()
     if(useLimiter_){
         std::cout<<"Using Limiter"<<std::endl;
     firstLimiter(grid_->u());
+    firstLimiter(grid_->j());
     secondLimiter(grid_->u());
     }
     calcError(errorTime);
@@ -398,6 +411,7 @@ void Computation::rungeKutta() {
     //    grid_->u1_.printValues();
     //secondLimiter(grid_->j_1_);
     firstLimiter(grid_->u1_);
+    firstLimiter(grid_->j_1_);
     //    std::cout<<" AFTER first LIMITER U1 "<<std::endl;
     //    grid_->u1_.printValues();
     secondLimiter(grid_->u1_);
@@ -452,6 +466,7 @@ void Computation::rungeKutta() {
     //  grid_->u2_.printValues();
     //secondLimiter(grid_->u2_); 
     firstLimiter(grid_->u2_);
+    firstLimiter(grid_->j_2_);
     secondLimiter(grid_->u2_); 
     }
     //  std::cout<<" AFTER LIMITER U2 "<<std::endl;
@@ -507,6 +522,7 @@ void Computation::rungeKutta() {
     //   grid_->u_.printValues();
     //secondLimiter(grid_->j_);
     firstLimiter(grid_->u_);
+    firstLimiter(grid_->j_);
     secondLimiter(grid_->u_);
     //   std::cout<<" AFTER LIMITER U "<<std::endl;
     //   grid_->u_.printValues();   
@@ -901,10 +917,10 @@ void Computation::calcUdt(const Array2D& u_, Array2D& VdM_t){
                 ul_iplus    = u_(i+1,0);
             }
             for (int j = 0; j <=PP_N_; j++) {
-            flux_term = -guFlux_.computeNumFlux(ur_iminus,ul_i,uflux_,dt_,meshWidth_[0])*VdM_->L_(0,j)  + guFlux_.computeNumFlux(ur_i, ul_iplus,uflux_,dt_,meshWidth_[0]);
+            flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,uflux_,dt_,meshWidth_[0])*VdM_->L_(0,j)  + gFlux_.computeNumFlux(ur_i, ul_iplus,uflux_,dt_,meshWidth_[0]);
             double integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return uflux_.compute(x);}
                                                                 ,i,j ,grid_->faces(i),grid_->faces(i+1),u_);
-            VdM_->VdM_t_(i,j) =integ*(2.0*double(j)+1.0)*1/meshWidth_[0] - flux_term*1/meshWidth_[0]*(2.0*double(j)+1.0);
+            VdM_->VdM_t_(i,j) =(integ-flux_term)*1/meshWidth_[0]*(2.0*double(j)+1.0);
             //std::cout<<" FROM CALC U"<<" I "<<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
             
         }
