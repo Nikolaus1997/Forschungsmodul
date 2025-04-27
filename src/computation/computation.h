@@ -49,7 +49,8 @@ class Computation
         void calcUdt(const Array2D& u, Array2D& VdM_t);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
-        void fillXanalyze(Array2D& x);
+        void thirdLimiter(Array2D &u);
+        void fillXanalyze(Array2D &x);
         void fillUanalyze(Array2D& u_analyze,const Array2D& x,const Array2D& Vdm);
     
     private:

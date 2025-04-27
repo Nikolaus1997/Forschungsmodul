@@ -134,8 +134,13 @@ void Computation::initialize(std::string filename)
     }else if (settings_.initialCondition == "barenblatt")
     {
         initialCond_.setInitialCondType(InitialCondition::InitialCondType::Barenblatt);
-        std::cout<< "Choosing the barenblatt function as initial condition..."<<std::endl;        
-    }else {
+        std::cout<< "Choosing the barenblatt function as initial condition..."<<std::endl;     
+    }else if (settings_.initialCondition == "gaussian")
+        {
+            initialCond_.setInitialCondType(InitialCondition::InitialCondType::gaussian);
+            std::cout<< "Choosing the gaussian as initial condition..."<<std::endl;
+        }   
+    else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
     if(settings_.useLimiter=="true"){
@@ -195,7 +200,7 @@ void Computation::runSimulation()
     if(useLimiter_){
         std::cout<<"Using Limiter"<<std::endl;
     firstLimiter(grid_->u());
-    firstLimiter(grid_->j());
+    //firstLimiter(grid_->j());
     secondLimiter(grid_->u());
     }
     calcError(errorTime);
@@ -379,6 +384,7 @@ void Computation::rungeKutta() {
         calcUdt(grid_->u_,grid_->q_,VdM_->VdMJ_t_,epsilon_);
     }
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
+    //firstLimiter(grid_->jt_);
     for (int i = 0; i < grid_->j_.size()[0]; i++) {
         for (int j = 0; j <grid_->j_.size()[1]; j++) {
             // u^(1) = u^n + Δt * L_h(u^n)
@@ -394,6 +400,7 @@ void Computation::rungeKutta() {
     if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
         calcUdt(grid_->j_1_,VdM_->VdM_t_); // Compute the time derivative for u^n
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
+    //firstLimiter(grid_->ut_);
     for (int i = 0; i < grid_->j_.size()[0]; i++) {
         for (int j = 0; j <grid_->j_.size()[1]; j++) {
             // u^(1) = u^n + Δt * L_h(u^n)
@@ -428,6 +435,7 @@ void Computation::rungeKutta() {
     }// Compute the time derivative for u^(1)
 
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
+    //firstLimiter(grid_->jt_);
     for (int i = 0; i < grid_->j_.size()[0]; i++) {
         for (int j = 0; j <grid_->j_.size()[1]; j++) {
             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
@@ -446,6 +454,7 @@ void Computation::rungeKutta() {
     if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
         calcUdt(grid_->j_2_,VdM_->VdM_t_); // Compute the time derivative for u^n
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
+    //firstLimiter(grid_->ut_);
     for (int i = 0; i < grid_->j_.size()[0]; i++) {
         for (int j = 0; j <grid_->j_.size()[1]; j++) {
             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
@@ -481,6 +490,7 @@ void Computation::rungeKutta() {
     } // Compute the time derivative for u^(2)
     // Ensure all updates to time derivatives are reflected
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
+    //firstLimiter(grid_->jt_);
     for (int i = 0; i < grid_->u_.size()[0]; i++) {
         for (int j = 0; j <grid_->u_.size()[1]; j++) {
             // u^(n+1) = 1/3 * u^n + 2/3 * u^(2) + (2/3 * Δt) * L_h(u^(2))
@@ -501,6 +511,7 @@ void Computation::rungeKutta() {
         calcUdt(grid_->j_,VdM_->VdM_t_); // Compute the time derivative for u^n
     }
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
+    //firstLimiter(grid_->ut_);
     for (int i = 0; i < grid_->u_.size()[0]; i++) {
         for (int j = 0; j <grid_->u_.size()[1]; j++) {
             // u^(n+1) = 1/3 * u^n + 2/3 * u^(2) + (2/3 * Δt) * L_h(u^(2))
@@ -571,14 +582,14 @@ void Computation::firstLimiter(Array2D &u)
         double c_ = u_mean_plus - u_mean;
         limit_l = u_mean-limiter_.computeLimiter(a_,b_,c_,meshWidth_[0]);
         
-        if(std::abs(limit_r-u_r)>1E-12){
+        if(std::abs(limit_r-u_r)>1E-10){
             // for(int k = 1; k<u.size()[1]-1;k++){
             //     u(i,k) = u_mean;
             // }
             proj_.makeProjection(u,grid_->x_,i,2);
             check = true;
         }else
-        if(std::abs(limit_l-u_l)>1E-12){
+        if(std::abs(limit_l-u_l)>1E-10){
             // for(int k = 1; k<u.size()[1]-1;k++){
             //     u(i,k) = u_mean;
             // }
@@ -660,6 +671,31 @@ void Computation::secondLimiter(Array2D &u)
 
 
 
+}
+
+void Computation::thirdLimiter(Array2D &u){
+    double old_ =0.0, current_ =0.0;
+    for(int i=0;i<u.size()[0];i++){
+        for(int j=0;j<u.size()[1];j++){
+            old_ = current_;
+            current_ = u(i,j);
+            if((std::max(old_,0.0)==0 and std::min(current_,0.0)==current_) or (std::min(old_,0.0)==old_ and std::max(current_,0.0)==0.0)){
+                proj_.makeProjection(u,grid_->x_,i,2);
+
+              double x_j = (grid_->x_(i,0)+grid_->x_(i,nNodes+1))/2.0;
+              double mean = 0.0;
+
+            for(int k = 0;k<u.size()[1];k++){
+                mean += u(i,k);
+            }
+            mean = mean/(u.size()[1]);
+            //std::cout<<" PROJECTION i "<<i<<" "<<u(i,0)<<" "<<u(i,1)<<" "<<u(i,2)<<" "<<u(i,3)<<" "<<u(i,4)<<" mean "<<mean<<" x_j "<<x_j<<std::endl;
+            u(i,j ) = mean;
+            break;
+                
+            }
+        }
+    }
 }
 
 

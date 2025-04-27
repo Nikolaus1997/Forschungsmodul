@@ -15,7 +15,11 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
             case InitialCondType::NegativeUnitStep:
                 return negativeUnitStep(x,a,b);
             case InitialCondType::Sinus:
-                return sinusFunc(x,a,b);    
+                return sinusFunc(x,a,b); 
+            case InitialCondType::exponential:
+                return exp(-x*x);
+            case InitialCondType::gaussian:
+                return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI));   
             default:
                 throw std::invalid_argument("Invalid initial condition type");
         }
