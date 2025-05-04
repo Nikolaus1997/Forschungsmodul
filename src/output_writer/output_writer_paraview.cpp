@@ -33,14 +33,15 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
 
   // set spacing of mesh
   const double dx = grid_->meshWidth()[0];
-  const double dy = 1;
+  const double dy = grid_->meshWidth()[1];
   const double dz = 1;
   dataSet->SetSpacing(dx, dy, dz);
 
   // set number of points in each dimension, 1 cell in z direction
   int nCells = grid_->solution_.size()[0];
-  dataSet->SetDimensions(nCells, 1, 1);  // we want to have points at each corner of each cell
-  
+  int nCellsY = grid_->solution_.size()[1];
+  dataSet->SetDimensions(nCells, nCellsY, 1);  // we want to have points at each corner of each cell
+  std::cout << "nCells " << nCells << " nCellsY " << nCellsY << std::endl;
   // add solution field variable
   // ---------------------------
   vtkSmartPointer<vtkDoubleArray> arraySolution = vtkDoubleArray::New();
@@ -58,101 +59,109 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
 
   int index = 0;   // index for the vtk data structure, will be incremented in the inner loop
 
-  for (int i = 0; i < nCells; i++, index++)
+  for (int i = 0; i <nCells; i++)
+  
   {
+    for (int j = 0; j <nCellsY ; j++,index++)
+    {
+
+          arraySolution->SetValue(index,grid_->solution_(i,j));
+        }
+        //std::cout<<i<<" "<<j<<" "<<grid_->u(i,j)<<" "<<grid_->x_(i,j)<<" "<<grid_->x_(i,j+1)<<" "<<grid_->x_(i,j-1)<<std::endl;
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arraySolution->SetValue(index,grid_->solution_(i));
+    //arraySolution->SetValue(index,grid_->solution_(i));
   }
+
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());
 
-  // add the field variable to the data set
-  dataSet->GetPointData()->AddArray(arraySolution);
+//   // add the field variable to the data set
+   dataSet->GetPointData()->AddArray(arraySolution);
 
-  // add solution field variable
-  // ---------------------------
-  vtkSmartPointer<vtkDoubleArray> arraySolutionJ = vtkDoubleArray::New();
+//   // add solution field variable
+//   // ---------------------------
+//   vtkSmartPointer<vtkDoubleArray> arraySolutionJ = vtkDoubleArray::New();
 
-  // the pressure is a scalar which means the number of components is 1
-  arraySolutionJ->SetNumberOfComponents(1);
+//   // the pressure is a scalar which means the number of components is 1
+//   arraySolutionJ->SetNumberOfComponents(1);
 
-  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
-  arraySolutionJ->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+//   // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+//   arraySolutionJ->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arraySolutionJ->SetName("du/dx");
+//   arraySolutionJ->SetName("du/dx");
 
-  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
-  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+//   // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+//   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
-  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+//   index = 0;   // index for the vtk data structure, will be incremented in the inner loop
 
-  for (int i = 0; i < nCells; i++, index++)
-  {
-    //std::array<double,1> solutionVector;
-    //solutionVector[0] =grid_->x(i);
-    //solutionVector[0] = grid_->u(i);
-    arraySolutionJ->SetValue(index,grid_->solutionJ_(i));
-  }
-  // now, we should have added as many values as there are points in the vtk data structure
-  assert(index == dataSet->GetNumberOfPoints());
+//   for (int i = 0; i < nCells; i++, index++)
+//   {
+//     //std::array<double,1> solutionVector;
+//     //solutionVector[0] =grid_->x(i);
+//     //solutionVector[0] = grid_->u(i);
+//     //arraySolutionJ->SetValue(index,grid_->solutionJ_(i));
+//   }
+//   // now, we should have added as many values as there are points in the vtk data structure
+//   assert(index == dataSet->GetNumberOfPoints());
 
-  // add the field variable to the data set
-  dataSet->GetPointData()->AddArray(arraySolutionJ);
+//   // add the field variable to the data set
+//   dataSet->GetPointData()->AddArray(arraySolutionJ);
 
-  // add solution field variable
-  // ---------------------------
-  vtkSmartPointer<vtkDoubleArray> arrayXaxis = vtkDoubleArray::New();
+//   // add solution field variable
+//   // ---------------------------
+//   vtkSmartPointer<vtkDoubleArray> arrayXaxis = vtkDoubleArray::New();
 
-  // the pressure is a scalar which means the number of components is 1
-  arrayXaxis->SetNumberOfComponents(1);
+//   // the pressure is a scalar which means the number of components is 1
+//   arrayXaxis->SetNumberOfComponents(1);
 
-  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
-  arrayXaxis->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+//   // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+//   arrayXaxis->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arrayXaxis->SetName("xAxis");
+//   arrayXaxis->SetName("xAxis");
 
-  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
-  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+//   // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+//   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
-  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  for (int i = 0; i <grid_->x_.size()[0]; i++)
-  {
-    for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
-    {
-      arrayXaxis->SetValue(index,grid_->x_(i,j));
-    }
-  }
-  // now, we should have added as many values as there are points in the vtk data structure
-  assert(index == dataSet->GetNumberOfPoints());
-  dataSet->GetPointData()->AddArray(arrayXaxis);
-// add solution field variable
-  // ---------------------------
-  vtkSmartPointer<vtkDoubleArray> arrayTrueSolution = vtkDoubleArray::New();
+//   index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+//   for (int i = 0; i <grid_->x_.size()[0]; i++)
+//   {
+//     for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
+//     {
+//       //arrayXaxis->SetValue(index,grid_->x_(i,j));
+//     }
+//   }
+//   // now, we should have added as many values as there are points in the vtk data structure
+//   assert(index == dataSet->GetNumberOfPoints());
+//   dataSet->GetPointData()->AddArray(arrayXaxis);
+// // add solution field variable
+//   // ---------------------------
+//   vtkSmartPointer<vtkDoubleArray> arrayTrueSolution = vtkDoubleArray::New();
 
-  // the pressure is a scalar which means the number of components is 1
-  arrayTrueSolution->SetNumberOfComponents(1);
+//   // the pressure is a scalar which means the number of components is 1
+//   arrayTrueSolution->SetNumberOfComponents(1);
 
-  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
-  arrayTrueSolution->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+//   // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+//   arrayTrueSolution->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arrayTrueSolution->SetName("true solution");
+//   arrayTrueSolution->SetName("true solution");
 
-  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
-  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+//   // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+//   // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
-  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  for (int i = 0; i <grid_->x_.size()[0]; i++)
-  {
-    for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
-    {
-      arrayTrueSolution->SetValue(index,grid_->true_solution_(i,j));
-    }
-  }
-  // now, we should have added as many values as there are points in the vtk data structure
-  assert(index == dataSet->GetNumberOfPoints());
-  dataSet->GetPointData()->AddArray(arrayTrueSolution);
+//   index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+//   for (int i = 0; i <grid_->x_.size()[0]; i++)
+//   {
+//     for (int j = 1; j < grid_->x_.size()[1]-1; j++, index++)
+//     {
+//       //arrayTrueSolution->SetValue(index,grid_->true_solution_(i,j));
+//     }
+//   }
+//   // now, we should have added as many values as there are points in the vtk data structure
+//   assert(index == dataSet->GetNumberOfPoints());
+//   dataSet->GetPointData()->AddArray(arrayTrueSolution);
 
 //  // add solution field variable
 //   // ---------------------------
@@ -181,33 +190,33 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
 //   assert(index == dataSet->GetNumberOfPoints());
 //   dataSet->GetPointData()->AddArray(arrayAnalyzeSolution); 
 
-  // add solution field variable
-  // ---------------------------
-  vtkSmartPointer<vtkDoubleArray> arrayUt = vtkDoubleArray::New();
+  // // add solution field variable
+  // // ---------------------------
+  // vtkSmartPointer<vtkDoubleArray> arrayUt = vtkDoubleArray::New();
 
-  // the pressure is a scalar which means the number of components is 1
-  arrayUt->SetNumberOfComponents(1);
+  // // the pressure is a scalar which means the number of components is 1
+  // arrayUt->SetNumberOfComponents(1);
 
-  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
-  arrayUt->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+  // // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+  // arrayUt->SetNumberOfTuples(dataSet->GetNumberOfPoints());
   
-  arrayUt->SetName("dUdt");
+  // arrayUt->SetName("dUdt");
 
-  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
-  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+  // // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+  // // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
 
-  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
-  nCells = grid_->derivative_.size()[0];
-  for (int i = 0; i < nCells; i++, index++)
-  {
-    //std::array<double,1> solutionVector;
-    //solutionVector[0] =grid_->x(i);
-    //solutionVector[0] = grid_->u(i);
-    arrayUt->SetValue(index,grid_->derivative_(i));
-  }
-  // now, we should have added as many values as there are points in the vtk data structure
-  assert(index == dataSet->GetNumberOfPoints());
-  dataSet->GetPointData()->AddArray(arrayUt);
+  // index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+  // nCells = grid_->derivative_.size()[0];
+  // for (int i = 0; i < nCells; i++, index++)
+  // {
+  //   //std::array<double,1> solutionVector;
+  //   //solutionVector[0] =grid_->x(i);
+  //   //solutionVector[0] = grid_->u(i);
+  //   //arrayUt->SetValue(index,grid_->derivative_(i));
+  // }
+  // // now, we should have added as many values as there are points in the vtk data structure
+  // assert(index == dataSet->GetNumberOfPoints());
+  // dataSet->GetPointData()->AddArray(arrayUt);
     
   // add current time 
   vtkSmartPointer<vtkDoubleArray> arrayTime = vtkDoubleArray::New();
@@ -247,10 +256,10 @@ void OutputWriterParaview::writeFileTrueSolution(double currentTime,std::string 
   dataSet->SetOrigin(0, 0, 0);
 
   // set spacing of mesh
-  const double dx = -grid_->x_analyze_(0,0)+grid_->x_analyze_(1,0);
+  //const double dx = -grid_->x_analyze_(0,0)+grid_->x_analyze_(1,0);
   const double dy = 1;
   const double dz = 1;
-  dataSet->SetSpacing(dx, dy, dz);
+  //dataSet->SetSpacing(dx, dy, dz);
 
   // set number of points in each dimension, 1 cell in z direction
   int nCells = grid_->u_analyze_.size()[0];
@@ -278,7 +287,7 @@ void OutputWriterParaview::writeFileTrueSolution(double currentTime,std::string 
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arraySolutionTrue->SetValue(index,grid_->u_analyze_true_(i,0));
+    //arraySolutionTrue->SetValue(index,grid_->u_analyze_true_(i,0));
   }
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());
@@ -308,7 +317,7 @@ void OutputWriterParaview::writeFileTrueSolution(double currentTime,std::string 
     //std::array<double,1> solutionVector;
     //solutionVector[0] =grid_->x(i);
     //solutionVector[0] = grid_->u(i);
-    arraySolution->SetValue(index,grid_->u_analyze_(i,0));
+    //arraySolution->SetValue(index,grid_->u_analyze_(i,0));
   }
   // now, we should have added as many values as there are points in the vtk data structure
   assert(index == dataSet->GetNumberOfPoints());
@@ -335,7 +344,7 @@ void OutputWriterParaview::writeFileTrueSolution(double currentTime,std::string 
   for (int i = 0; i <grid_->x_analyze_.size()[0]; i++,index++)
   {
 
-      arrayXaxis->SetValue(index,grid_->x_analyze_(i,0));
+     // arrayXaxis->SetValue(index,grid_->x_analyze_(i,0));
     
   }
   // now, we should have added as many values as there are points in the vtk data structure

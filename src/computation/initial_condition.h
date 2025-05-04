@@ -18,6 +18,8 @@ public:
 
     double computeInitialCondition(double x, double a, double b, double time = 0 , double m = 0.);
 
+    double computeInitialCondition2D(double x, double y, double a, double b, double time = 0 , double m = 0.);
+
     // Destructor (optional, for cleanup if needed)
     double unitStep(double x, double a, double b);
 
@@ -25,7 +27,15 @@ public:
 
     double sinusFunc(double x, double a, double b);
 
-    double barenBlatt(double x, double a, double b, double time, double m);
+    double barenBlatt(double x, double y, double a, double b, double time, double m);
+
+    double unitStep(double x, double y, double a, double b);
+
+    double negativeUnitStep(double x, double y, double a, double b);
+
+    double sinusFunc(double x, double y, double a, double b);
+
+    //double barenBlatt(double x, double y, double a, double b, double time, double m);
 
     // Other member functions and data members can be added here
 private:

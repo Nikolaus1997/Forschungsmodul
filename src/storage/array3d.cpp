@@ -67,13 +67,18 @@ double Array3D::operator()(int i, int j, int k) const {
  */
 
 void Array3D::print() const {
-    std::cout << std::endl << "----------" << std::endl;
-    for (int j = size_[1] - 1; j >= 0; j--) {
-        for (int i = 0; i < size_[0]; i++) {
-            for (int k = 0; k < size_[1]; k++){
-                std::cout << (*this)(i, j, k) << " | ";
+    
+        std::cout << "=== Array3D Contents ===\n";
+        
+        for (int k = 0; k < size_[2]; ++k) { // over elements
+            std::cout << "Element:  " << k << ":\n";
+            for (int i = 0; i <size_[0]; ++i) { // over local nodes in i
+                for (int j = 0; j < size_[1]; ++j) { // over local nodes in j
+                    std::cout << "Indeces  (" <<i<<", "<< j << "): ";
+                    std::cout << (*this)(i, j, k) << " ";
+                }
+                std::cout << "\n";
             }
+            std::cout << "----------------------\n";
         }
-        std::cout << std::endl << "----------" << std::endl;
-    }
 }

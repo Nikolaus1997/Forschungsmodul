@@ -12,17 +12,19 @@ Array2D::Array2D(std::array<int,2> size) :
 
 void Array2D::printValues()
 {
-  for (int i = 0; i < size_[0]; i++)
+  constexpr int width = 3; // width per number column
+
+  for (int i = size_[1]-1; i >=0 ; --i)
   {
-    for (int j = 0; j < size_[1]; j++)
+    std::cout << " [";
+    for (int j = 0; j < size_[0]; ++j)
     {
-      if(operator()(i,j)<0){
-        std::cout << operator()(i, j) <<"|";
-      }else{
-        std::cout << operator()(i, j) << " "<<"|";
-      }
-      }
-    std::cout << std::endl;
+      if(j!=0)
+        std::cout << std::setw(width)<<"| " << operator()(j,i) << " ";
+      else  
+        std::cout << std::setw(width)<< operator()(j,i) << " ";
+    }
+    std::cout <<" ]"<< std::endl;
   }
 }
 //! get the size

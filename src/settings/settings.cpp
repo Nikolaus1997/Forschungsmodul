@@ -131,9 +131,13 @@ void Settings::loadFromFile(std::string filename)
        dirichletBcRight[1] = atof(parameterValue.c_str()); 
     }
 
-    if (parameterName=="nCells")
+    if (parameterName=="nCellsX")
     {
          nCells[0] = atof(parameterValue.c_str());
+    }
+    if (parameterName=="nCellsY")
+    {
+         nCells[1] = atof(parameterValue.c_str());
     }
 
     if (parameterName=="maximumDt")

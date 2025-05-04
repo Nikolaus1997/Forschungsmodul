@@ -8,6 +8,50 @@ void NumericalFlux::setNumFluxFunction(FunctionType type)
     selectedFunction = type;
 }
 
+void NumericalFlux::fillFluxArray(Flux flux, Array3D &faceId, Array2D &faceFlux, const Array2D &elemId, int iCell, int jCell, double dt, double meshWidth)
+{
+    int iElem_0, iElem_2, iElem_3, iElem_1;
+    int iElem = elemId(iCell,jCell);
+    if(iCell > 0 and iCell < elemId.size()[0]-1){
+        iElem_0 = elemId(iCell-1,jCell);
+        iElem_2 = elemId(iCell+1,jCell);
+    }
+    else if(iCell == 0){
+        iElem_0 = elemId(elemId.size()[0]-1,jCell);
+        iElem_2 = elemId(iCell+1,jCell);
+    }
+    else if(iCell == elemId.size()[0]-1){
+        iElem_0 = elemId(iCell-1,jCell);
+        iElem_2 = elemId(0,jCell);
+    }
+    if(jCell> 0 and jCell < elemId.size()[1]-1){
+        iElem_1 = elemId(iCell,jCell-1);
+        iElem_3 = elemId(iCell,jCell+1);
+    }else if(jCell == 0){
+        iElem_1 = elemId(iCell,elemId.size()[1]-1);
+        iElem_3 = elemId(iCell,jCell+1);
+    }else if(jCell == elemId.size()[1]-1){
+        iElem_1 = elemId(iCell,jCell-1);
+        iElem_3 = elemId(iCell,0);
+    }
+    for(int i = 0; i < faceId.size()[0]; ++i) {
+        for (int j = 0; j < faceId.size()[1]; ++j) {
+            if(j == 0){
+                faceFlux(i,j) = computeNumFlux(faceId(i,j,iElem_0),faceId(i,j,iElem),flux,dt,meshWidth);
+            }
+            else if(j == 1){
+                faceFlux(i,j) = computeNumFlux(faceId(i,j,iElem_1),faceId(i,j,iElem),flux,dt,meshWidth);
+            }
+            else if(j == 2){
+                faceFlux(i,j) = computeNumFlux(faceId(i,j,iElem),faceId(i,j,iElem_2),flux,dt,meshWidth);
+            }
+            else if(j == 3){
+                faceFlux(i,j) = computeNumFlux(faceId(i,j,iElem),faceId(i,j,iElem_3),flux,dt,meshWidth);
+            }
+        }
+
+    }
+}
 // Compute the numerical flux based on the selected function
 double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_, double dt, double meshWidth)
 {
@@ -67,6 +111,114 @@ double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
     else
         return u_r;
     return 0.0;
+}
+
+void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& quad_,Array3D& u,Flux flux, Array3D& faceId, Array3D& faceIdQ, Array2D& faceFlux, const Array2D& elemId,int iCell, int jCell, double dt, double meshWidth, double m)
+{   
+    int iElem_0, iElem_2, iElem_3, iElem_1;
+    int iElem = elemId(iCell,jCell);
+    if(iCell > 0 and iCell < elemId.size()[0]-1){
+        iElem_0 = elemId(iCell-1,jCell);
+        iElem_2 = elemId(iCell+1,jCell);
+    }
+    else if(iCell == 0){
+        iElem_0 = elemId(elemId.size()[0]-1,jCell);
+        iElem_2 = elemId(iCell+1,jCell);
+    }
+    else if(iCell == elemId.size()[0]-1){
+        iElem_0 = elemId(iCell-1,jCell);
+        iElem_2 = elemId(0,jCell);
+    }
+    if(jCell> 0 and jCell < elemId.size()[1]-1){
+        iElem_1 = elemId(iCell,jCell-1);
+        iElem_3 = elemId(iCell,jCell+1);
+    }else if(jCell == 0){
+        iElem_1 = elemId(iCell,elemId.size()[1]-1);
+        iElem_3 = elemId(iCell,jCell+1);
+    }else if(jCell == elemId.size()[1]-1){
+        iElem_1 = elemId(iCell,jCell-1);
+        iElem_3 = elemId(iCell,0);
+    }
+
+    for (int j = 0; j < faceId.size()[1]; ++j) {
+        for(int i = 0; i < faceId.size()[0]; ++i) {        
+            if(j == 0){
+                double u_mean = 0.0, u_mean_plus = 0.0;
+                for(int k = 0; k<u.size()[0];k++){
+                    u_mean += u(k,i,iElem_0);
+                    u_mean_plus += u(k,i,iElem);
+                }
+                u_mean += u(i,j,iElem_0)+u(i,j,iElem_0);
+                u_mean_plus += u(i,j,iElem)+u(i,j,iElem);
+                u_mean = u_mean/(u.size()[0]+2);
+                u_mean_plus = u_mean_plus/(u.size()[0]+2);
+                if(QTrue){
+                    faceFlux(i,j) = porousMediaMinus( faceId(i,j,iElem_0),faceId(i,j,iElem), 0.0,0.0,
+                                                            m, flux,quad_, u_mean, u_mean_plus)[1];
+                }else{
+                    faceFlux(i,j) = porousMediaMinus(faceId(i,j,iElem_0),faceId(i,j,iElem), faceIdQ(i,j,iElem_0),
+                                                    faceIdQ(i,j,iElem), m, flux,quad_, u_mean, u_mean_plus)[0];
+                }
+            }
+            else if(j == 1){
+                double u_mean = 0.0, u_mean_plus = 0.0;
+                for(int k = 0; k<u.size()[1];k++){
+                    u_mean += u(i,k,iElem_1);
+                    u_mean_plus += u(i,k,iElem);
+                }
+                u_mean += u(i,j,iElem_1)+u(i,j,iElem_1);
+                u_mean_plus += u(i,j,iElem)+u(i,j,iElem);
+                u_mean = u_mean/(u.size()[1]+2);
+                u_mean_plus = u_mean_plus/(u.size()[1]+2);
+                if(QTrue){
+                    faceFlux(i,j) = porousMediaMinus(faceId(i,j,iElem_1),faceId(i,j,iElem),0.0,0.0,
+                                                         m, flux,quad_, u_mean, u_mean_plus)[1];
+                }
+                else{
+                    faceFlux(i,j) = porousMediaMinus(faceId(i,j,iElem_1),faceId(i,j,iElem), faceIdQ(i,j,iElem_1),
+                                                    faceIdQ(i,j,iElem), m, flux,quad_, u_mean, u_mean_plus)[0];
+                }
+            }
+            else if(j == 2){
+                double u_mean = 0.0, u_mean_plus = 0.0;
+                for(int k = 0; k<u.size()[0];k++){
+                    u_mean += u(k,i,iElem_2);
+                    u_mean_plus += u(k,i,iElem);
+                }
+                u_mean_plus += u(i,j,iElem_2)+u(i,j,iElem_2);
+                u_mean += u(i,j,iElem)+u(i,j,iElem);
+                u_mean = u_mean/(u.size()[0]+2);
+                u_mean_plus = u_mean_plus/(u.size()[0]+2);
+                if(QTrue){
+                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_2), 0.0,0.0,
+                                                        m, flux,quad_, u_mean, u_mean_plus)[1];
+                }
+                else{
+                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_2), faceIdQ(i,j,iElem),
+                                                    faceIdQ(i,j,iElem_2), m, flux,quad_, u_mean, u_mean_plus)[0];
+                }
+            }
+            else if(j == 3){
+                double u_mean = 0.0, u_mean_plus = 0.0;
+                for(int k = 0; k<u.size()[1];k++){
+                    u_mean_plus += u(i,k,iElem_3);
+                    u_mean += u(i,k,iElem);
+                }
+                u_mean_plus += u(i,j,iElem_3)+u(i,j,iElem_3);
+                u_mean += u(i,j,iElem)+u(i,j,iElem);
+                u_mean = u_mean/(u.size()[1]+2);
+                u_mean_plus = u_mean_plus/(u.size()[1]+2);
+                if(QTrue){
+                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_3), 0.0,0.0,
+                                                    m, flux,quad_, u_mean, u_mean_plus)[1];
+                }
+                else{
+                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_3), faceIdQ(i,j,iElem),
+                                                    faceIdQ(i,j,iElem_3), m, flux,quad_, u_mean, u_mean_plus)[0];
+                }
+            }
+        }
+    }
 }
 
 std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, double q_l, double q_r, double m, Flux flux_,const std::unique_ptr<Quadrature>& quad_, double u_mean, double u_mean_plus)

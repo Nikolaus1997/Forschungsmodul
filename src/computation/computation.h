@@ -37,16 +37,17 @@ class Computation
         void runSimulation();
 
         void fillX();
-        void calcQ(const Array2D& u);
+        // void calcQ(const Array2D& u);
         void initVdm();
         void initVdmJ();
+        void calcQ(const Array3D &u, const Array2D &faceIdQ);
         void eulerTimeStep();
         void rungeKutta();
         void fillFaces();
         void calcDt();
         void calcError(double currenTime);
         void calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t, double epsilon = 1.0);
-        void calcUdt(const Array2D& u, Array2D& VdM_t);
+        void calcUdt(const Array3D& u, Array3D& VdM_t);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
         void thirdLimiter(Array2D &u);
@@ -54,9 +55,9 @@ class Computation
         void fillUanalyze(Array2D& u_analyze,const Array2D& x,const Array2D& Vdm);
     
     private:
-        std::array<double,1> meshWidth_;
-        std::array<double,1> innerMeshWidth_;
-        std::array<int, 1>  nCells_;
+        std::array<double,2> meshWidth_;
+        std::array<double,2> innerMeshWidth_;
+        std::array<int, 2>  nCells_;
         Settings settings_;
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;

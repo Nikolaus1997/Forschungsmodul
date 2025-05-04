@@ -8,7 +8,7 @@
 struct Settings
 {
   std::string OutputName = "linearFlux";
-  std::array<int,1> nCells;             //< number of cells in x and y direction
+  std::array<int,2> nCells;             //< number of cells in x and y direction
   std::array<double,2> physicalSize;    //< physical size of the domain
   double endTime = 10.0;                //< end time of the simulation
   double dt = 0.001;                      //< maximum time step width

@@ -1,6 +1,6 @@
 #include "Vdm.h"
 
-Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
+Vandermonde::Vandermonde(std::array<int, 3> size, int nNodes):Array3D(size),
                     VdM_(size),
                     VdMQ_(size),    
                     VdM1_(size),
@@ -9,133 +9,142 @@ Vandermonde::Vandermonde(std::array<int, 2> size, int nNodes):Array2D(size),
                     VdMJ1_(size),
                     VdMJ2_(size),
                     VdMJ_t_(size),
-                    L_({nNodes,size[1]}),
-                    L_prime_({nNodes,size[1]}), 
+                    L_({nNodes,size[2]}),
+                    L_prime_({nNodes,size[2]}), 
                     VdM_t_(size)
 {
 }
 
 void Vandermonde::printValues()
 {
-    for (int i = 0; i < VdM_.size()[1]; i++)
-    {
-        std::cout<<"PP_N "<<i<<" :";
-        for(int j= 0; j<VdM_.size()[0];j++){
-            std::cout<<VdM_(j,i)<<" ";
-        }
-        std::cout<<";"<<std::endl;
-    }
+    std::cout << "=== Array3D Contents ===\n";
     
+    for (int k = 0; k < VdM_.size()[2]; ++k) { // over elements
+        std::cout << "PPN:  " << k << ":\n";
+        for (int i = 0; i < VdM_.size()[0]; ++i) { // over local nodes in i
+            for (int j = 0; j < VdM_.size()[1]; ++j) { // over local nodes in j
+                std::cout << "inCell  (" <<i<<", "<< j << "): ";
+                std::cout << VdM_(i, j, k) << " ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "----------------------\n";
+    }
 }
 
 void Vandermonde::LprintValues()
 {
-    for (int i = 0; i < L_.size()[1]; i++)
-    {
-        std::cout<<"PP_N "<<i<<" :";
-        for(int j= 0; j<L_.size()[0];j++){
-            std::cout<<L(j,i)<<" ";
-        }
-        std::cout<<";"<<std::endl;
-    }
+
+
+        for (int i = 0; i < L_.size()[1]; i++)
+            {
+                std::cout<<"PP_N "<<i<<" :";
+                for(int j= 0; j<L_.size()[0];j++){
+                    std::cout<<L(j,i)<<" ";
+                }
+                std::cout<<";"<<std::endl;
+            }
+    
 }
 
 void Vandermonde::LprimePrintValues()
 {
+
     for (int i = 0; i < L_prime_.size()[1]; i++)
-    {
-        std::cout<<"PP_N "<<i<<" :";
-        for(int j= 0; j<L_prime_.size()[0];j++){
-            std::cout<<L_prime(j,i)<<" ";
+        {
+            std::cout<<"PP_N "<<i<<" :";
+            for(int j= 0; j<L_prime_.size()[0];j++){
+                std::cout<<L_prime(j,i)<<" ";
+            }
+            std::cout<<";"<<std::endl;
         }
-        std::cout<<";"<<std::endl;
-    }
+    
 }
 
-Array2D &Vandermonde::VdM() 
+Array3D &Vandermonde::VdM() 
 {
     return VdM_;
 }
 
-Array2D &Vandermonde::VdM1() 
+Array3D &Vandermonde::VdM1() 
 {
     return VdM1_;
 }
 
-Array2D &Vandermonde::VdM2() 
+Array3D &Vandermonde::VdM2() 
 {
     return VdM2_;
 }
 
-Array2D &Vandermonde::VdMt()
+Array3D &Vandermonde::VdMt()
 {
     return VdM_t_;
 }
 
-Array2D &Vandermonde::VdMQ()
+Array3D &Vandermonde::VdMQ()
 {
     return VdMQ_;
 }
 
-double Vandermonde::VdM(int i, int j) const
+double Vandermonde::VdM(int i, int j, int k) const
 {
-    return VdM_(i,j);
+    return VdM_(i,j,k);
 }
 
-double &Vandermonde::VdM(int i, int j)
+double &Vandermonde::VdM(int i, int j, int k)
 {
-    return VdM_(i,j);
+    return VdM_(i,j,k);
 }
 
-double Vandermonde::VdMJ(int i, int j) const
+double Vandermonde::VdMJ(int i, int j, int k) const
 {
-    return VdMJ_(i,j);
+    return VdMJ_(i,j,k);
 }
 
-double &Vandermonde::VdMJ(int i, int j)
+double &Vandermonde::VdMJ(int i, int j, int k)
 {
     // TODO: insert return statement here
-    return VdMJ_(i,j);
+    return VdMJ_(i,j,k);
 }
 
-double Vandermonde::VdM1(int i, int j) const
+double Vandermonde::VdM1(int i, int j, int k) const
 {
-    return VdM1_(i,j);
+    return VdM1_(i,j,k);
 }
 
-double &Vandermonde::VdM1(int i, int j)
+double &Vandermonde::VdM1(int i, int j, int k)
 {
-    return VdM1_(i,j);
+    return VdM1_(i,j,k);
 }
 
-double Vandermonde::VdM2(int i, int j) const
+double Vandermonde::VdM2(int i, int j, int k) const
 {
-    return VdM2_(i,j);
+    return VdM2_(i,j,k);
 }
 
-double &Vandermonde::VdM2(int i, int j)
+double &Vandermonde::VdM2(int i, int j, int k)
 {
-    return VdM2_(i,j);
+    return VdM2_(i,j,k);
 }
 
-double Vandermonde::VdMQ(int i, int j) const
+double Vandermonde::VdMQ(int i, int j, int k) const
 {
-    return VdMQ_(i,j);
+    return VdMQ_(i,j,k);
 }
 
-double &Vandermonde::VdMQ(int i, int j)
+double &Vandermonde::VdMQ(int i, int j, int k)
 {
-    return VdMQ_(i,j);
+    return VdMQ_(i,j,k);
 }
 
-double Vandermonde::VdMt(int i, int j) const
+double Vandermonde::VdMt(int i, int j, int k) const
 {
-    return VdM_t_(i,j);
+    return VdM_t_(i,j,k);
 }
 
-double &Vandermonde::VdMt(int i, int j)
+double &Vandermonde::VdMt(int i, int j, int k)
 {
-    return VdM_t_(i,j);
+    return VdM_t_(i,j,k);
 }
 
 double Vandermonde::L(int i, int j) const
