@@ -355,7 +355,7 @@ void Computation::eulerTimeStep()
         std::cout<<" U "<<std::endl;
     }else{  
         calcQ(grid_->u_);
-        calcUdt(grid_->u_,grid_->q_, VdM_->VdMJ_t_, epsilon_);
+        calcUdt(grid_->u_,grid_->q_,grid_->j_, VdM_->VdMJ_t_, epsilon_);
         calcUdt(grid_->j_,VdM_->VdM_t_);
     }
 
@@ -381,7 +381,7 @@ void Computation::rungeKutta() {
     }else
     {
         calcQ(grid_->u_);
-        calcUdt(grid_->u_,grid_->q_,VdM_->VdMJ_t_,epsilon_);
+        calcUdt(grid_->u_,grid_->q_,grid_->j_,VdM_->VdMJ_t_,epsilon_);
     }
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
     //firstLimiter(grid_->jt_);
@@ -431,7 +431,7 @@ void Computation::rungeKutta() {
     }else
     {
         calcQ(grid_->u1_);
-        calcUdt(grid_->u1_,grid_->q_,VdM_->VdMJ_t_,epsilon_);
+        calcUdt(grid_->u1_,grid_->q_,grid_->j_1_,VdM_->VdMJ_t_,epsilon_);
     }// Compute the time derivative for u^(1)
 
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
@@ -486,7 +486,7 @@ void Computation::rungeKutta() {
     }else
     {
         calcQ(grid_->u2_);
-        calcUdt(grid_->u2_,grid_->q_,VdM_->VdMJ_t_);
+        calcUdt(grid_->u2_,grid_->q_,grid_->j_2_,VdM_->VdMJ_t_);
     } // Compute the time derivative for u^(2)
     // Ensure all updates to time derivatives are reflected
     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
@@ -700,7 +700,7 @@ void Computation::thirdLimiter(Array2D &u){
 
 
 
-void Computation::calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t, double epsilon)
+void Computation::calcUdt(const Array2D& u,const Array2D& q,const Array2D& j_, Array2D& VdM_t, double epsilon)
 {
     double flux_term =0.0,integ=0.0;
     double ul_i =0.0,ur_i =0.0,ur_iminus  = 0.0,ul_iplus = 0.0;
@@ -764,11 +764,11 @@ void Computation::calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t, dou
             // if(abs(flux_term)<1E-12)
             //     flux_term = 0.0;
             integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
-                                            grid_->faces(i), grid_->faces(i+1),u, q,grid_->j_);
+                                            grid_->faces(i), grid_->faces(i+1),u, q, j_);
             // if(abs(integ)<1E-12)
             //     integ = 0.0;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            VdM_t(i,j) = 1.0/epsilon*(integ + flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);///(meshWidth_[0]);
+            VdM_t(i,j) = 1.0/epsilon*(integ - flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);///(meshWidth_[0]);
             //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
         }
     }   
@@ -956,6 +956,10 @@ void Computation::calcUdt(const Array2D& u_, Array2D& VdM_t){
             flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,uflux_,dt_,meshWidth_[0])*VdM_->L_(0,j)  + gFlux_.computeNumFlux(ur_i, ul_iplus,uflux_,dt_,meshWidth_[0]);
             double integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return uflux_.compute(x);}
                                                                 ,i,j ,grid_->faces(i),grid_->faces(i+1),u_);
+            // if(abs(flux_term)<1E-8)
+            //     flux_term = 0.0;
+            // if(abs(integ)<1E-8)
+            //     integ = 0.0;
             VdM_->VdM_t_(i,j) =(integ-flux_term)*1/meshWidth_[0]*(2.0*double(j)+1.0);
             //std::cout<<" FROM CALC U"<<" I "<<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
             
