@@ -184,7 +184,7 @@ void Grid::fillArray(Array2D& x,const Array2D& VdM, const Array2D& L)
                 for(int p=0;p<VdM.size()[1];p++){
                     x(i,j) +=VdM(i,p)*L(j,p);
                 }
-                // if(abs(x(i,j))<1E-12)
+                // if(fabs(x(i,j))<1E-8)   
                 //     x(i,j) = 0.0;
             }
     }

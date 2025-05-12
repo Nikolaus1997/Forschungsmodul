@@ -4,7 +4,7 @@
 #include <memory>   
 #include <vector>
 #include <storage/Vdm.h>
-
+#include <cmath>
 
 class Grid
 {

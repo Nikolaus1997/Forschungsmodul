@@ -58,7 +58,7 @@ std::array<double, 2> Flux::barenBlattFlux(double u, double q, double m)
     //     return {(-1.0*q),(-1.0)};
     // }else{
     double minus = m-1.0;
-    return {(-std::sqrt(m*std::pow(u,minus))*q),(-std::sqrt(m*std::pow(u,minus)))};
+    return {(std::sqrt(m*std::pow(u,minus))*q),(std::sqrt(m*std::pow(u,minus)))};
     // }
 
 }
