@@ -105,7 +105,7 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
-    double sol = 0.5 * (b - a)*sol1 +sol2;//0.5 * (b - a)*sol1 + 
+    double sol =0.5 * (b - a)*sol1 +sol2;//0.5 * (b - a)*sol1 + 
     return sol;
 }
 

@@ -441,7 +441,7 @@ void Computation::rungeKutta() {
     firstLimiter(grid_->j_1_);
     //    std::cout<<" AFTER first LIMITER U1 "<<std::endl;
     //    grid_->u1_.printValues();
-    //secondLimiter(grid_->u1_);
+    secondLimiter(grid_->u1_);
     }
     //    std::cout<<" AFTER LIMITER U1 "<<std::endl;
     //    grid_->u1_.printValues();
@@ -496,7 +496,7 @@ void Computation::rungeKutta() {
     //secondLimiter(grid_->u2_); 
     firstLimiter(grid_->u2_);
     firstLimiter(grid_->j_2_);
-    //secondLimiter(grid_->u2_); 
+    secondLimiter(grid_->u2_); 
     }
     //  std::cout<<" AFTER LIMITER U2 "<<std::endl;
     //  grid_->u2_.printValues();
@@ -554,7 +554,7 @@ void Computation::rungeKutta() {
     //secondLimiter(grid_->j_);
     firstLimiter(grid_->u_);
     firstLimiter(grid_->j_);
-    //secondLimiter(grid_->u_);
+    secondLimiter(grid_->u_);
     //   std::cout<<" AFTER LIMITER U "<<std::endl;
     //   grid_->u_.printValues();   
     } 
