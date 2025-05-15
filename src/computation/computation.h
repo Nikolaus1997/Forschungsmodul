@@ -46,7 +46,8 @@ class Computation
         void calcDt();
         void calcError(double currenTime);
         void calcUdt(Array2D& u,Array2D& q,Array2D& j, Array2D& VdM_t, double epsilon = 1.0);
-        void calcUdt(Array2D& u, Array2D& VdM_t);
+        void calcUdt(Array2D &u, Array2D &source, Array2D &VdM_t, double epsilon);
+        void calcUdt(Array2D &u, Array2D &VdM_t);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
         void thirdLimiter(Array2D &u);
@@ -62,7 +63,7 @@ class Computation
         std::shared_ptr<Grid> grid_;
         std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
         bool useLimiter_;  
-        int firstLimiterCalls_,secondLimiterCalls_; 
+        int firstLimiterCalls_,secondLimiterCalls_,iter; 
         double dt_;    
         double b_,m_;
         double a_;

@@ -100,12 +100,33 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
         sol1 +=weight * (-source(i,k)*L[0]);
+        //std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
         //std::cout<<" source "<<source(i,k)<<" u "<<u(i,k)<<" q "<<q(i,k)<<" L[0] "<<L[0]<<" L[1] "<<L[1]<<" i "<<i<<" k "<<k<<std::endl;
         sol2 += weight * (intermediate_sol * L[1]);
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
     double sol =0.5 * (b - a)*sol1 +sol2;//0.5 * (b - a)*sol1 + 
+    return sol;
+}
+double Quadrature::IntFluxU( int i, int j, double a, double b, const Array2D& u,const Array2D& source) {
+    int length = basis_.weights_.size()[0];
+    double sol1 = 0.0,sol2 = 0.0;
+
+    for (int k = 1; k < length - 1; k++) {
+        double node = basis_.nodes(k);
+        double weight = basis_.weights(k);
+
+        // Transform the node from [-1, 1] to [a, b]
+        std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
+        sol1 +=weight * (-source(i,k)*L[0]);
+        //std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
+        //std::cout<<" source "<<source(i,k)<<" u "<<u(i,k)<<" q "<<q(i,k)<<" L[0] "<<L[0]<<" L[1] "<<L[1]<<" i "<<i<<" k "<<k<<std::endl;
+        sol2 += weight * (u(i,k) * L[1]);
+    }
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
+    // Scale by the length of the interval
+    double sol =0.5 * (b - a)*sol1+sol2;//0.5 * (b - a)*sol1 + 
     return sol;
 }
 
