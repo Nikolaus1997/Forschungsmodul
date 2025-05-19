@@ -56,7 +56,8 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l)*meshWidth/(dt*0.5);
+    double alpha =1.;// meshWidth/dt;
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l) * alpha;
     //return 0.0;
 }
 
@@ -64,7 +65,7 @@ double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double 
 double NumericalFlux::laxWen(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l)*dt/(meshWidth*0.5);
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l)*dt/(meshWidth);
     //return 0.0;
 }
 
@@ -93,18 +94,18 @@ std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, doub
     if((abs(u_diff))<1.E-10 ){
         //std::cout<<"IM IN THE IF"<<std::endl;
         fraction_term = flux_.compute(u_l,0,m)[1];
-        g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
-        // g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        // g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        // g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        // g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
 
         //std::cout<<"IN IF fraction term "<<fraction_term<<" UDIFF "<< u_diff<<" G_plus "<<g_plus<<" u_R "<<u_r<<" G_minus "<<g_minus<<" U_l"<<u_l <<std::endl;
     }else{
-        g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        // g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        // g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
 
-        // g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        // g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
 
         //std::cout<<"IN ELSE fraction term "<<fraction_term<<" UDIFF "<< u_diff<<" G_plus "<<g_plus<<" u_R "<<u_r<<" G_minus "<<g_minus<<" U_l"<<u_l<<" u_mean_plus "<< u_mean_plus<< " u_mean "<<u_mean <<std::endl;
 
@@ -123,8 +124,8 @@ std::array<double,2> NumericalFlux::porousMediaPlus(double u_l, double u_r, doub
         // g_mean_plus = quad_->G(u_mean_plus,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
         // g_mean_minus = quad_->G(u_mean,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
  
-        g_mean_plus = quad_->G(u_mean_plus,m);//quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
-        g_mean_minus = quad_->G(u_mean,m);//quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
+        g_mean_plus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
+        g_mean_minus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
 
         gamma = 1.*(g_mean_plus-g_mean_minus)/(u_mean_plus-u_mean);
     }
@@ -149,10 +150,10 @@ std::array<double, 2> NumericalFlux::porousMediaMinus(double u_l, double u_r, do
     if((abs(u_diff))<1.E-10 ){
         //std::cout<<"IM IN THE IF"<<std::endl;
         fraction_term = flux_.compute(u_r,0,m)[1];
-        g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
-        // g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
-        // g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        // g_plus= quad_->G(u_r,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        // g_minus= quad_->G(u_l,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
+        g_plus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_r);
+        g_minus= quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_l);
 
 
         //std::cout<<"IN IF fraction term "<<fraction_term<<" UDIFF "<< u_diff<<" G_plus "<<g_plus<<" u_R "<<u_r<<" G_minus "<<g_minus<<" U_l"<<u_l <<std::endl;
@@ -179,11 +180,11 @@ std::array<double, 2> NumericalFlux::porousMediaMinus(double u_l, double u_r, do
     if((abs(u_mean_diff))<1.E-10 ){
         gamma = 1.*flux_.compute(u_mean_plus,0,m)[1];
     }else{
-        g_mean_plus = quad_->G(u_mean_plus,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
-        g_mean_minus = quad_->G(u_mean,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
+        // g_mean_plus = quad_->G(u_mean_plus,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
+        // g_mean_minus = quad_->G(u_mean,m);//-1.0*quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
  
-        // g_mean_plus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
-        // g_mean_minus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
+        g_mean_plus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean_plus);
+        g_mean_minus = quad_->GaussLegendreQuad([&](double x) {return flux_.compute(x,0,m)[1];},0.0,u_mean);
 
         gamma = 1.*(g_mean_plus-g_mean_minus)/(u_mean_plus-u_mean);
     }
