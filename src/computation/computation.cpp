@@ -294,8 +294,8 @@ void Computation::calcDt(){
     double c = 0.0, c1 = 0.0;
     for(int i=0;i<grid_->u_.size()[0];i++){
         for(int j = 0; j<grid_->u_.size()[1];j++){
-            double u_temp = fabs(grid_->u_(i,j));
-            double j_temp = fabs(grid_->j_(i,j));
+            double u_temp = abs(grid_->u_(i,j));
+            double j_temp = abs(grid_->j_(i,j));
             // if(abs(u_temp)<1E-11)
             //     continue;
             double m_ = double(settings_.BarenblattM);
@@ -317,7 +317,7 @@ void Computation::calcDt(){
     if(flux_.selectedFunction!=Flux::FunctionType::Barenblatt)
         dt_ = settings_.CFL*dx/(max+maxj)*epsilon_*0.5*sqrt(epsilon_)*1./(PP_N_+1.);
     else
-        dt_ = settings_.CFL*dx*dx*1./(PP_N_+1.)*0.5;
+        dt_ = settings_.CFL*dx*dx*1./(PP_N_+1.)*0.5*1/max;
     if(dt_>settings_.dt)
         dt_ = settings_.dt;
 }
@@ -724,7 +724,7 @@ void Computation::secondLimiter(Array2D &u)
             //std::cout<<" PROJECTION i "<<i<<" "<<u(i,0)<<" "<<u(i,1)<<" "<<u(i,2)<<" "<<u(i,3)<<" "<<u(i,4)<<" mean "<<mean<<" x_j "<<x_j<<std::endl;
                     if(u(i,nNodes+1)<0.){
                         for(int k = 0;k<u.size()[1];k++){
-                            if(fabs(grid_->x(i,k)-double(x_j)-meshWidth_[0]/2.)<1E-12){
+                            if(abs(grid_->x(i,k)-double(x_j)-meshWidth_[0]/2.)<1E-12){
                                 u(i,k)=0.0;
                             }else{
 
