@@ -29,9 +29,9 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
                 L_1_prime = L_prime;
             }
         }
-        if(std::abs(L)<1E-12)
+        if(std::abs(L)<2*__DBL_EPSILON__)
             L=0.0;
-        if(std::abs(L_prime)<1E-12)
+        if(std::abs(L_prime)<2*__DBL_EPSILON__)
             L_prime=0.0;
         return {L, L_prime};
 }

@@ -193,13 +193,17 @@ void Settings::loadFromFile(std::string filename)
     {
       useLimiter =parameterValue;
     }
+    if(parameterName=="useModLimiter")
+    {
+      useModLimiter =parameterValue;
+    }
   }
 }
 
 //output all settings to console
 void Settings::printSettings()
 {
-  std::cout << "Settings: " << std::endl
+  std::cout << "Settings: "<< OutputName<<" Limiter: "<<useModLimiter<<std::endl
     <<"PP_N: "<<PP_N<<" BBM "<<BarenblattM<<" BBTime "<<BarenblattTime<<std::endl
     << "  Interval: [" << physicalSize[0] << " , " << physicalSize[1] << "] , nCells: " << nCells[0]  << std::endl
     << "  endTime: " << endTime <<  ", maximum dt: " << dt << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;

@@ -30,12 +30,14 @@
 class Computation
 {
     public:
+        double PP_N_;
         //initialize the computation object, parse the settings from file that is given as the only command line argument 
         void initialize(std::string filename);
 
         //run the whole simulation until tend 
         void runSimulation();
 
+        void printError();
         void fillX();
         void calcQ(const Array2D& u);
         void initVdm();
@@ -48,8 +50,10 @@ class Computation
         void calcUdt(const Array2D& u);
         void firstLimiter(Array2D& u);
         void secondLimiter(Array2D& u);
-        void fillXanalyze(Array2D& x);
+        void newSecondLimiter(Array2D &u);
+        void fillXanalyze(Array2D &x);
         void fillUanalyze(Array2D& u_analyze,const Array2D& x,const Array2D& Vdm);
+        bool almostEqual(double a, double b);
     
     private:
         std::array<double,1> meshWidth_;
@@ -59,7 +63,7 @@ class Computation
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;
         std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
-        bool useLimiter_;  
+        bool useLimiter_, useModLimiter_;  
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_;
@@ -67,7 +71,7 @@ class Computation
         double nNodes;
         double initCondA_;
         double initCondB_;
-        int PP_N_;
+
         Projection proj_;
         Flux flux_;
         Limiter limiter_;

@@ -15,6 +15,8 @@ class Limiter
     // Set the limiter type
     void setLimiterFunction(FunctionType type);
 
+    void setLimiterFunction(FunctionType type, double PP_N_);
+
     // Compute the limiter based on the selected function
     double computeLimiter(double a, double b, double c, double h = 0);
 
@@ -27,4 +29,5 @@ class Limiter
 private:
     FunctionType selectedFunction; // Stores the currently selected function
     friend class Computation;
+    double PP_N_; // Polynomial degree for limiters
 };

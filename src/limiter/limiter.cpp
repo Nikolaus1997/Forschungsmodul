@@ -1,9 +1,12 @@
 #include "limiter.h"
 #include <algorithm>
 #include <cmath>
+#include <computation/computation.h>
 
-void Limiter::setLimiterFunction(FunctionType type) {
+void Limiter::setLimiterFunction(FunctionType type,double PP_N) {
     selectedFunction = type;
+    PP_N_ = PP_N;  // Store the polynomial degree for use in limiters
+// Store the polynomial degree for use in limiters
 }
 
 double Limiter::computeLimiter(double a, double b, double c,double h) {
@@ -27,7 +30,7 @@ double Limiter::minmod(double a, double b, double c, double h) {
     double sign_a = (a > 0) ? 1.0 : ((a < 0) ? -1.0 : 0.0);
     double sign_b = (b > 0) ? 1.0 : ((b < 0) ? -1.0 : 0.0);
     double sign_c = (c > 0) ? 1.0 : ((c < 0) ? -1.0 : 0.0);
-    double mu = 1.;
+    double mu = 1./PP_N_; // Assuming PP_N_ is a member of Computation class
 
     if(std::abs(a)>mu*pow(h,2) and (sign_a == sign_b) and (sign_b == sign_c)){
         double sol = std::min({std::abs(a), std::abs(b), std::abs(c)});

@@ -20,7 +20,8 @@ public:
 
     Array2D &u();
 
-
+    bool almostEqual(double a, double b);
+    void checkValues(Array2D &u_);
     const Array2D &u2() const;
 
     double u2(int i, int j) const;

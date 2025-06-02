@@ -11,9 +11,9 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2
                                         solution_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         derivative_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         x_      ({int(nCells_[0]),(numberNodes+2)}),
-                                        x_analyze_    ({300,1}),
-                                        u_analyze_    ({300,1}),
-                                        u_analyze_true_    ({300,1}),
+                                        x_analyze_    ({600,1}),
+                                        u_analyze_    ({600,1}),
+                                        u_analyze_true_    ({600,1}),
                                         faces_  ({nCells_[0]+1},   meshWidth_),
                                         rhs_    (nCells_,   meshWidth_),
                                         l2_error_({1},   meshWidth_),
@@ -159,16 +159,13 @@ void Grid::fillArray(Array2D& x,const Array2D& VdM, const Array2D& L)
 {
     for(int i=0;i<x.size()[0];i++){
         for(int j=0;j<x.size()[1];j++){
-                x(i,j) =0.0;
-                for(int p=0;p<VdM.size()[1];p++){
-                    x(i,j) +=VdM(i,p)*L(j,p);
-                    // if(abs(x(i,j))<1E-12)
-                    //     x(i,j) = 0.0;
-                }
+            x(i,j) =0.0;
+            for(int p=0;p<VdM.size()[1];p++){
+                x(i,j) +=VdM(i,p)*L(j,p);
             }
+        }
     }
 }
-
 void Grid::fillSolution(Variable& x,const Array2D& u)
 {
     for(int i=0;i<u.size()[0];i++){
@@ -188,5 +185,32 @@ void Grid::fillDerivative(Variable& x,const std::shared_ptr<Vandermonde> VdM)
                     x(i*(VdM->size()[1]-1)+j-1) +=VdM->VdMt(i,p)*VdM->L(j,p);
                 }
             }
+    }
+}
+
+bool Grid::almostEqual(double a, double b)
+{
+    if(a==0. or b==0.0){
+        if(std::abs(a-b)<2*__DBL_EPSILON__){
+            return true;
+        }else{
+            return false;
+        }
+    }else{
+        if(std::abs(a-b<=__DBL_EPSILON__*std::abs(a)) and std::abs(a-b)<=__DBL_EPSILON__*std::abs(b)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+void Grid::checkValues(Array2D &u_)
+{
+    for(int i=0;i<u_.size()[0];i++){
+        for(int j=0;j<u_.size()[1];j++){
+                if(almostEqual(u_(i,j),0.0)){
+                        u_(i,j) = 0.0;
+                }
+        }
     }
 }
