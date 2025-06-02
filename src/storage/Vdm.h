@@ -17,37 +17,37 @@ class Vandermonde: public Array2D
         Array2D &VdMQ();    
 
         double VdM(int i, int j) const;
-
         double &VdM(int i, int j);
+        
+        double VdMJ(int i, int j) const;
+        double &VdMJ(int i, int j);
+
         double VdM1(int i, int j) const;
-
         double &VdM1(int i, int j);
-        double VdM2(int i, int j) const;
 
+        double VdM2(int i, int j) const;
         double &VdM2(int i, int j);
 
         double VdMQ(int i, int j) const;
-
         double &VdMQ(int i, int j);
 
         double VdMt(int i, int j) const;
-
         double &VdMt(int i, int j);
 
         double L(int i, int j) const;
-
         double &L(int i, int j);
 
         double L_prime(int i, int j) const;
-
         double &L_prime(int i, int j);
 
     protected:
         Array2D VdM_;
         Array2D VdM_t_;
+        Array2D VdMJ_t_;
         Array2D VdMQ_;
-        Array2D VdM1_;
-        Array2D VdM2_;
+        Array2D VdMJ_;
+        Array2D VdM1_, VdMJ1_;
+        Array2D VdM2_, VdMJ2_;
         Array2D L_;
         Array2D L_prime_;
     friend class Computation;

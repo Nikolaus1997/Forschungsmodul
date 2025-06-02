@@ -3,12 +3,17 @@
 
 Grid::Grid(std::array<int, 1>  nCells, std::array<double, 1>  meshWidth, int numberNodes):
 nCells_(nCells), meshWidth_(meshWidth), u_      ({int(nCells_[0]),(numberNodes+2)}),
+                                        j_      ({int(nCells_[0]),(numberNodes+2)}),
+                                        jt_     ({int(nCells_[0]),(numberNodes+2)}),
+                                        j_1_    ({int(nCells_[0]),(numberNodes+2)}),
+                                        j_2_    ({int(nCells_[0]),(numberNodes+2)}),
                                         true_solution_({int(nCells_[0]),(numberNodes+2)}),
                                         q_      ({int(nCells_[0]),(numberNodes+2)}),
                                         ut_      ({int(nCells_[0]),(numberNodes+2)}),
                                         u1_     ({int(nCells_[0]),(numberNodes+2)}),
                                         u2_    ({int(nCells_[0]),(numberNodes+2)}),
                                         solution_({int(nCells_[0]*(numberNodes))},   meshWidth_),
+                                        solutionJ_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         derivative_({int(nCells_[0]*(numberNodes))},   meshWidth_),
                                         x_      ({int(nCells_[0]),(numberNodes+2)}),
                                         x_analyze_    ({600,1}),
@@ -84,6 +89,22 @@ double Grid::x(int i, int j) const
 double &Grid::x(int i,int j)
 {
     return x_(i,j);
+}
+
+Array2D &Grid::j()
+{
+    return j_;
+}
+
+double Grid::j(int i, int j) const
+{
+    return j_(i,j);
+}
+
+double &Grid::j(int i, int j)
+{
+    // TODO: insert return statement here
+    return j_(i,j);
 }
 
 const Variable &Grid::faces() const

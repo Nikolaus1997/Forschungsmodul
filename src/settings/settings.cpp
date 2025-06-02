@@ -196,15 +196,18 @@ void Settings::loadFromFile(std::string filename)
     if(parameterName=="useModLimiter")
     {
       useModLimiter =parameterValue;
-    }
   }
+      if(parameterName=="Epsilon")
+    {
+      Epsilon = atof(parameterValue.c_str());
+    }
+}
 }
 
 //output all settings to console
-void Settings::printSettings()
-{
+void Settings::printSettings(){
   std::cout << "Settings: "<< OutputName<<" Limiter: "<<useModLimiter<<std::endl
-    <<"PP_N: "<<PP_N<<" BBM "<<BarenblattM<<" BBTime "<<BarenblattTime<<std::endl
+    <<"PP_N: "<<PP_N<<" BBM "<<BarenblattM<<" BBTime "<<BarenblattTime<<" Epsilon "<<Epsilon<<std::endl
     << "  Interval: [" << physicalSize[0] << " , " << physicalSize[1] << "] , nCells: " << nCells[0]  << std::endl
     << "  endTime: " << endTime <<  ", maximum dt: " << dt << ", maximumNumberOfIterations: " << maximumNumberOfIterations << std::endl;
 }

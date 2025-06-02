@@ -57,10 +57,9 @@ double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,i
     {
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
-        double evaluation=0.0;
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
         //std::cout<<"Eval: "<<func(evaluation)<<"i: "<<i<<" L_prime "<<L_prime<<std::endl;
-        sol += weight * func(u(i,k))*L_prime;
+        sol += weight * u(i,k)*L_prime;
     }
 
     // Scale by the length of the interval
@@ -77,7 +76,6 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
     {
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
-        double evaluation=0.0;
 
         double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
         double intermediate_sol= GaussLegendreQuad(func,0.0,u(i,k));
@@ -90,28 +88,75 @@ double Quadrature::IntFluxQ(std::function<double(double)> func, int i, int j, do
     return sol;
 }
 double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, int j, double a, double b, 
-                            const Array2D& u, const Array2D& q) {
+                            const Array2D& u, const Array2D& q,const Array2D& source, bool isSource) {
     int length = basis_.weights_.size()[0];
-    double sol = 0.0;
+    double sol1 = 0.0,sol2 = 0.0;
 
     for (int k = 1; k < length - 1; k++) {
         double node = basis_.nodes(k);
         double weight = basis_.weights(k);
-        double evaluationU = 0.0;
-        double evaluationQ = 0.0;
 
         // Transform the node from [-1, 1] to [a, b]
-        double L_prime = LegendrePolynomialAndDerivative(j, node)[1];
+        std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
-        sol += weight * intermediate_sol * L_prime;
+        if(isSource)
+            sol1 +=weight * (-source(i,k)*L[0]);
+        else
+            sol1 = 0.0;
+        //std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
+        //std::cout<<" source "<<source(i,k)<<" u "<<u(i,k)<<" q "<<q(i,k)<<" L[0] "<<L[0]<<" L[1] "<<L[1]<<" i "<<i<<" k "<<k<<std::endl;
+        sol2 += weight * (intermediate_sol * L[1]);
     }
     //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
     // Scale by the length of the interval
-    //sol *= 0.5 * (b - a);
+    double sol =0.5 * (b - a)*sol1 +sol2;//0.5 * (b - a)*sol1 + 
+    return sol;
+}
+double Quadrature::IntFluxU( int i, int j, double a, double b, const Array2D& u,const Array2D& source) {
+    int length = basis_.weights_.size()[0];
+    double sol1 = 0.0,sol2 = 0.0;
+
+    for (int k = 1; k < length - 1; k++) {
+        double node = basis_.nodes(k);
+        double weight = basis_.weights(k);
+
+        // Transform the node from [-1, 1] to [a, b]
+        std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
+        sol1 +=weight * (-source(i,k)*L[0]);
+        //std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
+        //std::cout<<" source "<<source(i,k)<<" u "<<u(i,k)<<" q "<<q(i,k)<<" L[0] "<<L[0]<<" L[1] "<<L[1]<<" i "<<i<<" k "<<k<<std::endl;
+        sol2 += weight * (u(i,k) * L[1]);
+    }
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
+    // Scale by the length of the interval
+    double sol =0.5 * (b - a)*sol1+sol2;//0.5 * (b - a)*sol1 + 
     return sol;
 }
 
 double Quadrature::G(double u, double m)
 {
     return sqrt(m)*2./(m+1.)*sqrt(pow(u,m-1.))*u;
+}
+
+double Quadrature::IntJ_0(std::function<double(double)> func, int j, double a, double b)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int k = 1; k < length-1; k++)
+    {
+        double node = basis_.nodes(k);
+        double weight = basis_.weights(k);
+        double evaluation=0.0;
+        double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+        double  L_prime = LegendrePolynomialAndDerivative(j,node)[1];
+        double intermediate_sol= func(transformedNode);
+    
+        //std::cout<<"FUNCEval: "<<func(evaluation)<<" i: "<<i<<" L_prime "<<L_prime<<std::endl;
+        // if(i==8 or i ==9)
+        //     std::cout<<"Evaluation "<< evaluation<<" -g(u): "<<intermediate_sol<<" i: "<<i<<" j "<<j<<" L_prime "<<L_prime<<std::endl;
+        sol += weight * intermediate_sol*L_prime;
+    }
+    //std::cout<<"sol: "<<sol<<" i: "<<i<<" j: "<<j<<std::endl;
+    return sol;
 }

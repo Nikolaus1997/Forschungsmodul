@@ -61,8 +61,8 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
 
                 // Refine root using Newton's method
                 for (int k = 0; k < iterations; k++) {
-                    auto [L, L_prime] = LegendrePolynomialAndDerivative(N, x);
-                    dx = -L / L_prime;
+                    std::array<double,2> L = LegendrePolynomialAndDerivative(N, x);
+                    dx = -L[0] / L[1];
                     x += dx;
                     if (std::abs(dx) <= tol * std::abs(x)) break;
                 }
@@ -78,8 +78,8 @@ std::array<double,2> Basis::LegendrePolynomialAndDerivative(int N, double x)
 
 
                 // Compute the weight for this node
-                auto [L, L_prime] = LegendrePolynomialAndDerivative(N, x);
-                double w = 2.0 / ((1 - x * x) * L_prime * L_prime);
+                std::array<double,2> L = LegendrePolynomialAndDerivative(N, x);
+                double w = 2.0 / ((1 - x * x) * L[1]* L[1]);
                 weights[j] = w;
                 weights[N - j - 1] = w;
             }

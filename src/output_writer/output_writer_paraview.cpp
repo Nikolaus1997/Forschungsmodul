@@ -73,6 +73,36 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
 
   // add solution field variable
   // ---------------------------
+  vtkSmartPointer<vtkDoubleArray> arraySolutionJ = vtkDoubleArray::New();
+
+  // the pressure is a scalar which means the number of components is 1
+  arraySolutionJ->SetNumberOfComponents(1);
+
+  // Set the number of pressure values and allocate memory for it. We already know the number, it has to be the same as there are nodes in the mesh.
+  arraySolutionJ->SetNumberOfTuples(dataSet->GetNumberOfPoints());
+  
+  arraySolutionJ->SetName("du/dx");
+
+  // loop over the nodes of the mesh and assign the interpolated p values in the vtk data structure
+  // we only consider the cells that are the actual computational domain, not the helper values in the "halo"
+
+  index = 0;   // index for the vtk data structure, will be incremented in the inner loop
+
+  for (int i = 0; i < nCells; i++, index++)
+  {
+    //std::array<double,1> solutionVector;
+    //solutionVector[0] =grid_->x(i);
+    //solutionVector[0] = grid_->u(i);
+    arraySolutionJ->SetValue(index,grid_->solutionJ_(i));
+  }
+  // now, we should have added as many values as there are points in the vtk data structure
+  assert(index == dataSet->GetNumberOfPoints());
+
+  // add the field variable to the data set
+  dataSet->GetPointData()->AddArray(arraySolutionJ);
+
+  // add solution field variable
+  // ---------------------------
   vtkSmartPointer<vtkDoubleArray> arrayXaxis = vtkDoubleArray::New();
 
   // the pressure is a scalar which means the number of components is 1

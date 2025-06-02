@@ -8,14 +8,18 @@ void InitialCondition::setInitialCondType(InitialCondType type){
 
 double InitialCondition::computeInitialCondition(double x, double a, double b, double t, double m)
 {
-    if(m==0 and t ==0){
+    if(selectedFunction != InitialCondType::Barenblatt){
         switch (selectedFunction){
             case InitialCondType::UnitStep:
                 return unitStep( x, a, b);
             case InitialCondType::NegativeUnitStep:
                 return negativeUnitStep(x,a,b);
             case InitialCondType::Sinus:
-                return sinusFunc(x,a,b);    
+                return sinusFunc(x,a,b); 
+            case InitialCondType::exponential:
+                return exp(-x*x);
+            case InitialCondType::gaussian:
+                return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI));   
             default:
                 throw std::invalid_argument("Invalid initial condition type");
         }
@@ -23,8 +27,6 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
         switch (selectedFunction)
         {
         case InitialCondType::Barenblatt:
-        if(m==0)
-            throw std::invalid_argument("The parameter m of the barenblatt function cant be 0");
             return barenBlatt(x,a,b,t,m);
         default:
             throw std::invalid_argument("Invalid initial condition type");
@@ -59,7 +61,7 @@ double InitialCondition::negativeUnitStep(double x, double a, double b)
 
 double InitialCondition::sinusFunc(double x, double a, double b)
 {
-    return sin(x);
+    return sin(x)+2.;
 }
 //like in the papaer from ZhangWu
 // never ever just use an int as multiplicator

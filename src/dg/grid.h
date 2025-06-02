@@ -4,7 +4,7 @@
 #include <memory>   
 #include <vector>
 #include <storage/Vdm.h>
-
+#include <cmath>
 
 class Grid
 {
@@ -47,6 +47,11 @@ public:
 
     double &x(int i, int j);
 
+    Array2D &j() ;
+
+    double j(int i, int j) const;
+
+    double &j(int i, int j);
 
     const Variable &faces() const;
 
@@ -83,9 +88,10 @@ public:
 protected:
     const std::array<int, 1>        nCells_;
     const std::array<double, 1>     meshWidth_;
-    Variable solution_;
+    Variable solution_,solutionJ_;
     Variable derivative_;
     Array2D u_,u_analyze_, u_analyze_true_;
+    Array2D j_,j_1_,j_2_,jt_;
     Array2D true_solution_;
     Array2D q_;
     Array2D u2_;
