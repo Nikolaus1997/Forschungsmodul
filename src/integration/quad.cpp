@@ -99,10 +99,11 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         // Transform the node from [-1, 1] to [a, b]
         std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
-        if(isSource)
-            sol1 +=weight * (-source(i,k)*L[0]);
-        else
-            sol1 = 0.0;
+        if(isSource){
+            sol1 +=weight * (pow(source(i,k),0.1)*L[0]);
+            // std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
+        }else{
+            sol1 = 0.0;}
         //std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
         //std::cout<<" source "<<source(i,k)<<" u "<<u(i,k)<<" q "<<q(i,k)<<" L[0] "<<L[0]<<" L[1] "<<L[1]<<" i "<<i<<" k "<<k<<std::endl;
         sol2 += weight * (intermediate_sol * L[1]);
@@ -135,7 +136,7 @@ double Quadrature::IntFluxU( int i, int j, double a, double b, const Array2D& u,
 
 double Quadrature::G(double u, double m)
 {
-    return sqrt(m)*2./(m+1.)*sqrt(pow(u,m-1.))*u;
+    return sqrt(m)*2./(m+1.)*sqrt(pow(u,double(m-1.)))*u;
 }
 
 double Quadrature::IntJ_0(std::function<double(double)> func, int j, double a, double b)

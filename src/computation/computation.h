@@ -65,7 +65,7 @@ class Computation
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;
         std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
-        bool useLimiter_, useModLimiter_;  
+        bool useLimiter_, useModLimiter_, useSource_;  
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_,m_;

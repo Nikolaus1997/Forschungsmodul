@@ -8,7 +8,7 @@
 class InitialCondition
 {
 public:
-    enum class InitialCondType{ UnitStep, NegativeUnitStep, Sinus,Barenblatt, exponential, gaussian, linear, constant, none };
+    enum class InitialCondType{ UnitStep, NegativeUnitStep, Sinus,Barenblatt, exponential, gaussian, linear, constant, divorce, none };
 
     InitialCondition() : selectedFunction(InitialCondType::UnitStep) {}
 

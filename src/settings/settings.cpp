@@ -201,6 +201,10 @@ void Settings::loadFromFile(std::string filename)
     {
       Epsilon = atof(parameterValue.c_str());
     }
+    if(parameterName=="useSource")
+    {
+      useSource = parameterValue;
+    }
 }
 }
 

@@ -23,7 +23,7 @@ struct Settings
   std::string useLimiter = "false";
   std::string useModLimiter = "false";
   std::string timeStepping = "euler";  //< Time stepping scheme
-
+  std::string useSource = "false";
   double BarenblattM = 0;
   double BarenblattTime= 1.0;
   double Epsilon = 0.1;

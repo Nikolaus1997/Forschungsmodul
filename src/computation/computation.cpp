@@ -144,6 +144,11 @@ void Computation::initialize(std::string filename)
             initialCond_.setInitialCondType(InitialCondition::InitialCondType::gaussian);
             std::cout<< "Choosing the gaussian as initial condition..."<<std::endl;
         }   
+        else if (settings_.initialCondition == "divorce")
+        {
+            initialCond_.setInitialCondType(InitialCondition::InitialCondType::divorce);
+            std::cout<< "Choosing the divorce as initial condition..."<<std::endl;
+        }   
     else {
         std::cout << "Initial Condition not set, choosing default" << std::endl;
     }
@@ -157,6 +162,9 @@ void Computation::initialize(std::string filename)
     }else{
         useModLimiter_ = false;
     }
+    if(settings_.useSource=="true"){
+        std::cout<<"Using Source Term"<<std::endl;
+        useSource_ = true;}
     // fillXanalyze(grid_->x_analyze_);
     // grid_->x_analyze_.printValues();
     // Array2D x_ = Array2D({1,3});
@@ -301,7 +309,7 @@ void Computation::calcDt(){
             double m_ = double(settings_.BarenblattM);
             if(flux_.selectedFunction==Flux::FunctionType::Barenblatt){
                 //c = m_*pow(u_temp,m_-1.0);
-                c =     m_*pow(u_temp,m_-1.0);
+                c =     m_*pow(u_temp,double(m_-1.0));
                // c1 =    j_temp;
             }else{
             c =     u_temp;
@@ -888,9 +896,13 @@ void Computation::calcUdt(Array2D& u,Array2D& q,Array2D& source, Array2D& VdM_t)
             //std::cout<<" FROM CALC UUUU "<<" i "<<i<<std::endl;
             // if(abs(flux_term)<1E-12)
             //     flux_term = 0.0;
-   
+            if(useSource_){
                 integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
+                                                grid_->faces(i), grid_->faces(i+1),u, q, source,true);
+            }else{
+            integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
                                                 grid_->faces(i), grid_->faces(i+1),u, q, source,false);
+            }
 
             // if(abs(integ)<1E-12)
             //     integ = 0.0;
@@ -971,20 +983,20 @@ void Computation::calcError(double currentTime)
     if(settings_.initialCondition=="barenblatt"){
         for(int i = 0; i<grid_->u_.size()[0];i++){
             for(int j=0; j<grid_->u_.size()[1];j++){
-                grid_->true_solution_(i,j) =initialCond_.computeInitialCondition(grid_->x_(i,j),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, settings_.BarenblattM);     
+                grid_->true_solution_(i,j) =initialCond_.computeInitialCondition(grid_->x_(i,j),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, double(settings_.BarenblattM));     
             }
         }
         grid_->l2_error(0) = 0.0;
         for(int i =0;i<grid_->u_analyze_.size()[0];i++){
-            grid_->u_analyze_true_(i,0) = initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, settings_.BarenblattM);
+            grid_->u_analyze_true_(i,0) = initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, double(settings_.BarenblattM));
             grid_->l2_error(0) += pow(grid_->u_analyze_(i,0)- grid_->u_analyze_true_(i,0),2.);     
         }
         
         grid_->linf_error(0) = 0.0;
 
         for(int i =0;i<grid_->u_analyze_.size()[0];i++){
-            if(grid_->linf_error(0)<abs(grid_->u_analyze_(i,0)-initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, settings_.BarenblattM))) 
-                grid_->linf_error(0) = abs(grid_->u_analyze_(i,0)-initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, settings_.BarenblattM));
+            if(grid_->linf_error(0)<fabs(grid_->u_analyze_(i,0)-initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, double(settings_.BarenblattM)))) 
+                grid_->linf_error(0) = fabs(grid_->u_analyze_(i,0)-initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_,currentTime+settings_.BarenblattTime, double(settings_.BarenblattM)));
         }
     }
     else if(settings_.initialCondition =="sinus"){
@@ -999,8 +1011,8 @@ void Computation::calcError(double currentTime)
             double sol = initialCond_.computeInitialCondition(grid_->x_analyze_(i,0),initCondA_,initCondB_);
             //std::cout<<" SOL "<<sol<<" "<<grid_->u_analyze_(i,0)<<std::endl;
             grid_->l2_error(0) += pow(grid_->u_analyze_(i,0)-sol ,2);     
-        if(grid_->linf_error(0)<abs(grid_->u_analyze_(i,0)-sol))
-                grid_->linf_error(0) = abs(grid_->u_analyze_(i,0)-sin(grid_->x_analyze_(i,0)));
+        if(grid_->linf_error(0)<fabs(grid_->u_analyze_(i,0)-sol))
+                grid_->linf_error(0) = fabs(grid_->u_analyze_(i,0)-sin(grid_->x_analyze_(i,0)));
         }
     }
 }
@@ -1042,7 +1054,7 @@ void Computation::initVdm() {
                     [&](double x) {
                         return initialCond_.computeInitialCondition(
                             x, initCondA_, initCondB_,
-                            settings_.BarenblattTime, settings_.BarenblattM);
+                            settings_.BarenblattTime, double(settings_.BarenblattM));
                     },
                     j, grid_->faces(i), grid_->faces(i + 1));
             } else {
@@ -1075,8 +1087,8 @@ void Computation::initVdmJ(){
     for(int i = 0; i < grid_->faces_.size()[0] - 1; i++) {
         double node_left = grid_->faces_(i), node_right = grid_->faces_(i + 1);
 
-        flux_term_left  = initialCond_.computeInitialCondition(node_left, initCondA_, initCondB_,settings_.BarenblattTime, settings_.BarenblattM);
-        flux_term_right = initialCond_.computeInitialCondition(node_right, initCondA_, initCondB_,settings_.BarenblattTime, settings_.BarenblattM);
+        flux_term_left  = initialCond_.computeInitialCondition(node_left, initCondA_, initCondB_,settings_.BarenblattTime, double(settings_.BarenblattM));
+        flux_term_right = initialCond_.computeInitialCondition(node_right, initCondA_, initCondB_,settings_.BarenblattTime, double(settings_.BarenblattM));
         for (int j = 0; j < VdM_->VdM_.size()[1]; j++) {
             // Compute the integral for the j-th polynomial degree
             double integral = 0.0;
@@ -1084,14 +1096,14 @@ void Computation::initVdmJ(){
                 integral = quad_->IntJ_0(
                     [&](double x) {return initialCond_.computeInitialCondition(
                         x, initCondA_, initCondB_,
-                        settings_.BarenblattTime, settings_.BarenblattM);
+                        settings_.BarenblattTime, double(settings_.BarenblattM));
                     },
                     j, grid_->faces(i), grid_->faces(i + 1));
             } else {
             integral = quad_->IntJ_0(
                 [&](double x) {return initialCond_.computeInitialCondition(
                     x, initCondA_, initCondB_,
-                    settings_.BarenblattTime, settings_.BarenblattM);
+                    settings_.BarenblattTime, double(settings_.BarenblattM));
                 },
                 j, grid_->faces(i), grid_->faces(i + 1));
             }

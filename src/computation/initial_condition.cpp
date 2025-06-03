@@ -19,7 +19,13 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
             case InitialCondType::exponential:
                 return exp(-x*x);
             case InitialCondType::gaussian:
-                return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI));   
+                return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI)); 
+            case InitialCondType::divorce:
+                if(x>-M_PI and x<-M_PI/6. or x<M_PI and x>M_PI/6.)
+                    return std::fabs(std::sin(x));
+                else if (x>-M_PI/6. and x<M_PI/6.)
+                    return 0.5;
+                return 0.0;  
             default:
                 throw std::invalid_argument("Invalid initial condition type");
         }
