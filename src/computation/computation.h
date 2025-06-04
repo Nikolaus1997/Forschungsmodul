@@ -40,9 +40,10 @@ class Computation
         // void calcQ(const Array2D& u);
         void initVdm();
         void initVdmJ();
-        void calcQ(const Array3D &u, const Array2D &faceIdQ);
+        void calcQ(const Array3D &u,Array2D &faceIdQ);
         void eulerTimeStep();
         void rungeKutta();
+        void calcUdt(const Array3D &u, const Array3D &q, Array3D &VdM_t);
         void fillFaces();
         void calcDt();
         void calcError(double currenTime);

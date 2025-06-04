@@ -113,7 +113,7 @@ double NumericalFlux::enquist(double u_l, double u_r, Flux flux_)
     return 0.0;
 }
 
-void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& quad_,Array3D& u,Flux flux, Array3D& faceId, Array3D& faceIdQ, Array2D& faceFlux, const Array2D& elemId,int iCell, int jCell, double dt, double meshWidth, double m)
+void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& quad_,const Array3D& u,Flux flux, Array3D& faceId, Array3D& faceIdQ, Array2D& faceFlux, Array2D& faceFluxQ, const Array2D& elemId,int iCell, int jCell, double m)
 {   
     int iElem_0, iElem_2, iElem_3, iElem_1;
     int iElem = elemId(iCell,jCell);
@@ -153,7 +153,7 @@ void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& 
                 u_mean = u_mean/(u.size()[0]+2);
                 u_mean_plus = u_mean_plus/(u.size()[0]+2);
                 if(QTrue){
-                    faceFlux(i,j) = porousMediaMinus( faceId(i,j,iElem_0),faceId(i,j,iElem), 0.0,0.0,
+                        faceFluxQ(i,j) = porousMediaMinus( faceId(i,j,iElem_0),faceId(i,j,iElem), 0.0,0.0,
                                                             m, flux,quad_, u_mean, u_mean_plus)[1];
                 }else{
                     faceFlux(i,j) = porousMediaMinus(faceId(i,j,iElem_0),faceId(i,j,iElem), faceIdQ(i,j,iElem_0),
@@ -171,7 +171,7 @@ void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& 
                 u_mean = u_mean/(u.size()[1]+2);
                 u_mean_plus = u_mean_plus/(u.size()[1]+2);
                 if(QTrue){
-                    faceFlux(i,j) = porousMediaMinus(faceId(i,j,iElem_1),faceId(i,j,iElem),0.0,0.0,
+                    faceFluxQ(i,j) = porousMediaMinus(faceId(i,j,iElem_1),faceId(i,j,iElem),0.0,0.0,
                                                          m, flux,quad_, u_mean, u_mean_plus)[1];
                 }
                 else{
@@ -190,7 +190,7 @@ void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& 
                 u_mean = u_mean/(u.size()[0]+2);
                 u_mean_plus = u_mean_plus/(u.size()[0]+2);
                 if(QTrue){
-                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_2), 0.0,0.0,
+                    faceFluxQ(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_2), 0.0,0.0,
                                                         m, flux,quad_, u_mean, u_mean_plus)[1];
                 }
                 else{
@@ -209,7 +209,7 @@ void NumericalFlux::fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature>& 
                 u_mean = u_mean/(u.size()[1]+2);
                 u_mean_plus = u_mean_plus/(u.size()[1]+2);
                 if(QTrue){
-                    faceFlux(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_3), 0.0,0.0,
+                    faceFluxQ(i,j) = porousMediaPlus(faceId(i,j,iElem),faceId(i,j,iElem_3), 0.0,0.0,
                                                     m, flux,quad_, u_mean, u_mean_plus)[1];
                 }
                 else{

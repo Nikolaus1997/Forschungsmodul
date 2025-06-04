@@ -28,7 +28,7 @@ class NumericalFlux
     double downwind(double u_l, double u_r, Flux flux_);
     double lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth);
     double enquist(double u_l, double u_r, Flux flux_);
-    void fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature> &quad_, Array3D& u, Flux flux, Array3D &faceId, Array3D &faceIdQ, Array2D &faceFluxQ, const Array2D &elemId, int iCell, int jCell, double dt, double meshWidth, double m);
+    void fillFluxArray(bool QTrue,const std::unique_ptr<Quadrature> &quad_,const Array3D& u, Flux flux, Array3D &faceId, Array3D &faceIdQ, Array2D &faceFlux, Array2D &faceFluxQ, const Array2D &elemId, int iCell, int jCell, double m);
     std::array<double, 2> porousMediaPlus(double u_l, double u_r, double q_l, double q_r, double m, Flux flux_, const std::unique_ptr<Quadrature> &quad_, double u_mean = .0, double u_mean_plus = 0.0);
     std::array<double,2> porousMediaMinus(double u_l, double u_r,double q_l, double q_r, double m,Flux flux_,const std::unique_ptr<Quadrature>& quad_,double u_mean=.0, double u_mean_plus=0.0);      
 
