@@ -286,7 +286,7 @@ void Computation::runSimulation()
             time_+=dt_;
             iter++;
 
-            if(iter%int(settings_.nWriteState)==0){
+            if(iter%int(settings_.nWriteState)==0 or (time_>=0.6 and useSource_)){
                 writecounter++;
                 grid_->fillSolution(grid_->solution_,grid_->u_);
                 grid_->fillSolution(grid_->derivative_,grid_->ut_);
@@ -911,8 +911,16 @@ void Computation::calcUdt(Array2D& u,Array2D& q,Array2D& source, Array2D& VdM_t)
             u_mean = u_mean/(u.size()[1]);
             u_mean_plus = u_mean_plus/(u.size()[1]);  
             u_mean_minus = u_mean_minus/(u.size()[1]);
+            if(useTransport_){
+                // Compute the numerical flux
             g_minus =  gFlux_.computeNumFlux(ur_iminus,ul_i,transportFlux_,dt_,meshWidth_[0])+gFlux_.computeNumFlux(true,ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_,u_mean_minus,u_mean)[0];
+
             g_plus  =  -(gFlux_.computeNumFlux(ur_i, ul_iplus, transportFlux_,dt_,meshWidth_[0]) + gFlux_.computeNumFlux(false,ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_,u_mean,u_mean_plus)[0]); 
+            }else{
+                g_minus =  gFlux_.computeNumFlux(true,ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_,u_mean_minus,u_mean)[0];
+                g_plus  =  -(gFlux_.computeNumFlux(false,ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_,u_mean,u_mean_plus)[0]); 
+
+            }
         for (int j = 0; j <=PP_N_; j++) {
             double l = double(j);
             flux_term = g_minus*VdM_->L_(0,j)+g_plus;
@@ -992,7 +1000,10 @@ void Computation::calcUdt(Array2D& u,Array2D& source, Array2D& VdM_t, double eps
             // if(abs(integ)<1E-12)
             //     integ = 0.0;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
-            VdM_t(i,j) = 1.0/epsilon*(integ - flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);
+            if(!almostEqual(epsilon_,0.0))
+                VdM_t(i,j) = 1.0/epsilon*(integ - flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);
+            else
+                VdM_t(i,j) = (integ - flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);
             //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
         }
     }   

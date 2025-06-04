@@ -100,7 +100,7 @@ double Quadrature::IntFluxU(std::function<double(double, double)> func, int i, i
         std::array<double,2> L = LegendrePolynomialAndDerivative(j, node);
         double intermediate_sol = func(u(i,k), q(i,k));
         if(isSource){
-            sol1 +=weight * (pow(source(i,k),0.1)*L[0]);
+            sol1 +=weight * (pow(source(i,k),0.08)*L[0]);
             // std::cout<<" i "<<i<<" k "<<k<<" source "<<source(i,k)<<" sol1 "<<sol1<<std::endl;
         }else{
             sol1 = 0.0;}
