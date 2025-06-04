@@ -24,6 +24,9 @@ struct Settings
   std::string useModLimiter = "false";
   std::string timeStepping = "euler";  //< Time stepping scheme
   std::string useSource = "false";
+  std::string useTransport = "false";
+  std::string transportFlux = "linear";
+
   double BarenblattM = 0;
   double BarenblattTime= 1.0;
   double Epsilon = 0.1;

@@ -65,7 +65,7 @@ class Computation
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;
         std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
-        bool useLimiter_, useModLimiter_, useSource_;  
+        bool useLimiter_, useModLimiter_, useSource_, useTransport_;  
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_,m_;
@@ -75,7 +75,7 @@ class Computation
         double initCondB_;
         double epsilon_;
         Projection proj_;
-        Flux flux_;
+        Flux flux_, transportFlux_;
         Limiter limiter_;
         NumericalFlux gFlux_;
         InitialCondition initialCond_;

@@ -17,5 +17,6 @@ public:
     double IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);
     double IntFluxQ(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u);
     double IntFluxU(std::function<double(double,double)> func,int i,int j ,double a, double b,const Array2D& u, const Array2D& q, const Array2D& source, bool isSource = false);
+    double IntFluxU(std::function<double(double)> transportFunc, std::function<double(double, double)> func, int i, int j, double a, double b, const Array2D &u, const Array2D &q, const Array2D &source, bool isSource);
     double IntFluxU(int i, int j, double a, double b, const Array2D &u, const Array2D &source);
 };

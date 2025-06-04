@@ -205,6 +205,14 @@ void Settings::loadFromFile(std::string filename)
     {
       useSource = parameterValue;
     }
+    if(parameterName=="useTransport")
+    {
+      useTransport = parameterValue;
+    }
+    if(parameterName=="transportFlux")
+    {
+      transportFlux = parameterValue;
+    }
 }
 }
 

@@ -87,6 +87,26 @@ void Computation::initialize(std::string filename)
         std::cout << "flux function not found!" << std::endl;
     }
 
+    if (settings_.transportFlux == "linear") {
+        transportFlux_.setFluxFunction(Flux::FunctionType::Linear);
+        std::cout<< "Choosing the linear flux function..."<<std::endl;
+    }
+    else if (settings_.transportFlux == "burgers") {
+        transportFlux_.setFluxFunction(Flux::FunctionType::Burgers);
+        std::cout<< "Choosing the burgers flux function..."<<std::endl;
+    } 
+    else if (settings_.transportFlux == "buckley") {
+        transportFlux_.setFluxFunction(Flux::FunctionType::BuckleyLeverett);
+        std::cout<< "Choosing the buckley flux function..."<<std::endl;
+    }
+    else if (settings_.transportFlux == "barenblatt") {
+        transportFlux_.setFluxFunction(Flux::FunctionType::Barenblatt);
+        std::cout<< "Choosing the barenblatt flux function..."<<std::endl;
+    } 
+    else {
+        std::cout << "flux function not found!" << std::endl;
+    }
+
     // initialize the numerical flux function
     if (settings_.RiemannSolver == "upwind") {
         gFlux_.setNumFluxFunction(NumericalFlux::FunctionType::upwind);
@@ -165,6 +185,9 @@ void Computation::initialize(std::string filename)
     if(settings_.useSource=="true"){
         std::cout<<"Using Source Term"<<std::endl;
         useSource_ = true;}
+    if(settings_.useTransport=="true"){
+        std::cout<<"Using Transport Term"<<std::endl;
+        useTransport_ = true;}
     // fillXanalyze(grid_->x_analyze_);
     // grid_->x_analyze_.printValues();
     // Array2D x_ = Array2D({1,3});
@@ -321,11 +344,11 @@ void Computation::calcDt(){
                 }
         }
     }
-    dx = meshWidth_[0];    
-    if(flux_.selectedFunction!=Flux::FunctionType::Barenblatt)
+    dx = meshWidth_[0];   
+    if(flux_.selectedFunction!=Flux::FunctionType::Barenblatt )
         dt_ = settings_.CFL*dx/(max+maxj)*epsilon_*0.5*sqrt(epsilon_)*1./(PP_N_+1.);
     else
-        dt_ = settings_.CFL*dx*dx*1./(PP_N_+1.)*0.5*1/max;
+        dt_ = settings_.CFL*dx*dx*1./(PP_N_+1.)*0.5*1/(max+2*max)*dx;
     if(dt_>settings_.dt)
         dt_ = settings_.dt;
 }
@@ -888,19 +911,27 @@ void Computation::calcUdt(Array2D& u,Array2D& q,Array2D& source, Array2D& VdM_t)
             u_mean = u_mean/(u.size()[1]);
             u_mean_plus = u_mean_plus/(u.size()[1]);  
             u_mean_minus = u_mean_minus/(u.size()[1]);
-            g_minus =  gFlux_.computeNumFlux(true,ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_,u_mean_minus,u_mean)[0];
-            g_plus  =  -gFlux_.computeNumFlux(false,ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_,u_mean,u_mean_plus)[0]; 
+            g_minus =  gFlux_.computeNumFlux(ur_iminus,ul_i,transportFlux_,dt_,meshWidth_[0])+gFlux_.computeNumFlux(true,ur_iminus,ul_i,qr_iminus,ql_i,m,flux_,quad_,u_mean_minus,u_mean)[0];
+            g_plus  =  -(gFlux_.computeNumFlux(ur_i, ul_iplus, transportFlux_,dt_,meshWidth_[0]) + gFlux_.computeNumFlux(false,ur_i, ul_iplus,qr_i,ql_iplus,m,flux_,quad_,u_mean,u_mean_plus)[0]); 
         for (int j = 0; j <=PP_N_; j++) {
             double l = double(j);
             flux_term = g_minus*VdM_->L_(0,j)+g_plus;
             //std::cout<<" FROM CALC UUUU "<<" i "<<i<<std::endl;
             // if(abs(flux_term)<1E-12)
             //     flux_term = 0.0;
-            if(useSource_){
-                integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
+            if(useSource_ and useTransport_){
+                integ =quad_->IntFluxU([&](double u) { return transportFlux_.compute(u); },[&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
                                                 grid_->faces(i), grid_->faces(i+1),u, q, source,true);
-            }else{
-            integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
+            }else if(useSource_)
+            {
+                            integ =quad_->IntFluxU([&](double u, double q) { return -flux_.compute(u, q, m)[0]; }, i, j,
+                                                grid_->faces(i), grid_->faces(i+1),u, q, source,true);
+            }else if(useTransport_){
+                integ =quad_->IntFluxU([&](double u) { return transportFlux_.compute(u); },[&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
+                                                grid_->faces(i), grid_->faces(i+1),u, q, source,false);
+            }
+            else{
+            integ =quad_->IntFluxU([&](double u, double q) { return -flux_.compute(u, q, m)[0]; }, i, j,
                                                 grid_->faces(i), grid_->faces(i+1),u, q, source,false);
             }
 
@@ -908,7 +939,7 @@ void Computation::calcUdt(Array2D& u,Array2D& q,Array2D& source, Array2D& VdM_t)
             //     integ = 0.0;
             // Apply the formula for the update of VdM_t_* pow(-1, j) 
      
-                VdM_t(i,j) = (-integ + flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);
+                VdM_t(i,j) = (integ + flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);
             //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
         }
     }   
@@ -1186,13 +1217,13 @@ void Computation::fillUanalyze(Array2D &u_analyze, const Array2D &x, const Array
 bool Computation::almostEqual(double a,double b)
 {
     if(a==0. or b==0.0){
-        if(std::abs(a-b)<2*__FLT128_EPSILON__){
+        if(std::abs(a-b)<2*__DBL_EPSILON__){
             return true;
         }else{
             return false;
         }
     }else{
-        if(std::abs(a-b<=__FLT128_EPSILON__*std::abs(a)) and std::abs(a-b)<=__FLT128_EPSILON__*std::abs(b)){
+        if(std::abs(a-b<=__DBL_EPSILON__*std::abs(a)) and std::abs(a-b)<=__DBL_EPSILON__*std::abs(b)){
             return true;
         }else{
             return false;

@@ -57,7 +57,7 @@ double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double 
 {
     // Example implementation: average of left and right
     double alpha = meshWidth/dt;
-    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l) * alpha;
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l) * alpha;
     //return 0.0;
 }
 
