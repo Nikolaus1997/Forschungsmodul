@@ -19,6 +19,8 @@ double NumericalFlux::computeNumFlux(double u_l, double u_r,Flux flux_, double d
         return downwind(u_l, u_r,flux_);
     case FunctionType::lax:
         return lax(u_l, u_r,flux_, dt, meshWidth);
+    case FunctionType::laxEps:
+        return laxEps(u_l, u_r,flux_, dt, meshWidth);
     case FunctionType::laxWen:
         return laxWen(u_l, u_r,flux_, dt, meshWidth);
     case FunctionType::enquist:
@@ -56,10 +58,19 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    double alpha = meshWidth/dt;
-    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l) * alpha;
+    double alpha = 5.*sqrt(epsilon_); // Assuming meshWidth is the spatial step size
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l)*alpha;
     //return 0.0;
 }
+
+double NumericalFlux::laxEps(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
+{
+    // Example implementation: average of left and right
+    double alpha = 1.*epsilon_;
+    return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) - 0.5 * (u_r - u_l)*alpha;
+    //return 0.0;
+}
+
 
 // Lax flux function
 double NumericalFlux::laxWen(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
@@ -210,5 +221,13 @@ bool NumericalFlux::almostEqual(double a, double b)
         }else{
             return false;
         }
+    }
+}
+
+void NumericalFlux::setEpsilon(double epsilon)
+{
+    epsilon_ = epsilon;
+    if(epsilon_ < 0.0) {
+        throw std::invalid_argument("Epsilon must be non-negative.");
     }
 }

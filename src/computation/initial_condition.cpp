@@ -20,6 +20,10 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
                 return exp(-x*x);
             case InitialCondType::gaussian:
                 return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI)); 
+            case InitialCondType::waitingTime:
+                return waitingTime(x,a,b);
+            case InitialCondType::unitDoubleStep:
+                return unitDoubleStep(x,a,b);
             case InitialCondType::divorce:
                 if(x>-M_PI and x<-M_PI/6. or x<M_PI and x>M_PI/6.)
                     return std::fabs(std::sin(x));
@@ -52,6 +56,40 @@ double InitialCondition::unitStep(double x, double a, double b)
         return 0.0;
     }
     
+}
+
+double InitialCondition::unitDoubleStep(double x, double a, double b)
+{
+    if(x>-3.7 and x<-0.7)
+    {
+        return 1.0;
+    }
+    if(x>0.7 and x<3.7)
+    {
+        return 1.0;
+    }
+        return 0.0;
+}
+
+double InitialCondition::diffDoubleUnitStep(double x, double a, double b)
+{
+    if(x>-4 and x<-1)
+    {
+        return 1.0;
+    }
+    if(x>0. and x<3)
+    {
+        return 1.5;
+    }
+        return 0.0;
+}
+double InitialCondition::waitingTime(double x, double a, double b)
+{
+    if(x>-M_1_PI/2. and x<M_1_PI/2.)
+    {
+        return cos(x);
+    }
+    return 0.0;
 }
 
 double InitialCondition::negativeUnitStep(double x, double a, double b)

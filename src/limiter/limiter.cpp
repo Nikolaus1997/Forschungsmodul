@@ -49,27 +49,27 @@ double Limiter::minmod(double a, double b, double c, double h) {
 double Limiter::superbee(double a, double b, double c) {
     // Implementation of the superbee limiter
     // Returns the maximum of minmod(a, 2b) and minmod(2a, b)
-    if (std::abs(b) < 1e-10) return 0.0;
+    if (std::abs(c) < 1e-10) return 0.0;
     
-    double r = a / b;
+    double r = b / c;
     return std::max(0.0, std::max(std::min(2.0 * r, 1.0), std::min(r, 2.0)));
 }
 
 double Limiter::vanLeer(double a, double b, double c) {
     // Implementation of the van Leer limiter
     // phi(r) = (r + |r|)/(1 + |r|)
-    if (std::abs(b) < 1e-10) return 0.0;
+    if (std::abs(c) < 1e-10) return 0.0;
     
-    double r = a / b;
+    double r = b / c;
     return (r + std::abs(r)) / (1.0 + std::abs(r));
 }
 
 double Limiter::vanAlbada(double a, double b, double c) {
     // Implementation of the van Albada limiter
     // phi(r) = (r^2 + r)/(r^2 + 1)
-    if (std::abs(b) < 1e-10) return 0.0;
+    if (std::abs(c) < 1e-10) return 0.0;
     
-    double r = a / b;
+    double r = b / c;
     double r2 = r * r;
     return (r2 + r) / (r2 + 1.0);
 }

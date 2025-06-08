@@ -20,12 +20,14 @@ struct Settings
   std::string RiemannSolver = "upwind";  //< Initial condition
   double initCondA = 0.0;                     //< Starting point of the initial Condition
   double initCondB = 0.0;                     //< End point of the initial Condition
+  std::string extendLimiter = "false";
   std::string useLimiter = "false";
   std::string useModLimiter = "false";
   std::string timeStepping = "euler";  //< Time stepping scheme
   std::string useSource = "false";
   std::string useTransport = "false";
   std::string transportFlux = "linear";
+  std::string limiterType = "superbee"; //< Type of limiter to use, e.g. minmod, superbee, vanLeer, vanAlbada
 
   double BarenblattM = 0;
   double BarenblattTime= 1.0;

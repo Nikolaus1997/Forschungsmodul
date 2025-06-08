@@ -169,6 +169,13 @@ void Settings::loadFromFile(std::string filename)
       RiemannSolver=parameterValue;
     }
 
+    if (parameterName=="limiterType"){
+      limiterType=parameterValue;
+    }
+    if (parameterName=="extendLimiter"){
+      extendLimiter=parameterValue;
+    }
+
     if(parameterName=="initCondA"){
       initCondA = atof(parameterValue.c_str());
     }

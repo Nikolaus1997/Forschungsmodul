@@ -43,6 +43,10 @@ class Computation
         void initVdm();
         void initVdmJ();
         void eulerTimeStep();
+        void rungeKuttaNoEps();
+        void applyLimiter(Array2D& u);
+        void applyCalcUdt(Array2D &u, Array2D &VdM_t);
+        void applyCalcUdtEps(Array2D &u,Array2D &j);
         void rungeKutta();
         void fillFaces();
         void calcDt();
@@ -65,7 +69,7 @@ class Computation
         std::unique_ptr<Quadrature> quad_;
         std::shared_ptr<Grid> grid_;
         std::unique_ptr<OutputWriterParaview> outputWriterParaview_;     
-        bool useLimiter_, useModLimiter_, useSource_, useTransport_;  
+        bool useLimiter_, useModLimiter_, useSource_, useTransport_, extend_;  
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_,m_;

@@ -8,7 +8,7 @@
 class InitialCondition
 {
 public:
-    enum class InitialCondType{ UnitStep, NegativeUnitStep, Sinus,Barenblatt, exponential, gaussian, linear, constant, divorce, none };
+    enum class InitialCondType{ UnitStep, NegativeUnitStep, Sinus,Barenblatt, exponential, gaussian, linear, constant, divorce, diffDoubleUnitStep, unitDoubleStep, waitingTime,none };
 
     InitialCondition() : selectedFunction(InitialCondType::UnitStep) {}
 
@@ -20,6 +20,12 @@ public:
 
     // Destructor (optional, for cleanup if needed)
     double unitStep(double x, double a, double b);
+
+    double unitDoubleStep(double x, double a, double b);
+
+    double diffDoubleUnitStep(double x, double a, double b);
+
+    double waitingTime(double x, double a, double b);
 
     double negativeUnitStep(double x, double a, double b);
 

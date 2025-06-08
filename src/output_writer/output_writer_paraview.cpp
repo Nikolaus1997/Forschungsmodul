@@ -19,7 +19,7 @@ void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
   // Assemble the filename
   std::stringstream fileName;
   std::string outputName_ = OutputName;
-  fileName << "out/" <<outputName_<<"_"<< std::setw(4) << setfill('0') << fileNo_ << "." << vtkWriter_->GetDefaultFileExtension();
+  fileName << "out/"<<outputName_<<"_"<< std::setw(4) << setfill('0') << fileNo_ << "." << vtkWriter_->GetDefaultFileExtension();
   
   // increment file no.
   fileNo_++;

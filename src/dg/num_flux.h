@@ -10,7 +10,7 @@
 
 class NumericalFlux
 {
-    enum class FunctionType { upwind, downwind, lax, enquist, porousMedia, central, laxWen };
+    enum class FunctionType { upwind, downwind, lax, enquist, porousMedia, central, laxWen, laxEps };
 
     // Constructor
     NumericalFlux() : selectedFunction(FunctionType::upwind) {}
@@ -25,13 +25,16 @@ class NumericalFlux
     double upwind(double u_l, double u_r, Flux flux_);
     double downwind(double u_l, double u_r, Flux flux_);
     double lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth);
+    double laxEps(double u_l, double u_r, Flux flux_, double dt, double meshWidth);
     double laxWen(double u_l, double u_r, Flux flux_, double dt, double meshWidth);
     double enquist(double u_l, double u_r, Flux flux_);
     bool almostEqual(double a, double b);
+    void setEpsilon(double epsilon);
     std::array<double,2> porousMediaPlus(double u_l, double u_r,double q_l, double q_r, double m,Flux flux_,const std::unique_ptr<Quadrature>& quad_,double u_mean=.0, double u_mean_plus=0.0);
     std::array<double,2> porousMediaMinus(double u_l, double u_r,double q_l, double q_r, double m,Flux flux_,const std::unique_ptr<Quadrature>& quad_,double u_mean=.0, double u_mean_plus=0.0);      
 
 private:
     FunctionType selectedFunction; // Stores the currently selected function
     friend class Computation;
+    double epsilon_ = 0.0; // Epsilon value for Lax-Eps flux
 };
