@@ -532,18 +532,18 @@ This behavior is particularly noticeable under \(h\)-refinement, whereas for \(l
 	\caption{Numerical results for the Barenblatt function as initial condition at $t=1\,\text{s}$ computed until the final time $t=2\,\text{s}$. With the polynomial degree $l=3$ and number of cells $N_{cells} =320$ for various nonlinearities $m$.}
 	\label{fig:BBVariousM}
 \end{figure}\\
-The investigation of the solution’s overall behavior with increasing nonlinearity up to time \( t = 2\,\text{s} \) demonstrates consistency with the general form of the Barenblatt-type solution, as shown in Fig.~\ref{fig:BBVariousM}. Notably, the LDG formulation combined with the proposed limiters captures the free boundary with high accuracy. Nonetheless, both the \( L^2 \) and \( L^\infty \) errors are significantly larger, as expected, due to the simulation running over twenty times longer than the previous case and involving substantially more limiter activations. In this case not even $l/p$-refinement seem to increase the accuracy (in appendix Tab.~\ref{TBL:APFULLSECOND ERROR}).\\
+The investigation of the solution’s overall behavior with increasing nonlinearity up to time \( t = 2\,\text{s} \) demonstrates consistency with the general form of the Barenblatt-type solution, as shown in Fig.~\ref{fig:BBVariousM}. Additionally, the LDG formulation combined with the proposed limiters captures the free boundary with high accuracy. Nonetheless, both the \( L^2 \) and \( L^\infty \) errors are significantly larger, as expected, due to the simulation running over twenty times longer than the previous case and involving substantially more limiter activations. In this case not even $l/p$-refinement seem to increase the accuracy (in appendix Tab.~\ref{TBL:APFULLSECOND ERROR}).\\
 \\
-\textit{Case 2} Since we have thus far considered only the porous medium equation without a source term, we now turn our attention to the case in which a strong absorption source term is added:
+\textit{Case 2} Since we have thus far considered only the porous medium equation without a source term, we now turn our attention to the case in which a strong absorption source term is added\\
 \begin{equation}
 	\frac{\partial u}{\partial t} = \left(u^m\right)_{x x} - c u^p,
-\end{equation}
-where $0<p<1$ and $0<c$. Setting the initial condition to 
+\end{equation}\\
+where $0<p<1$ and $0<c$. Setting the initial condition to\\
 \begin{equation}
 	u_0(x)= \begin{cases}|\sin x|, & x \in(-\pi,-\pi / 6) \cup(\pi / 6, \pi), \\ 0.5, & x \in(-\pi / 6, \pi / 6), \\ 0, & \text { otherwise, }
 	\end{cases}
-\end{equation}
-leads to a disconnect in the positive support region and after some time to a total absorption of the initial data see Fig.~\ref{fig:Divorce}. The examples presented by Zhang and Wu, in which the parameters \( p \) and \( m \) satisfy \( p + m = 2 \) with \( 0 < p < 1 \), could also be reproduced reliably.\\
+\end{equation}\\
+leads to a disconnect in the positive support region and after some time to a total absorption of the initial data see Fig.~\ref{fig:Divorce}. The so-called "divorce of support" phenomenon, first described by Rosenau and Kamin~\cite{ROSENAU1983273} and later rigorously proven by Nakai and Tomoeda~\cite{Nakaki}, can be reliably reproduced under the necessary parameter constraint \( p + m = 2 \) with \( 0 < p < 1 \) (in appendix Fig.\ref{fig:Divorce1.98}).\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
@@ -595,7 +595,7 @@ u_0(x) = \frac{\pi}{\sqrt{2}} \exp\left(-\frac{x^2}{2}\right),
 \]
 which is smooth and compactly supported on the computational domain. The goal of this experiment is to examine whether the solution of the hyperbolic system converges to that of the porous medium equation as \( \varepsilon \to 0 \).\\
 \\
-Fig.~\ref{fig:gam8pp2central1s} illustrates the behavior of the solution for \( m = 1 \) under varying values of \( \varepsilon \). As \( \varepsilon \) decreases, the numerical solution converges toward the expected result. Notably, even for \( \varepsilon = 0.01 \), the approximation exhibits good accuracy, and further reductions in \( \varepsilon \) produce only marginal improvements. A comparison to the LDG formulation is also provided in Fig.~\ref{fig:gam8pp2central1s} that clearly shows that the choice of $\varepsilon=0.01$ is reasonable, since we know that the LDG formulation is relatively exact for $m=1$.\\
+Fig.~\ref{fig:gam8pp2central1s} illustrates the behavior of the solution for \( m = 1 \) under varying values of \( \varepsilon \). As \( \varepsilon \) decreases, the numerical solution converges toward the expected result. Remarkably, even for a relatively high \( \varepsilon = 0.01 \), the approximation exhibits good accuracy, and further reductions in \( \varepsilon \) produce only marginal improvements. A comparison to the LDG formulation is also provided in Fig.~\ref{fig:gam8pp2central1s} that clearly shows that the choice of $\varepsilon=0.01$ is reasonable, since we know that the LDG formulation is relatively exact for $m=1$.\\
 \\
 For \( m = 1 \), the diffusion corresponds to the classical heat equation, which yields smooth solutions for all \( t > 0 \). As a result, no limiters were applied in this case. However, increasing \( m \) introduces nonlinear diffusion effects, which lead to the formation of steep gradients in the solution after a certain time \( t > 0 \). To address this, the two previously introduced limiters were employed. Specifically, if the first limiter (minmod) flags a troubled cell, the two neighboring cells are also limited by projecting their solutions to first-order polynomials. This conservative strategy enhances stability and helps reduce oscillations.\\
 \\
@@ -606,7 +606,7 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\includegraphics[width=.9\linewidth]{../../../Studium/Forschungsmodul/Pictures/ComparisonLDGHBLS}
 	\caption{Results for the hyperbolic system with varying $\varepsilon$ and a comparison to the LDG method for the exponent $m = 1$}
 	\label{fig:gam8pp2central1s}
-\end{figure}
+\end{figure}\\
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
@@ -694,7 +694,7 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\caption{Numerical results for varying nonlinearity factors with relative smooth initial data and polynomial degree of $l=3$ calculated until $t=2\,\text{s}$}
 	\label{fig:HBBVariousM}
 \end{figure}\\
-Notably, the computation times for this relatively fine grid with \( N_{\text{cells}} = 320 \) are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for relative smooth initial data such as the Barenblatt formula.\\
+Noteworthy are the computation times for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
 \\
 \textit{Case 3 }Considering now the two-Box initial condition\\
 \begin{equation*}
@@ -767,7 +767,9 @@ At early times \( t > 0\,\text{s} \), when the solution remains close to the ini
 Despite these oscillations, the numerical solution appears to capture the qualitative behavior of the porous medium equation (PME) accurately and is capable of producing sharp transitions at the free boundary. This case is particularly noteworthy due to the high nonlinearity exponent \( m = 8 \). In comparison, the hyperbolic system was unable to accurately capture the sharp free boundary for the Barenblatt initial data with the same exponent at \( t = 1\,\text{s} \) (compare Fig.~\ref{fig:hbbm8}), which supports the observation that the choice of initial data plays a crucial role in the accuracy and stability of the simulation.
 \clearpage
 \section{Conclusion}
-	The LDG method effectively solves the PME while maintaining stability and high-order accuracy. Future work includes extensions to higher dimensions and adaptive mesh refinement.
+In this work, we have numerically investigated the porous medium equation using two distinct discretization strategies: the Local Discontinuous Galerkin (LDG) method and a hyperbolic relaxation system. The implementation was carried out with a focus on positivity preservation, limiter design, and adaptive tolerance thresholds, ensuring both stability and physical accuracy in degenerate regimes.\\
+Our results demonstrate that the LDG method, when equipped with appropriately tuned limiters, can provide accurate and robust solutions for a wide range of nonlinearity exponents mm, though challenges remain for high-order schemes under strong degeneracy. The hyperbolic formulation, on the other hand, exhibits greater robustness with respect to oscillations and is capable of capturing key phenomena such as waiting time behavior, even for small values of the relaxation parameter $\varepsilon$.\\
+Through a systematic study of convergence behavior, limiter activity, and solution structure, we have shown that the choice of initial data and boundary treatment significantly influences the observed accuracy and stability. In particular, differences in experimental order of convergence compared to prior works such as Zhang and Shu can largely be attributed to the full-domain treatment used here.
 	\newpage
 	\bibliographystyle{plain}
 	\bibliography{/home/nikolaus/Studium/Forschungsmodul/Ausarbeitung/references.bib}
@@ -1052,4 +1054,18 @@ Despite these oscillations, the numerical solution appears to capture the qualit
 	\caption{Error calculations for varying polynomial degrees and the nonlinearity factor $m=3$ at $t=2\,\text{s}$,for the LDG system the Barenblatt function at $t=1\,\text{s}$ as initial data}
 	\label{TBL:APFULLSECOND ERROR}
 \end{table}
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/Divorce1.98T0}
+		\caption{$t=0\,\textit{s}$}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/Divorce1.98T0.710025}
+		\caption{$t=0.710025\,\textit{s}$}
+	\end{subfigure}
+	\caption{Divorce of the support with parameters $m=1.98$ and $p=0.02$. Calculated for $N_{cells} = 80$ and a polynomial degree of $l=2$}
+	\label{fig:Divorce1.98}
+\end{figure}
 \end{document}
