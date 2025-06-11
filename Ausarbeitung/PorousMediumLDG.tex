@@ -29,21 +29,22 @@
 
 \begin{document}
 	\maketitle
-	\begin{abstract}
-	The porous medium equation (PME) is a nonlinear partial differential equation that models diffusion in porous media. In this Research Project, the Local Discontinuous Galerkin (LDG) method is employed to numerically solve the PME. The well-established method is tested in various settings, using different polynomial orders of basis functions, to study their effects on the solution’s behavior. Furthermore, a hyperbolic system that degenerates into the PME under certain parameter regimes is investigated. For both approaches, extensive numerical results are presented to illustrate the capabilities and limitations of each method.
-	\end{abstract}
+\begin{abstract}
+	The porous medium equation (PME) is a nonlinear partial differential equation of parabolic type, widely used to model processes such as fluid flow, heat transfer, and diffusion in porous media. This research project employs the Local Discontinuous Galerkin (LDG) method to numerically solve the PME. The method is evaluated under various configurations, including different polynomial orders of basis functions, to assess their impact on solution behavior. In addition, a Hyperbolic Balance Law (HBL) system, known to degenerate into the PME under appropriate parameter regimes, is investigated. For both numerical approaches, extensive simulations are conducted to explore their respective strengths and limitations. The results demonstrate that the HBL formulation qualitatively captures the essential features of nonlinear diffusion and is capable of handling certain non-smooth initial data in regimes with relatively small nonlinearity.
+\end{abstract}
+
 	
 	\section{Introduction}
-The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction, and even image processing. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
-The general form of the PME is:
+The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction, and many more. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
+The general form of the PME is
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m), \quad x \in \Omega, \quad t > 0,
 \]
-where \( m > 1 \) is a constant characterizing the medium's porosity. Assuming that the initial condition \( u_0 \) is nonnegative, the PME can be rewritten as
+where \( m > 1 \) is a constant characterizing the medium's diffusion behavior. Assuming that the initial condition \( u_0 \) is nonnegative, the PME can be rewritten as
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m) = \nabla \cdot (m u^{m-1} \nabla u) = \nabla \cdot (a(u)\nabla u), \quad x \in \Omega, \quad t > 0,
 \]
-where \( a(u) = m u^{m-1} \geq 0 \). Thus, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution vanishes.\\ Another interesting novelty of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a finite positive time (the waiting time), after which it instantaneously moves with finite speed, e.g. see chapter \ref{sec:numerical-results}.\\
+where \( a(u) = m u^{m-1} \geq 0 \). Generally, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution vanishes.\\ Another interesting novelty of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a finite positive time (the waiting time), after which it instantaneously moves with finite speed, e.g. see chapter \ref{sec:numerical-results}.\\
 A fundamental example of a solution is the Barenblatt (or source-type) solution \cite{Barenblatt}, which can be written explicitly as a formula which is given by
 \begin{equation}
 	\label{eq:barenblatt function}
@@ -60,7 +61,7 @@ This solution will later be useful for assessing the accuracy of the numerical m
 \section{Mathematical and Numerical Formulation}
 To numerically solve the porous medium equation (PME), we discretize the spatial domain using a finite number of non-overlapping cells and apply a high-order accurate numerical method tailored for problems with nonlinear diffusion and potential degeneracies. Specifically, we employ the Discontinuous Galerkin (DG) method, known for its flexibility in handling complex boundary conditions, its ability to use high-order polynomial approximations, and its local conservation properties.\\
 \\
-The computational domain is $\Omega\subset\mathbb{R}$ divided into \( N_{\text{cells}} \in \mathbb{N} \) cells, where each cell
+The computational domain $\Omega\subset\mathbb{R}$ is divided into \( N_{\text{cells}} \in \mathbb{N} \) cells, where each cell
 \[
 I_i = \left(x_{i-\frac{1}{2}}, x_{i+\frac{1}{2}}\right)
 \]
@@ -370,7 +371,7 @@ For the implementation, \texttt{C++ version:(Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.
 	}
 	\caption{Example parameter.ini file.}
 \end{figure}\\
-Furthermore, the code was tested using \texttt{long double} floating-point precision. However, this led to significant stability issues within the LDG formulation, maybe cause to the comparison process with the \texttt{Algorithm:AlmostEqual} for the evaluation of the jump-term Eq.:\ref{eq:jumpterm} . As a result, the use of \texttt{long double} was abandoned, and computations were reverted to standard \texttt{double} precision. Switching from the LDG formulation to the hyperbolic system is straightforward: it only requires changing the \texttt{FluxFunction} and setting the parameter \( \varepsilon \neq 0 \) and the \texttt{FluxFunction} parameter to everything else but \texttt{barenblatt}. This flexibility enables the simulation of a wide range of test cases and modifications to the porous medium equation. For example, one can include a source term of the form \( cu^p \), and/or add a transport term, which can be specified via the \texttt{TransportFlux} option.\\
+Furthermore, the code was tested using \texttt{long double} floating-point precision. However, this led to significant stability issues within the LDG formulation, maybe cause to the comparison process with the \texttt{Algorithm:AlmostEqual} for the evaluation of the jump-term Eq.~\ref{eq:jumpterm} . As a result, the use of \texttt{long double} was abandoned, and computations were reverted to standard \texttt{double} precision. Switching from the LDG formulation to the hyperbolic system is straightforward: it only requires changing the \texttt{FluxFunction} and setting the parameter \( \varepsilon \neq 0 \) and the \texttt{FluxFunction} parameter to everything else but \texttt{barenblatt}. This flexibility enables the simulation of a wide range of test cases and modifications to the porous medium equation. For example, one can include a source term of the form \( cu^p \), and/or add a transport term, which can be specified via the \texttt{TransportFlux} option.\\
 For all error calculations, a fixed evaluation grid consisting of 1000 points is used. This grid remains constant across all tests. The solution is evaluated at these points using the Legendre basis functions and the computed coefficients. The user can specify the interval over which the evaluation points are distributed (default: \( [-1.5, 1.5] \)).\\
 \begin{algorithm}
 	\caption{Rough representation of the simulation loop}
@@ -593,12 +594,9 @@ All numerical experiments for the hyperbolic system were conducted on the spatia
 u_0(x) = \frac{\pi}{\sqrt{2}} \exp\left(-\frac{x^2}{2}\right),
 \label{eq: smoothInitialExp}
 \]
-which is smooth and compactly supported on the computational domain. The goal of this experiment is to examine whether the solution of the hyperbolic system converges to that of the porous medium equation as \( \varepsilon \to 0 \).\\
-\\
+which is smooth and compactly supported on the computational domain. The goal of this experiment is to examine whether the solution of the hyperbolic system converges to that of the porous medium equation as \( \varepsilon \to 0 \).
 Fig.~\ref{fig:gam8pp2central1s} illustrates the behavior of the solution for \( m = 1 \) under varying values of \( \varepsilon \). As \( \varepsilon \) decreases, the numerical solution converges toward the expected result. Remarkably, even for a relatively high \( \varepsilon = 0.01 \), the approximation exhibits good accuracy, and further reductions in \( \varepsilon \) produce only marginal improvements. A comparison to the LDG formulation is also provided in Fig.~\ref{fig:gam8pp2central1s} that clearly shows that the choice of $\varepsilon=0.01$ is reasonable, since we know that the LDG formulation is relatively exact for $m=1$.\\
-\\
-For \( m = 1 \), the diffusion corresponds to the classical heat equation, which yields smooth solutions for all \( t > 0 \). As a result, no limiters were applied in this case. However, increasing \( m \) introduces nonlinear diffusion effects, which lead to the formation of steep gradients in the solution after a certain time \( t > 0 \). To address this, the two previously introduced limiters were employed. Specifically, if the first limiter (minmod) flags a troubled cell, the two neighboring cells are also limited by projecting their solutions to first-order polynomials. This conservative strategy enhances stability and helps reduce oscillations.\\
-\\
+For \( m = 1 \), the diffusion corresponds to the classical heat equation, which yields smooth solutions for all \( t > 0 \). As a result, no limiters were applied in this case. However, increasing \( m \) introduces nonlinear diffusion effects, which lead to the formation of steep gradients in the solution after a certain time \( t > 0 \). To address this, the two previously introduced limiters were employed. Specifically, if the first limiter (minmod) flags a troubled cell, the two neighboring cells are also limited by projecting their solutions to first-order polynomials. This conservative strategy enhances stability and helps reduce oscillations.
 Despite this aggressive limiting, substantial oscillations still occur for larger nonlinearities such as \( m = 6, 7, 8 \). In contrast, for smaller values of \( m \), the solution remains mostly free of spurious oscillations when starting from smooth initial data (compare Fig.~\ref{fig:HGAVariousM}).\\
 \begin{figure}[h]
 	\centering
@@ -694,7 +692,7 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\caption{Numerical results for varying nonlinearity factors with relative smooth initial data and polynomial degree of $l=3$ calculated until $t=2\,\text{s}$}
 	\label{fig:HBBVariousM}
 \end{figure}\\
-Noteworthy are the computation times for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
+Noteworthy are the computation times (example $m=3,\,l=2$ computation time: HBL $ t_{HBL} = 17.00082\,\textit{s}$, LDG $t_{LDG}=2301.42\,\text{s}$) for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
 \\
 \textit{Case 3 }Considering now the two-Box initial condition\\
 \begin{equation*}
@@ -756,20 +754,33 @@ the hyperbolic system fails to produce acceptable solutions. The presence of hug
 	\caption{The numerical results gained from the hyperbolic system displaying waiting time phenomenon for polynomial degree of $l=3$ and nonlinearity exponent $m=8$}
 	\label{fig:HWaitingVariousM}
 \end{figure}\\
-\textit{Case 4} The final test case aims to investigate whether the hyperbolic system is capable of representing the waiting time phenomenon. For this purpose, the following specially designed initial condition is used\\
+\vfill
+\begin{flushleft}
+	\textit{Case 4} The final test case aims to investigate whether the hyperbolic system is capable of representing the waiting time phenomenon. For this purpose, the following specially designed initial condition is used\\
+\end{flushleft}
+
 \begin{equation*}
 	u_0(x)= \begin{cases}
 		\cos x, & \text{if } x \in\left(-\frac{\pi}{2}, \frac{\pi}{2}\right), \\
 		0, & \text{otherwise}.
 	\end{cases}
-\end{equation*}
+\end{equation*}\\
 At early times \( t > 0\,\text{s} \), when the solution remains close to the initial data, the hyperbolic system successfully reproduces the waiting time phenomenon, even with a relatively small parameter value of \( \varepsilon = 0.01 \) (see Fig.~\ref{fig:HWaitingVariousM}). However, as time progresses, small oscillations begin to appear despite the strong enforcement of the modified limiters. These oscillations grow in magnitude over time but remain localized near the kinks in the solution.\\
 Despite these oscillations, the numerical solution appears to capture the qualitative behavior of the porous medium equation (PME) accurately and is capable of producing sharp transitions at the free boundary. This case is particularly noteworthy due to the high nonlinearity exponent \( m = 8 \). In comparison, the hyperbolic system was unable to accurately capture the sharp free boundary for the Barenblatt initial data with the same exponent at \( t = 1\,\text{s} \) (compare Fig.~\ref{fig:hbbm8}), which supports the observation that the choice of initial data plays a crucial role in the accuracy and stability of the simulation.
 \clearpage
 \section{Conclusion}
-In this work, we have numerically investigated the porous medium equation using two distinct discretization strategies: the Local Discontinuous Galerkin (LDG) method and a hyperbolic relaxation system. The implementation was carried out with a focus on positivity preservation, limiter design, and adaptive tolerance thresholds, ensuring both stability and physical accuracy in degenerate regimes.\\
-Our results demonstrate that the LDG method, when equipped with appropriately tuned limiters, can provide accurate and robust solutions for a wide range of nonlinearity exponents mm, though challenges remain for high-order schemes under strong degeneracy. The hyperbolic formulation, on the other hand, exhibits greater robustness with respect to oscillations and is capable of capturing key phenomena such as waiting time behavior, even for small values of the relaxation parameter $\varepsilon$.\\
-Through a systematic study of convergence behavior, limiter activity, and solution structure, we have shown that the choice of initial data and boundary treatment significantly influences the observed accuracy and stability. In particular, differences in experimental order of convergence compared to prior works such as Zhang and Shu can largely be attributed to the full-domain treatment used here.
+This research project presents a numerical investigation of the porous medium equation (PME) using two distinct spatial discretization strategies: the Local Discontinuous Galerkin (LDG) method and a hyperbolic balance law (HBL) formulation. The implementation emphasizes critical numerical properties, including preservation of positivity, suppression of spurious oscillations, and adaptive tolerance thresholds for identifying nearly equal values. These features contribute to maintaining both numerical stability and physical accuracy, particularly in degenerate regimes.
+The numerical results indicate that the LDG method, when equipped with carefully tuned limiters, provides accurate and robust solutions over a broad range of nonlinearity exponents $m$. Although certain difficulties remain for extended simulation times—especially in accurately resolving both the free boundary and smooth interior regions—the LDG approach successfully captures essential features of the PME, such as the waiting time phenomenon and the splitting of the support region.
+By comparison, the HBL formulation exhibits reduced robustness with respect to oscillatory behavior. Nonetheless, it accurately captures key qualitative behaviors of the PME, including nonlinear diffusion effects and waiting time dynamics, even for relatively large values of the relaxation parameter $\varepsilon$. However, no evidence of support splitting was observed in the corresponding test case. Additionally, the use of non-smooth initial data, such as the Barenblatt function, was found to induce significant oscillations near points where the initial profile lacks continuous differentiability. In such cases, the application of a stricter limiter proved effective in controlling these oscillations.
+A detailed analysis of convergence behavior, limiter activity, and solution structure highlights the influence of initial data selection and boundary treatment on the accuracy and stability of the HBL system. In particular, discrepancies in the observed experimental orders of convergence for the LDG method, when compared with previous studies such as those by Zhang and Shu, are primarily attributed to the full-domain computation strategy employed in this work.
+%\begin{figure}[h]
+%	\centering
+%		\includegraphics[scale=0.2]{../../../Studium/Forschungsmodul/Pictures/2dBB31sec}
+%		\caption{text}
+%		\label{fig:2dBBM3_1sec}
+%		\includegraphics[scale=0.2]{../../../Studium/Forschungsmodul/Pictures/2dBB32sec}
+%		\caption{text}
+%\end{figure}
 	\newpage
 	\bibliographystyle{plain}
 	\bibliography{/home/nikolaus/Studium/Forschungsmodul/Ausarbeitung/references.bib}
