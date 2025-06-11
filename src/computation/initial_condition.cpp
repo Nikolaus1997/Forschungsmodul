@@ -85,7 +85,7 @@ double InitialCondition::diffDoubleUnitStep(double x, double a, double b)
 }
 double InitialCondition::waitingTime(double x, double a, double b)
 {
-    if(x>-M_1_PI/2. and x<M_1_PI/2.)
+    if(x>-M_PIf128/2. and x<M_PIf128/2.)
     {
         return cos(x);
     }

@@ -1,5 +1,5 @@
-\documentclass[a4paper,12pt]{article}
-\usepackage{amsmath, amssymb, graphicx}
+\documentclass[a4paper,12pt]{paper}
+\usepackage{amsmath, amssymb, graphicx, qrcode}
 \usepackage{hyperref}
 \usepackage{geometry}
 \usepackage{subfiles}
@@ -15,7 +15,7 @@
 \usepackage{algorithmic}
 \geometry{margin=1in}
 \newcommand{\mean}[1]{\{\!\!\{#1\}\!\!\}} 
-\title{Numerical Solution of the Porous Medium Equation using the LDG Method}
+\title{Research Project: Investigation of numerical schemes for the Porous Medium Equation}
 \author{Nikolaus Vohwinkel}
 \date{\today}
 
@@ -29,56 +29,56 @@
 
 \begin{document}
 	\maketitle
-	
 	\begin{abstract}
-	The porous medium equation (PME) is a nonlinear partial differential equation that models diffusion in porous media. In this Forschungsmodul, the Local Discontinuous Galerkin (LDG) method is employed to numerically solve the PME. The well-established method is tested in various settings, using different polynomial orders of basis functions, to study their effects on the solution’s behavior. Furthermore, a hyperbolic system that degenerates into the PME under certain parameter regimes is investigated. For both approaches, extensive numerical results are presented to illustrate the capabilities and limitations of each method.
+	The porous medium equation (PME) is a nonlinear partial differential equation that models diffusion in porous media. In this Research Project, the Local Discontinuous Galerkin (LDG) method is employed to numerically solve the PME. The well-established method is tested in various settings, using different polynomial orders of basis functions, to study their effects on the solution’s behavior. Furthermore, a hyperbolic system that degenerates into the PME under certain parameter regimes is investigated. For both approaches, extensive numerical results are presented to illustrate the capabilities and limitations of each method.
 	\end{abstract}
 	
 	\section{Introduction}
-The porous medium equation (PME) without source and advection terms is given by:
+The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction, and even image processing. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
+The general form of the PME is:
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m), \quad x \in \Omega, \quad t > 0,
 \]
-where \( m > 1 \) is a constant characterizing the medium's porosity. This equation models various physical processes, including gas flow in porous media and heat transfer in plasmas, where \( u \) typically represents a concentration or temperature that must remain nonnegative for all times. Assuming that the initial condition \( u_0 \) is nonnegative, the PME can be rewritten as:
+where \( m > 1 \) is a constant characterizing the medium's porosity. Assuming that the initial condition \( u_0 \) is nonnegative, the PME can be rewritten as
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m) = \nabla \cdot (m u^{m-1} \nabla u) = \nabla \cdot (a(u)\nabla u), \quad x \in \Omega, \quad t > 0,
 \]
-where \( a(u) = m u^{m-1} \geq 0 \). Thus, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution vanishes. Another interesting property of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a finite positive time (the waiting time), after which it instantaneously moves with finite speed.\\
-A fundamental example of a solution is the Barenblatt (or source-type) solution \cite{Barenblatt}, which can be written explicitly as:
+where \( a(u) = m u^{m-1} \geq 0 \). Thus, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution vanishes.\\ Another interesting novelty of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a finite positive time (the waiting time), after which it instantaneously moves with finite speed, e.g. see chapter \ref{sec:numerical-results}.\\
+A fundamental example of a solution is the Barenblatt (or source-type) solution \cite{Barenblatt}, which can be written explicitly as a formula which is given by
 \begin{equation}
 	\label{eq:barenblatt function}
 	B_m(x, t)=t^{-k}\left[\left(1-\frac{k(m-1)}{2 m} \frac{|x|^2}{t^{2 k}}\right)_{+}\right]^{1 /(m-1)},
 \end{equation}
-where \( (u)_{+}=\max (u, 0) \) and \( k=1/(m+1) \). For any time \( t>0 \), this solution has compact support \(\left[-\alpha_m(t), \alpha_m(t)\right]\), with the interface \(|x|=\alpha_m(t)\) moving outward at finite speed, where
+where \( (u)_{+}=\max (u, 0) \) and \( k=1/(m+1) \). For any time \( t>0 \), this solution has compact support \(\left[-\alpha_m(t), \alpha_m(t)\right]\), with the interface/free boundary moving outward at finite speed $\alpha_m(t)$, where
 \[
 \alpha_m(t)=\sqrt{\frac{2 m}{k(m-1)}} \cdot t^k.
 \]
-This solution will later be useful for assessing the accuracy of the numerical methods presented. In this work, two numerical frameworks will be tested. One relies on the Local Discontinuous Galerkin (LDG) formulation proposed by Zhang and Wu \cite{Zhang2009}, while the other employs a hyperbolic system that degenerates into the PME as the parameter \(\varepsilon \to 0\), similar to the system introduced by Jin, Pareschi, and Toscani \cite{Jin1998}. Both approaches utilize a Galerkin ansatz on discontinuous basis functions of varying polynomial degree. Since this ansatz tends to produce oscillations near the free boundary, the LDG method addresses this issue by introducing an artificial diffusion parameter \(\gamma\) and employing limiters extensively in the vicinity of the free boundary. However, for the hyperbolic system, these oscillations are unavoidable, as will be demonstrated by the findings in this work. 
+This solution will later be useful for assessing the accuracy of the numerical methods presented. In this work, two numerical frameworks will be tested. One relies on the Local Discontinuous Galerkin (LDG) formulation proposed by Zhang and Wu \cite{Zhang2009}, while the other employs a hyperbolic system that degenerates into the PME as the parameter \(\varepsilon \to 0\), similar to the system introduced by Jin, Pareschi, and Toscani \cite{Jin1998}. Both approaches utilize a Galerkin ansatz on discontinuous basis functions of varying polynomial degree. Since this ansatz tends to produce oscillations near the free boundary, the LDG method introduces an artificial diffusion parameter \(\gamma\) and employs limiters extensively in the vicinity of the free boundary to adress this issue. However, for the hyperbolic system, these oscillations are unavoidable, as will be demonstrated by the findings in this work. 
 
 
 %-------------------------------------------------------------------------------------------------------%
-\section{Mathematical and numerical Formulation}
-To approximate solutions of the porous medium equation (PME), we discretize the spatial domain using a finite number of non-overlapping cells and apply a high-order accurate numerical method tailored for problems with nonlinear diffusion and potential degeneracies. Specifically, we employ the Discontinuous Galerkin (DG) method, known for its flexibility in handling complex boundary conditions, its ability to use high-order polynomial approximations, and its local conservation properties.\\
+\section{Mathematical and Numerical Formulation}
+To numerically solve the porous medium equation (PME), we discretize the spatial domain using a finite number of non-overlapping cells and apply a high-order accurate numerical method tailored for problems with nonlinear diffusion and potential degeneracies. Specifically, we employ the Discontinuous Galerkin (DG) method, known for its flexibility in handling complex boundary conditions, its ability to use high-order polynomial approximations, and its local conservation properties.\\
 \\
-The computational domain is divided into \( N_{\text{cells}} \in \mathbb{N} \) cells, where each cell
+The computational domain is $\Omega\subset\mathbb{R}$ divided into \( N_{\text{cells}} \in \mathbb{N} \) cells, where each cell
 \[
 I_i = \left(x_{i-\frac{1}{2}}, x_{i+\frac{1}{2}}\right)
 \]
 has width 
 \[
 h_i = x_{i+\frac{1}{2}} - x_{i-\frac{1}{2}}, \quad i = 1, \ldots, N_{\text{cells}}.
-\]
-Since we use the DG approach in both schemes, we adopt an ansatz that separates spatial and temporal dependencies of the solution. Within each cell \( I_i \), the approximate solutions are represented as
+\]For notation purposes $x_{i\pm\frac{1}{2}}$ denotes the position at the interfaces and $x_i$ denotes the mid point of the cell $i$.\\
+Since we use the DG approach, we adopt an ansatz that separates spatial and temporal dependencies of the solution. Within each cell \( I_i \), the approximate solutions are represented as
 \[
 u_h(x,t)\big|_{I_i} = \sum_{l=0}^n u_i^l(t)\,\varphi_h^l(x), \quad
 j_h(x,t)\big|_{I_i} = \sum_{l=0}^n j_i^l(t)\,\varphi_h^l(x), \quad
 q_h(x,t)\big|_{I_i} = \sum_{l=0}^n q_i^l(t)\,\varphi_h^l(x),
 \]
-where the basis functions \(\varphi_h^l\) are scaled Legendre polynomials defined by
+with $j,\,q$ the auxiliary variables (see chapter \ref{sec:LDG} and \ref{sec:HBL}). The basis functions \(\varphi_h^l\) are scaled Legendre polynomials defined by
 \[
-\varphi_h^l(x) = p_l\left(\frac{x - x_i}{h_i}\right), \quad x \in I_i,
+\varphi_h^l(x) = p_l\left(\frac{2(x - x_i)}{h_i}\right), \quad x \in I_i,
 \]
-and \( p_l \) denotes the Legendre polynomial of degree \( l \in \mathbb{N}_0 \).
+and \( p_l \) denotes the Legendre polynomial of degree  \( l \in \mathbb{N}_0 \) and $\frac{2(x - x_i)}{h_i}\in [-1,1]$ is the scaled argument in terms of the current cell width.
 For the initial solution \( u_h(0) \), we use the \( L^2 \)-projection of the given initial data \( u_0 \) into the discrete function space
 \[
 V_h^n = \left\{ v_h : \mathbb{R} \to \mathbb{R} \;\middle|\; v_h|_{I_i} \in \mathcal{P}_n(I_i), \forall i=1,\ldots,N_{\text{cells}} \right\},
@@ -115,70 +115,84 @@ The Legendre polynomials and their derivatives are computed using\\ Algorithm 22
 
 %-------------------------------------------------------------------------------------------------------------%
 
-\subsection{The Local Discontinuous Galerkin (LDG) Method}
-A common strategy for addressing the nonlinearity in the porous medium equation (PME) is to introduce auxiliary variables, which facilitate the construction of a Local Discontinuous Galerkin (LDG) scheme. By carefully selecting appropriate numerical fluxes at element interfaces, the resulting formulation can be shown to be \( L^2 \)-stable.To apply the LDG method, we first rewrite the PME in first-order form by introducing auxiliary variables \( g \) and \( q \):
+\subsection{The Local Discontinuous Galerkin (LDG) Method}\label{sec:LDG}
+A common strategy for addressing the nonlinearity in the porous medium equation (PME) is to introduce auxiliary variables, which facilitate the construction of a Local Discontinuous Galerkin (LDG) scheme, as proposed by Cockburn and Shu~\cite{CockburnandShuLDG}. By carefully selecting appropriate numerical fluxes at element interfaces, the resulting formulation has been proven to be \( L^2 \)-stable (see Chapter 2.3 in~\cite{CockburnandShuLDG}).\\
+\\
+To apply the LDG method, we first rewrite the PME in first-order form by introducing auxiliary variables \( g \) and \( q \):
+
 \begin{align*}
-	\partial_t u + \partial_x\left[f(u) - \sqrt{a(u)}\,q\right] &= s(u), \quad x \in I,~t > 0, \\
-	q - \partial_x g &= 0, \quad x \in I,~t > 0,
+	\partial_t u + \partial_x\left[f(u) - \sqrt{a(u)}\,q\right] &= s(u), &x \in I,~t > 0, \\
+	q - \partial_x g &= 0, &x \in I,~t > 0,
 \end{align*}
 where
 \[
 g(u) = \int_0^u \sqrt{a(s)}\,ds, \quad \text{with} \quad a(u) = m u^{m-1}.
 \]
-Following the LDG approach Zhang and Wu \cite{Zhang2009} therefore defined numerical fluxes to handle discontinuities at element interfaces. The semi-discrete formulation in a cell \( I_i \) becomes:
+Following the proposed LDG approach by Cockburn and Shu, Zhang and Wu~\cite{Zhang2009} introduced the following numerical fluxes to handle discontinuities at element interfaces. In conjunction with the spatial DG discretization, the semi-discrete formulation in a cell \( I_i \) reads as:
 \begin{equation}
-	\label{eq:ldg}
 	\begin{aligned}
 		\partial_t u_i^l(t) &= \frac{2l+1}{h} \int_{I_i} \left[ s(u_h) \varphi^l(x) + \left( f(u_h) - \sqrt{a(u_h)}\,q_h \right) \partial_x \varphi^l(x) \right]\,dx \\
 		&\quad - \frac{2l+1}{h} \left[ \left( \hat{f}(u_h) - \frac{\llbracket g(u_h) \rrbracket}{\llbracket u_h \rrbracket} \mean{q_h} - \gamma \llbracket q_h \rrbracket \right) \varphi^l(x) \right]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}}, \\
 		q_i^l(t) &= -\frac{2l+1}{h} \int_{I_i} g(u_h) \partial_x \varphi^l(x)\,dx + \left[ \left( -\mean{g(u_h)} + \gamma \llbracket u_h \rrbracket \right) \varphi^l(x) \right]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}},
 	\end{aligned}
+	\label{eq:semidiscreteLDG}
 \end{equation}
-where \( \mean{\cdot} \) and \( \llbracket \cdot \rrbracket \) denote the arithmetic mean and jump operators, respectively, defined at cell interfaces as:
+where the arithmetic mean and jump operators are defined at cell interfaces as:
 \[
 \mean{g(u_h)} = \frac{g(u_h^+) + g(u_h^-)}{2}, \quad
 \llbracket u_h \rrbracket = u_h^+ - u_h^-.
 \]
 When \( \llbracket u_h \rrbracket \neq 0 \), the term
-\[
+\begin{equation}
 \frac{\llbracket g(u_h) \rrbracket}{\llbracket u_h \rrbracket}
-\]
+\label{eq:jumpterm}
+\end{equation}
 is well-defined and serves as an approximation of \( \sqrt{a(u_h)} \). However, when \( \llbracket u_h \rrbracket = 0 \), this expression becomes undefined. To preserve numerical stability and ensure a meaningful evaluation in such cases, it is customary to replace the undefined ratio with
 \[
 \sqrt{a(u_h)}.
 \]
-The numerical behavior of this replacement critically depends on how equality is determined between \( u_h^+ \) and \( u_h^- \). A very strict tolerance, such as that dictated by \textit{long double} precision (approximately \(10^{-18}\) to \(10^{-19}\)) can result in undesirable or unstable behavior. Therefore, we adopt the adaptive tolerance criterion recommended by Kopriva~\cite{Kopriva2009} (Algorithm 139: \texttt{AlmostEqual}), which ensures a more robust and stable scheme by using a practical threshold for comparing floating-point values.
+The numerical behavior of this replacement is highly sensitive to how equality is determined between \( u_h^+ \) and \( u_h^- \). To robustly assess whether these two values are approximately equal within machine precision, we adopt the adaptive tolerance criterion proposed by Kopriva~\cite{Kopriva2009}, specifically Algorithm 139: \texttt{AlmostEqual}. This method enhances the stability and reliability of the scheme by applying a practical and adaptive threshold for floating-point comparisons.
 
 %------------------------------------------------------------------------------------------------------------%
-\subsection{Hyperbolic balance law}
-Another approach to approximate the porous medium equation is to consider a hyperbolic system that degenerates to the porous medium equation as \( \varepsilon \to 0 \), similar to the method proposed by Jin, Pareschi, and Toscani in \cite{Jin1998}. 
-To this end, we introduce an auxiliary variable \( \mathbf{j} \) and a relaxation parameter \( \varepsilon \), leading to the following hyperbolic balance law:
+\subsection{Hyperbolic Balance law System}\label{sec:HBL}
+Another approach to numerically solve the porous medium equation is to consider a hyperbolic system that degenerates to the porous medium equation as \( \varepsilon \to 0 \), similar to the method proposed by Jin, Pareschi, and Toscani in \cite{Jin1998}. 
+To this end, we introduce an auxiliary variable \( \mathbf{j} \) and a relaxation parameter \( \varepsilon \), leading to the following system of hyperbolic balance laws:
 \begin{equation}
 	\begin{aligned}
 		\partial_t u^{\varepsilon} + \nabla \cdot \mathbf{j}^{\varepsilon} &= 0, \\
 		\varepsilon \partial_t \mathbf{j}^{\varepsilon} + \nabla \left( \left( u^{\varepsilon} \right)^m \right) &= -\mathbf{j}^{\varepsilon}.
 	\end{aligned}
 \end{equation}
-For spatial discretization, we employ the Discontinuous Galerkin (DG) method using Legendre polynomials as basis functions. This yields the following semi-discrete formulation over a cell \( I_i \):
-\begin{equation}
+As already mentioned, we use for the spatial discretization the Discontinuous Galerkin (DG) method incorporation with scaled Legendre polynomials as basis functions. This yields the following semi-discrete formulation given for cell \( I_i \)
+\begin{equation*}
+	\begin{aligned}
+		\int_{I_i} \partial_t u_h(x,t) \varphi^r(x) \, dx 
+		&+ \int_{I_i} \partial_x j_h(x,t) \varphi^r(x) \, dx = 0, \\
+		\int_{I_i} \varepsilon \, \partial_t j_h(x,t) \varphi^r(x) \, dx 
+		&+ \int_{I_i} \partial_x (u_h^m) \, \varphi^r(x) \, dx = -\int_{I_i} j_h \, \varphi^r(x) \, dx.
+	\end{aligned}
+\end{equation*}
+Projecting onto the Legendre basis and exploiting orthogonality, we obtain the following system of ODEs for the modal coefficients \( u_i^l(t) \) and \( j_i^l(t) \):
+\begin{equation*}
 	\begin{aligned}
 		\int_{I_i} \partial_t \left( \sum_{l=0}^{n} u_i^l(t) \varphi^l(x) \right) \varphi^r(x) \, dx 
 		&+ \int_{I_i} \partial_x \left( \sum_{l=0}^{n} j_i^l(t) \varphi^l(x) \right) \varphi^r(x) \, dx = 0, \\
 		\int_{I_i} \varepsilon \, \partial_t \left( \sum_{l=0}^{n} j_i^l(t) \varphi^l(x) \right) \varphi^r(x) \, dx 
 		&+ \int_{I_i} \partial_x (u_h^m) \, \varphi^r(x) \, dx = -\int_{I_i} j_h \, \varphi^r(x) \, dx.
 	\end{aligned}
-\end{equation}
-Projecting onto the Legendre basis and exploiting orthogonality, we obtain the following system of ODEs for the modal coefficients \( u_i^l(t) \) and \( j_i^l(t) \):
+\end{equation*}
+$\Leftrightarrow$
 \begin{equation}
 	\begin{aligned}
-		\partial_t u_i^l(t) &= \frac{2l+1}{h_i} \int_{I_i} j_h \left( \varphi_h^l \right)_x \, dx 
+		\partial_t u_i^l(t) &= \frac{2l+1}{h_i} \int_{I_i} j_h \partial_x\varphi_h^l  \, dx 
 		- \frac{2l+1}{h_i} \left[ \widehat{j}_h \varphi_h^l \right]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}}, \\
 		\varepsilon \, \partial_t j_i^l(t) &= -\frac{2l+1}{h_i} \int_{I_i} j_h \, \varphi_h^l \, dx 
-		+ \frac{2l+1}{h_i} \int_{I_i} (u_h)^m \left( \varphi_h^l \right)_x \, dx 
-		- \frac{2l+1}{h_i} \left[ \widehat{u}_h \varphi_h^l \right]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}},
+		+ \frac{2l+1}{h_i} \int_{I_i} (u_h)^m \partial_x\varphi_h^l\, dx 
+		- \frac{2l+1}{h_i} \left[ \widehat{u}^m_h \varphi_h^l \right]_{x_{i-\frac{1}{2}}}^{x_{i+\frac{1}{2}}},
 	\end{aligned}
+	\label{eq:semidiscreteHP}
 \end{equation}
-where \( \widehat{j}_h \) and \( \widehat{u}_h \) are appropriate numerical fluxes defined at the cell interfaces to ensure stability and consistency.
+where \( \widehat{j}_h \) and \( \widehat{u}_h \) are appropriate numerical fluxes defined at the cell interfaces to ensure stability and consistency. This formulation is then solved in time with the help of an explicit Runge-Kutta time stepping scheme (chapter \ref{sec:TimeStep}).
 
 %-------------------------------------------------------------------------------------------------------------%
 
@@ -187,9 +201,9 @@ In order to obtain accurate and stable simulations, two limiters are introduced,
 \subsubsection{First-Order Slope Limiter}
 The general formulation of the first-order slope-limited approximation is given by
 \begin{equation*}
-	u_h|_{I_i} = \bar{u}_i + (x - x_i) u_{x,i}, \quad i = 1, 2, \ldots, N_{\text{cells}},
+	u_h|_{I_i} = \bar{u}_i + (x - x_i) \sigma_{x,i}, \quad i = 1, 2, \ldots, N_{\text{cells}},
 \end{equation*}
-where $u_{x,i}$ is the slope, and $\bar{u}_i$ is the average solution in cell $I_i$. The slope is limited using the modified minmod function:
+where $\sigma_{x,i}$ is the slope, and $\bar{u}_i$ is the average solution in cell $I_i$. Using the minmod slope limiter proposed by Osher \cite{OsherLimiter} with a slight modification where we accept values under a certain threshold:
 \begin{equation*}
 	\Lambda \Pi^1_h u_h |_{I_i} = \bar{u}_i + (x - x_i) \bar{m} \left( u_{x,i}, \frac{\bar{u}_i - \bar{u}_{i-1}}{h_i/2}, \frac{\bar{u}_{i+1} - \bar{u}_i}{h_i/2} \right),
 \end{equation*}
@@ -199,9 +213,10 @@ where
 	\begin{cases}
 		a_1, & \text{if } |a_1| \leq \mu h^2, \\
 		s \min(|a_1|, |a_2|, |a_3|), & \text{if } |a_1| > \mu h^2 \text{ and } s = \operatorname{sgn}(a_k),\ k = 1,2,3, \\
-		0, & \text{otherwise}.
+		0, & \text{otherwise},
 	\end{cases}
 \end{equation*}
+here $\mu\geq 0$ has to be chosen in such a way that the total variation boundedness (TVB) and high order accuracy is ensured, for this work only $\mu=1$ was used.
 The limiter is applied in such a way that it preserves the current boundary values of the solution unless their deviation from the cell average is too large. This enforcement is given by:
 \begin{equation*}
 	\begin{aligned}
@@ -256,14 +271,14 @@ While Zhang and Wu \cite{Zhang2009} showed that their method avoids negative cel
 \end{equation*}
 is used to avoid such cases.
 %-------------------------------------------------------------------------------------------------------------%
-\subsection{Time-stepping}
+\subsection{Time-stepping}\label{sec:TimeStep}
 %-------------------------------------------------------------------------------------------------------------%
-For time discretization of the semi-discrete Discontinuous Galerkin (DG) formulation, we employ a third-order explicit Runge-Kutta scheme. The system can be written as
+For time discretization of the semi-discrete Discontinuous Galerkin (DG) formulation, a third-order explicit Runge-Kutta scheme is utilized. The spatial DG scheme (Eq.:\ref{eq:semidiscreteLDG} and Eq.:\ref{eq:semidiscreteHP}) can be written as a first-order ODE system
 \[
 \frac{\mathrm{d} u_h}{\mathrm{d} t} = \mathbb{M}^{-1} \operatorname{RHS}(u_h) = \mathcal{L}_h(u_h), \quad t \in (0, T),
 \]
 where \(\mathbb{M}\) is the mass matrix and \(\operatorname{RHS}(u_h)\) represents the spatial DG discretization operator.
-The third-order Runge-Kutta update from time \( t^n \) to \( t^{n+1} = t^n + \Delta t^n \) is given by:
+The third-order Runge-Kutta update from time \( t^n \) to \( t^{n+1} = t^n + \Delta t^n \) is then given by
 \[
 \begin{aligned}
 	u^{(1)} &= u_h^n + \Delta t^n \, \mathcal{L}_h\big(u_h^n\big), \\
@@ -271,32 +286,33 @@ The third-order Runge-Kutta update from time \( t^n \) to \( t^{n+1} = t^n + \De
 	u_h^{n+1} &= \frac{1}{3} u_h^n + \frac{2}{3} u^{(2)} + \frac{2}{3} \Delta t^n \, \mathcal{L}_h\big(u^{(2)}\big).
 \end{aligned}
 \]
-The time step \(\Delta t^n\) must satisfy appropriate stability restrictions. These are given for the two considered schemes by:
+The time step \( \Delta t^n \) must satisfy appropriate stability constraints, which differ depending on the numerical scheme. These conditions are expressed as:\\
 \begin{align}
 	\text{LDG:} \quad
-	\frac{\max |f'(u_h^n)| \, \Delta t^n}{\Delta x} + \frac{2 \max |a(u_h^n)| \, \Delta t^n}{(\Delta x)^2} &\leq\textit{CFL}  \cdot \frac{1}{PP_N + 1}, \\
-	\text{Hyperbolic relaxation:} \quad
-	\frac{\max |u_h^n| \, \Delta t^n}{\Delta x \sqrt{\varepsilon}} + \frac{2 \max |j_h^n| \, \Delta t^n}{(\Delta x)^2 \varepsilon} &\leq \textit{CFL} \cdot \frac{1}{PP_N + 1},
+	\frac{\max |f'(u_h^n)| \, \Delta t^n}{\Delta x} + \frac{2 \max |a(u_h^n)| \, \Delta t^n}{(\Delta x)^2} &\leq \textit{CFL} \cdot \frac{1}{l+ 1}, \\
+	\text{Hyperbolic system:} \quad
+	\frac{\max |u_h^n| \, \Delta t^n}{\Delta x \sqrt{\varepsilon}} + \frac{2 \max |j_h^n| \, \Delta t^n}{(\Delta x)^2 \varepsilon} &\leq \textit{CFL} \cdot \frac{1}{l+ 1},
 \end{align}
-where \(PP_N\) denotes the polynomial degree plus one (the number of basis functions per cell), and \textit{CFL} is the Courant–Friedrichs–Lewy number chosen based on stability considerations. For example, Zhang and Wu \cite{Zhang2009} have chosen the \textit{CFL} number as \( \mathrm{\textit{CFL}} = 0.02 \) when using a polynomial degree of \( l = 2 \).
+where \( l \) denotes the maximal polynomial degree of the basis functions, and \textit{CFL} is the Courant–Friedrichs–Lewy number selected according to stability requirements.\\
+In line with Zhang and Wu~\cite{Zhang2009}, a \textit{CFL} number of \( 0.02 \) was adopted for the LDG method with polynomial degree \( l = 2 \), and this value was retained throughout this work even for higher-order polynomials. For the hyperbolic system, a substantially larger value of \( \textit{CFL} = 0.9 \) was found to yield stable results in all tested scenarios.\\
+This choice stands in contrast to the more restrictive \textit{CFL} numbers reported by Sigal and Shu~\cite{RKShuSigal}, particularly those presented in their Table 2.1. However, the increased \textit{CFL} value is justified in the current study, since the time step scales with \( \Delta t/(\Delta x)^2 \), and stability is maintained provided that the grid spacing satisfies \( \max \Delta x_i < 1 \) for all \( 1 \leq i \leq N_{\text{cells}} \).
+
 %-------------------------------------------------------------------------------------------------------------%
 %-------------------------------------------------------------------------------------------------------------%
 \clearpage
 \section{Practical Implementation}
-For the implementation, \texttt{C++} was used along with the standard \texttt{vector} and \texttt{cmath} libraries for numerical operations, and the \texttt{VTK} library to generate output data. All calculations were performed in double precision. However, for fine grids and high polynomial degrees, higher-precision floating-point arithmetic may be required, as values near kinks can become extremely small and diffuse across the grid, which may not be adequately captured by standard double precision. Additionally, for polynomial degrees \( l > 15 \), a more accurate algorithm for computing Gauss–Legendre nodes must be employed.
-\\
-
+For the implementation, \texttt{C++ version:(Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0} was used along with the standard \texttt{vector} and \texttt{cmath} libraries for numerical operations, and the \texttt{VTK} library to generate output data. All calculations were performed in double precision. Additionally, for polynomial degrees \( l > 15 \), a more accurate algorithm for computing Gauss–Legendre nodes must be implemented.\\
 \begin{figure}[htbp]
 	\centering
 	\fbox{
-		\resizebox{0.5\textwidth}{!}{%
+		\resizebox{0.7\textwidth}{!}{%
 			\begin{minipage}{\textwidth}
 				\begin{framed}
 					\noindent
 					\textbf{Output Name:} \texttt{BBM2N160PP5}
 					
 					\noindent
-					\textbf{Polynomial Degree:} $P=5$
+					\textbf{Polynomial Degree:} $l=5$
 					
 					\noindent
 					\textbf{Physical Domain:} \\
@@ -314,12 +330,13 @@ For the implementation, \texttt{C++} was used along with the standard \texttt{ve
 					
 					\noindent
 					\textbf{Limiter Parameters:} \\
+					$\quad$ Use LimiterType: \texttt{minmod  Options: minmod, superbee, vanLeer, vanAlbada, none} \\
 					$\quad$ Use Limiter: \texttt{true} \\
 					$\quad$ Use Modified Limiter: \texttt{true} 
 					
 					\noindent
 					\textbf{Time Stepping:} \\
-					$\quad$ CFL: $0.002$ \\
+					$\quad$ CFL: $0.02$ \\
 					$\quad$ Scheme: \texttt{RK} (Runge-Kutta) \\
 					$\quad$ Maximum $\Delta t$: $1\times10^{-6}$
 					
@@ -329,7 +346,7 @@ For the implementation, \texttt{C++} was used along with the standard \texttt{ve
 					
 					\noindent
 					\textbf{Initial Condition:} \\
-					$\quad$ Type: \texttt{barenblatt} 
+					$\quad$ Type: \texttt{barenblatt\\  Options: gaussian, unitStep, negativeUnitStep, barenblatt, divorce, sinus, diffDoubleUnitStep, unitDoubleStep, waitingTime} 
 					
 					\noindent
 					\textbf{Barenblatt Parameters:} \\
@@ -352,32 +369,40 @@ For the implementation, \texttt{C++} was used along with the standard \texttt{ve
 		}
 	}
 	\caption{Example parameter.ini file.}
-\end{figure}
-
+\end{figure}\\
+Furthermore, the code was tested using \texttt{long double} floating-point precision. However, this led to significant stability issues within the LDG formulation, maybe cause to the comparison process with the \texttt{Algorithm:AlmostEqual} for the evaluation of the jump-term Eq.:\ref{eq:jumpterm} . As a result, the use of \texttt{long double} was abandoned, and computations were reverted to standard \texttt{double} precision. Switching from the LDG formulation to the hyperbolic system is straightforward: it only requires changing the \texttt{FluxFunction} and setting the parameter \( \varepsilon \neq 0 \) and the \texttt{FluxFunction} parameter to everything else but \texttt{barenblatt}. This flexibility enables the simulation of a wide range of test cases and modifications to the porous medium equation. For example, one can include a source term of the form \( cu^p \), and/or add a transport term, which can be specified via the \texttt{TransportFlux} option.\\
+For all error calculations, a fixed evaluation grid consisting of 1000 points is used. This grid remains constant across all tests. The solution is evaluated at these points using the Legendre basis functions and the computed coefficients. The user can specify the interval over which the evaluation points are distributed (default: \( [-1.5, 1.5] \)).\\
 \begin{algorithm}
-	\caption{Example algorithm with loops and initialization}
+	\caption{Rough representation of the simulation loop}
 	\begin{algorithmic}[1]
-		\STATE \textbf{Input:} $N_{cells}$, $m$, $PP_N$, $u_0$, \textit{flux, useSource, useTransport, numFlux, CFL}, $\varepsilon$,
+		\STATE \textbf{Input:} $N_{cells}$, $m$, $l$, $u_0$, \textit{fluxFunction, useSource, useTransport, numFlux, CFL, endTime, LimiterType, ErrorInterval}, $\varepsilon$,
 		\STATE \textbf{Initialize:}
-		\STATE $\quad u \gets 0$ \COMMENT{Solution array}
-		\STATE $\quad dx \gets \frac{1}{N_x - 1}$ \COMMENT{Grid spacing}
-		\STATE $\quad dy \gets \frac{1}{N_y - 1}$
-		
-		\FOR{$i=1$ to $N_x$}
-		\FOR{$j=1$ to $N_y$}
-		\STATE $x \gets (i - 1) \cdot dx$
-		\STATE $y \gets (j - 1) \cdot dy$
-		\STATE $u(i, j) \gets \text{initial condition at } (x, y)$
-		\ENDFOR
-		\ENDFOR
-		
-		\STATE \textbf{Output:} Solution array $u$
+		\STATE $\quad u \gets 0$ \hfill\COMMENT{Solution array}
+		\STATE $\quad dx \gets \frac{1}{N_x - 1}$ \hfill \COMMENT{Grid spacing}
+		\STATE $\quad LegendreGaussNodesAndWeights(l)$\hfill \COMMENT{calc. nodes\&weights for the pol. deg. $l$}
+		\STATE $\quad InitialSolution(u_0)$ \hfill \COMMENT{$L^2$ projection of $u_0$}
+		\STATE $\quad callLimiter(u) $\hfill \COMMENT{checks if a cell needs to be limited}
+		\STATE $\quad CalcDt()$\hfill \COMMENT{calc. $\Delta t$}
+		\STATE \textbf{Run Simulation:}
+		\WHILE{if time $<=$endTime}
+		\STATE $\quad RungeKutta()$\hfill\COMMENT{before each RK-stage the semi-discrete DG formulation is\\ \hfill calculated and after each RK-stage the Limiters are called}
+		\STATE $\quad CalcDt()$ \hfill \COMMENT{update $\Delta t$}
+		\IF{$iteration\%nWriteState==0$} 
+		\STATE $\quad writeSolution(u,time)$
+		\STATE $\quad calcError(u,time)$
+		\ENDIF
+		\ENDWHILE
+		\STATE $\quad writeSolution(u,time)$
+		\STATE $\quad calcError(u,time)$
 	\end{algorithmic}
-\end{algorithm}
+\end{algorithm}\\
+For visualization purposes, \texttt{ParaView} was used due to its efficient support for data interpretation, flexible visual customization, and its capability to generate video outputs directly from VTK data files.\\
+The source code can be found on github with this link:\\ \hyperlink{https://github.com/Nikolaus1997/Forschungsmodul}{https://github.com/Nikolaus1997/Forschungsmodul}\\
+or with this QR-code:\\ \hspace{3cm} \qrcode{https://github.com/Nikolaus1997/Forschungsmodul}
 %=============================================================================================================%
 \clearpage
-\section{Numerical Results}
-All numerical simulations were performed on an Intel i7-3600K processor equipped with 16\,GB of DDR3 RAM. The computational domain was \([-6,6]\), and unless stated otherwise, all error calculations were conducted on the subdomain \([-1.5,1.5]\).
+\section{Numerical Results}\label{sec:numerical-results}
+All numerical simulations were performed on an Intel i7-3600K processor equipped with 16\,GB of DDR3 RAM. The computational domain was \([-6,6]\), and unless stated otherwise, all error calculations were conducted on the subdomain \([-1.5,1.5]\). For both numerical approaches (LDG/hyperbolic system) periodic boundary conditions were imposed.
 \paragraph{Local Discontinuous Galerkin}  
 To initiate the simulation, one must select the artificial diffusion parameter \(\gamma\). Zhang and Shu~\cite{Zhang2009} proposed the following formulation:
 \[
@@ -387,35 +412,12 @@ To initiate the simulation, one must select the artificial diffusion parameter \
 	\frac{1}{2} \sqrt{a(u_{h,j})}, & \text{otherwise}.
 \end{cases}
 \]
-This approach has been analytically justified and is suggested to extend naturally to higher-order polynomial basis functions beyond the case of polynomial degree \(l=0\).
-In the following numerical experiments, no stability issues were encountered, even for high exponents such as \(m=8\), when the Barenblatt solution~(\ref{eq:barenblatt function}) was used as the initial condition at \(t=1\,\mathrm{s}\). However, the accuracy of the numerical scheme appears to depend on the nonlinearity:
-\begin{itemize}
-	\item For odd exponents \(m\), the number of limiter calls is significantly reduced, and the experimental order of convergence (EOC) is maintained.
-	\item In contrast, for even exponents, the number of limiter calls increases substantially, and no improvement in accuracy is observed with \(h\)-refinement.
-\end{itemize}
+This approach has been analytically justified and is suggested to extend naturally to higher-order polynomial basis functions beyond the case of polynomial degree \(l=0\).In the following numerical experiments, no stability issues were encountered, even for high exponents such as \(m=8\) coupled with a high order polynomial like $l=5$.\\
+\\
+\textit{Case 1 } For the first numerical experiment the Barenblatt solution~(Eq.:\ref{eq:barenblatt function}) was used as the initial condition at \(t=1\,\mathrm{s}\). As expected the numerical experiments show that the accuracy of the numerical scheme appears to heavily depend on the nonlinearity.
+Only for the odd exponent \(m=3\), the number of limiter calls are in comparison rather low, and the experimental order of convergence (EOC) was maintained.
+In contrast, for all even exponents (e.g $m=2$), the number of limiter calls increases substantially compare Tab.:\ref{table:BBM2P2} and Tab.:\ref{table:BBM3P2}, and no improvement in accuracy is observed with \(h\)-refinement.
 \begin{table}[h]
-	\centering
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-			\begin{tabular}{cccccccc}
-				\hline
-				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim. & \#steps\\
-				\hline
-				10 & 4.52e-03 & - & 1.12e-02 & - & 227 & 336 & 56\\
-				20 & 3.05e-03 & 0.57 & 6.30e-03 & 0.83 & 1302 & 1332 & 222\\
-				40 & 3.21e-03 & -0.08 & 4.91e-03 & 0.36 & 10092 & 12868 & 883\\
-				80 & 3.19e-03 & 0.01 & 3.95e-03 & 0.31 & 41119 & 42649 & 3530\\
-				160 & 3.18e-03 & 0.00 & 3.50e-03 & 0.18 & 167100 & 166384 & 14115\\
-				320 & 3.18e-03 & 0.00 & 3.28e-03 & 0.09 & 664708 & 1605483 & 56455\\
-				\hline
-			\end{tabular}
-		}
-		\caption{Convergence results for $P=1$, $m=8$}
-		\label{table:BBM8P1}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.49\linewidth}
 		\centering
 		\resizebox{\linewidth}{!}{%
 			\begin{tabular}{cccccccc}
@@ -431,219 +433,108 @@ In the following numerical experiments, no stability issues were encountered, ev
 				\hline
 			\end{tabular}
 		}
-		\caption{Convergence results for $P=2$, $m=8$}
+		\caption{Error calculation results for $l=2,~m=8$ for the Barenblatt function at $t=1\,\text{s}$ as initial data and the end time $t=1.05\,\textit{s}$}
 		\label{table:BBM8P2}
-	\end{minipage}
-	\vspace{0.5cm}
-	\begin{minipage}[t]{0.49\linewidth}
+\end{table}
+This behavior is particularly noticeable under \(h\)-refinement, whereas for \(l/p\)-refinement, an improvement in accuracy is indeed achieved. The first error calculations (Tab. \ref{table:BBM8P2} and Tab. \ref{table:BBM3P2}) in this work were performed up to the final time \(t=1.05\,\mathrm{s}\) to enable direct comparison with the results of Zhang and Shu~\cite{Zhang2009}, who also used this final time for their error analysis. However, it should be noted that their approach disregarded the entire computational domain and instead imposed Dirichlet boundary conditions, computing errors only within the arch region and excluding areas containing kinks. Specifically, they focused solely on the domain \([-1.5, 1.5]\) with Dirichlet boundaries. In contrast, the present study computed the approximate solution over the entire domain \([-6,6]\) and performed error calculations exclusively within the subdomain \([-1.5,1.5]\). This fundamental difference in the treatment of boundary conditions and domain extents leads to substantial discrepancies in the experimental order of convergence (EOC). Consequently, their assertion that ``[...] the accuracy is preserved in the smooth part of the solution [...]'' (Zhang and Shu~\cite{Zhang2009}, p.~140) cannot be reproduced when the entire domain \([-6,6]\) is considered and an even exponent \(m\) is chosen. However, for odd exponents \(m\), this statement does hold (see Tab. \ref{table:BBM3P2}). Interestingly, the accuracy appears to be limited at an order of magnitude of \(10^{-11}\), beyond which no further improvement is observed (see Appendix \ref{TBL:APFULLSECOND ERROR}). This behavior of the numerical scheme could be linked to the use of double-precision arithmetic coupled with the adaptive threshold for floating-point comparisons in this work.\\
+\begin{table}[h]
 		\centering
 		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 1.40e-04 & - & 9.53e-04 & - & 1009 & 557 & 110\\
-			20 & 5.26e-07 & 8.05 & 1.86e-06 & 9.00 & 3955 & 2743 & 437\\
-			40 & 4.59e-07 & 0.20& 6.22e-07 & 1.58 & 20872 & 19004 & 1745\\
-			80 &  4.59e-07 & 0.00 & 4.92e-07 & 0.34 & 66962 & 52520 & 6977\\
-			160 & 4.59e-07 & 0.00 & 4.70e-07 & 0.07 & 327605 & 265718 & 27908\\
-			320 & 4.59e-07 & 0.00 & 4.70e-07 & 0.00 & 1521531 & 339425 & 1025272\\
-			\hline
-		\end{tabular}}
-		\caption{Convergence results for P=3, M=8}
-		\label{table:BBM8P3}
-	\end{minipage}
-	\hfill
-		\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 9.15e-04 & - & 5.64e-03 & - & 235 & 95 & 32\\
+				20 & 4.32e-05 & 4.40 & 2.56e-04 & 4.46 & 1129 & 740 & 124\\
+				40 & 5.18e-06 & 3.06 & 4.37e-05 & 2.55 & 4947 & 2961 & 494\\
+				80 & 6.41e-07 & 3.01 & 4.98e-06 & 3.13 & 13940 & 11853 & 1976\\
+				160 & 8.07e-08 & 2.99 & 5.96e-07 & 3.06 & 75289 & 47413 & 7903\\
+				320 & 1.01e-08 & 3.00 & 7.29e-08 & 3.03 & 461077 & 189655 & 31610\\
+				\hline
+			\end{tabular}
+		}
+		\caption{Error calculation results for the parameters $l=2,~m=3$ and the final time $t=1.05\,\text{s}$ with the Barenblatt function at $t=1\,\text{s}$ as initial data.}
+		\label{table:BBM3P2}
+\end{table}\\
+\begin{table}[h]
+	\centering
 	\begin{tabular}{cccccccc}
 		\hline
 		$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
 		\hline
-		10 & 2.61e-05 & - & 1.67e-04 & - & 1085 & 807 & 137\\
-		20 & 3.12e-08 & 9.71 & 7.14e-08 & 11.19 & 6433 & 3276 & 546\\
-		40 & 3.06e-08 & 0.03 & 3.63e-08 & 0.98 & 23034 & 26129 & 2181\\
-		80 & 3.08e-08 & -0.01 & 3.20e-08 & 0.18 & 1208 & 102158 & 95678\\
-		160 & 3.08e-08 & 0.00 & 3.14e-08 & 0.03 & 418511 & 282164 & 34885\\
-		320 &  3.08e-08 & 0.00 & 3.14e-08 & 0.00 & 1101816 & 1475461 & 139537\\
+		10 & 6.65e-03 & - & 1.07e-02 & - & 3755 & 153 & 367\\
+		20 & 1.40e-03 & 2.25 & 1.60e-03 & 2.73 & 15916 & 7643 & 1467\\
+		40 & 1.08e-03 & 0.37 & 1.33e-03 & 0.27 & 62790 & 35200 & 5868\\
+		80 & 1.21e-03 & -0.16 & 1.40e-03 & -0.08 & 253359 & 140815 & 23472\\
+		160 & 1.23e-03 & -0.03 & 1.41e-03 & -0.01 & 1023085 & 563277 & 93884\\
+		320 & 1.25e-03 & -0.02 & 1.42e-03 & -0.01 & 4099218 & 2253158 & 375535\\
 		\hline
-		\end{tabular}}
-		\caption{Convergence results for P=4, M=8}
-		\label{table:BBM8P4}
-	\end{minipage}
-			\begin{minipage}[t]{0.49\linewidth}
+	\end{tabular}
+	\caption{Error calculation results for the parameters $l=2,~m=2$ and the final time $t=1.05\,\text{s}$ with the Barenblatt function at $t=1\,\text{s}$ as initial data.}
+	\label{table:BBM2P2}
+\end{table}\\
+\begin{table}[h]
 		\centering
 		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-		\hline
-		$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-		\hline
-		10 & 1.20e-05 & - & 7.81e-05 & - & 12578 & 9315 & 1636\\
-		20 & 4.21e-09 & 11.48 & 1.04e-08 & 12.88 & 67883 & 39246 & 6541\\
-		40 & 4.17e-09 & 0.01 & 4.63e-09 & 1.17 &358207& 290520 & 26164\\
-		80 & 4.13e-09 & 0.01 & 4.27e-09& 0.12 & 1315959 & 983439 & 104653\\
-		160 & 4.13e-09  & 0.00 & 4.92e-09 & -0.20 & 5415132 & 3868565 & 418608\\
-		320 &  4.07e-09 & 0.00 & 4.25e-09 & 0.00 & 24891778  & 19679230 & 1674432\\
-		\hline
-	\end{tabular}}
-	\caption{Convergence results for P=5, M=8}
-	\label{table:BBM8P5}
-\end{minipage}
-\end{table}
-This behavior is particularly noticeable under \(h\)-refinement, whereas for \(l/p\)-refinement, an improvement in accuracy is indeed achieved. All error calculations in this work were performed up to the final time \(t=1.05\,\mathrm{s}\) to enable direct comparison with the results of Zhang and Shu~\cite{Zhang2009}, who also used this final time for their error analysis. However, it should be noted that their approach disregarded the entire computational domain and instead imposed Dirichlet boundary conditions, computing errors only within the arch region and excluding areas containing kinks. Specifically, they focused solely on the subdomain \([-1.5, 1.5]\) with Dirichlet boundaries. In contrast, the present study computed the approximate solution over the entire domain \([-6,6]\) and performed error calculations exclusively within the subdomain \([-1.5,1.5]\). This fundamental difference in the treatment of boundary conditions and domain extents leads to substantial discrepancies in the experimental order of convergence (EOC). Consequently, their assertion that ``[...] the accuracy is preserved in the smooth part of the solution [...]'' (Zhang and Shu~\cite{Zhang2009}, p.~140) cannot be reproduced when the entire domain \([-6,6]\) is considered and an even exponent \(m\) is chosen. However, for odd exponents \(m\), this statement does hold. Interestingly, the accuracy appears to be limited at an order of magnitude of \(10^{-11}\), beyond which no further improvement is observed. This phenomenon could be linked to the use of double-precision arithmetic in this work.\\
-\\
-The investigation of the solution’s general behavior with increasing nonlinearity reveals consistency with the general form of the Barenblatt-type solution, as illustrated in Figure~\ref{fig:BBVariousM}.
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.69e-01 & - & 6.67e-01 & - & 6081 & 561 & 514\\
+				20 & 2.25e-01 & -0.41 & 1.25e+00 & -0.91 & 31713 & 12386 & 2065\\
+				40 & 2.33e-01 & -0.05 & 1.77e+00 & -0.50 & 117348 & 49671 & 8279\\
+				80 & 2.57e-01 & -0.14 & 3.11e+00 & -0.82 & 498766 & 198603 & 33131\\
+				160 & 3.84e-01 & -0.58 & 6.51e+00 & -1.06 & 2137409 & 793967 & 132509\\
+				320 & 5.27e-01 & -0.46 & 1.16e+01 & -0.83 & 7894659 & 2829346 & 530013\\
+				\hline
+			\end{tabular}
+		}
+		\caption{Error calculation results for the parameters $l=2,~m=3$ and the final time $t=2\,\text{s}$ and the Barenblatt function at $t=1\,\text{s}$ as initial data}
+		\label{table:BBM3P2FULLSECOND}
+\end{table}\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BB2P3N320}
-		\caption{BBM2}
+		\caption{$m=2$}
 		\label{fig:bbm2}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BB3M3P3N320}
-		\caption{BBM3}
+		\caption{$m=3$}
 		\label{fig:bbm3}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM4P3N320}
-		\caption{BBM4}
+		\caption{$m=4$}
 		\label{fig:bbm4}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM5P3N320}
-		\caption{BBM5}
+		\caption{$m=5$}
 		\label{fig:bbm5}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM6P3N320}
-		\caption{BBM6}
-		\label{fig:bbm7}
+		\caption{$m=6$}
+		\label{fig:bbm6}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM7P3N320}
-		\caption{BBM7}
+		\caption{$m=7$}
 		\label{fig:bbm7}
 	\end{subfigure}
-	\caption{$PP_N=3$, $M=2$}
+	\caption{Numerical results for the Barenblatt function as initial condition at $t=1\,\text{s}$ computed until the final time $t=2\,\text{s}$. With the polynomial degree $l=3$ and number of cells $N_{cells} =320$ for various nonlinearities $m$.}
 	\label{fig:BBVariousM}
-\end{figure}
-
-\begin{table}
-	\centering
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 1.09e-02 & - & 2.11e-02 & - & 102 & 126 & 21\\
-			20 & 2.60e-03 & 2.07 & 5.46e-03 & 1.95 & 1155 & 1488 & 83\\
-			40 & 6.29e-04 & 2.05 & 1.44e-03 & 1.93 & 5731 & 5709 & 330\\
-			80 & 1.57e-04 & 2.01 & 3.32e-04 & 2.11 & 19171 & 16462 & 1318\\
-			160 & 3.91e-05 & 2.00 & 8.02e-05 & 2.05 & 82244 & 72648 & 5269\\
-			320 & 9.79e-06 & 2.00 & 1.97e-05 & 2.02 & 307524 & 267161 & 21074\\
-			\hline
-		\end{tabular}
-		}
-		\caption{Convergence results for P=1, M=3}
-		\label{table:BBM3P1}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 9.15e-04 & - & 5.64e-03 & - & 235 & 95 & 32\\
-			20 & 4.32e-05 & 4.40 & 2.56e-04 & 4.46 & 1129 & 740 & 124\\
-			40 & 5.18e-06 & 3.06 & 4.37e-05 & 2.55 & 4947 & 2961 & 494\\
-			80 & 6.41e-07 & 3.01 & 4.98e-06 & 3.13 & 13940 & 11853 & 1976\\
-			160 & 8.07e-08 & 2.99 & 5.96e-07 & 3.06 & 75289 & 47413 & 7903\\
-			320 & 1.01e-08 & 3.00 & 7.29e-08 & 3.03 & 461077 & 189655 & 31610\\
-			\hline
-		\end{tabular}
-		}
-		\caption{Convergence results for P=2, M=3}
-		\label{table:BBM3P2}
-	\end{minipage}
-	\vspace{0.5cm}
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 5.98e-04 & - & 3.51e-03 & - & 456 & 288 & 42\\
-			20 & 2.82e-06 & 7.73 & 1.77e-05 & 7.63 & 2824 & 2479 & 165\\
-			40 & 1.51e-07 & 4.23 & 1.50e-06 & 3.57 & 11778 & 9795 & 659\\
-			80 & 9.34e-09 & 4.01 & 8.22e-08 & 4.19 & 39231 & 27082 & 2635\\
-			160 & 5.93e-10 & 3.98 & 4.83e-09 & 4.09 & 190875 & 117858 & 10537\\
-			320 & 5.26e-10 & 0.17 & 1.07e-08 & -1.15 & 722761 & 455974 & 42147\\
-			\hline
-		\end{tabular}}
-		\caption{Convergence results for P=3, M=3}
-		\label{table:BBM3P3}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 1.97e-04 & - & 1.61e-03 & - & 734 & 448 & 52\\
-			20 & 1.45e-07 & 10.41 & 9.72e-07 & 10.69 & 2408 & 2433 & 206\\
-			40 & 3.16e-09 & 5.52 & 4.61e-08 & 4.40 & 9671 & 9797 & 824\\
-			80 & 1.12e-10 & 4.81 & 1.28e-09 & 5.17 & 36854 & 42260 & 3293\\
-			160 & 7.59e-11 & 0.57 & 8.65e-10 & 0.56 & 153971 & 161134 & 13171\\
-			320 & 1.01e-10 & -0.41 & 9.52e-10 & -0.14 & 606102 & 639989 & 52683\\
-			\hline
-		\end{tabular}}
-		\caption{Convergence results for P=4, M=3}
-		\label{table:BBM3P4}
-	\end{minipage}
-	\begin{minipage}[t]{0.49\linewidth}
-		\centering
-		\resizebox{\linewidth}{!}{%
-		\begin{tabular}{cccccccc}
-			\hline
-			$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
-			\hline
-			10 & 6.60e-05 & - & 6.38e-04 & - & 7044 & 3708 & 618\\
-			20 & 2.17e-08 & 11.57 & 1.44e-07 & 12.12 & 50055 & 43906 & 2470\\
-			40 & 1.81e-10 & 6.90 & 9.24e-10 & 7.28 & 195788 & 155101 & 9879\\
-			80 & 5.55e-11 & 1.71 & 5.58e-10 & 0.73 & 650785 & 463878 & 39513\\
-			160 & 1.47e-10 & -1.41 & 1.53e-09 & -1.46 & 3028715 & 1859780 & 158049\\
-			320 & 4.88e-11 & 1.60 & 2.54e-10 & 2.59 & 11331375 & 7311999 & 632194\\
-			\hline
-		\end{tabular}}
-		\caption{Convergence results for P=5, M=3}
-		\label{table:BBM3P5}
-	\end{minipage}
-\end{table}
-\begin{equation*}
-	u_0(x)= \begin{cases}1, & \text { if } x \in(-3.7,-0.7) \cup(0.7,3.7) \\ 0, & \text { otherwise }\end{cases}
-\end{equation*}
-\begin{equation*}
-	u_0(x)= \begin{cases}1, & \text { if } x \in(-4,-1) \\ 1.5, & \text { if } x \in(0,3) \\ 0, & \text { otherwise }\end{cases}
-\end{equation*}
-\begin{equation*}
-u_0(x)= \begin{cases}\cos x, & \text { if } x \in\left(-\frac{\pi}{2}, \frac{\pi}{2}\right), \\ 0, & \text { otherwise }\end{cases}
-\end{equation*}
-\subparagraph{LDG with Source} 
-Since we have thus far considered only the porous medium equation without a source term, we now turn our attention to the case in which a strong absorption source term is added:
+\end{figure}\\
+The investigation of the solution’s overall behavior with increasing nonlinearity up to time \( t = 2\,\text{s} \) demonstrates consistency with the general form of the Barenblatt-type solution, as shown in Fig.~\ref{fig:BBVariousM}. Notably, the LDG formulation combined with the proposed limiters captures the free boundary with high accuracy. Nonetheless, both the \( L^2 \) and \( L^\infty \) errors are significantly larger, as expected, due to the simulation running over twenty times longer than the previous case and involving substantially more limiter activations. In this case not even $l/p$-refinement seem to increase the accuracy (in appendix Tab.~\ref{TBL:APFULLSECOND ERROR}).\\
+\\
+\textit{Case 2} Since we have thus far considered only the porous medium equation without a source term, we now turn our attention to the case in which a strong absorption source term is added:
 \begin{equation}
 	\frac{\partial u}{\partial t} = \left(u^m\right)_{x x} - c u^p,
 \end{equation}
@@ -652,153 +543,513 @@ where $0<p<1$ and $0<c$. Setting the initial condition to
 	u_0(x)= \begin{cases}|\sin x|, & x \in(-\pi,-\pi / 6) \cup(\pi / 6, \pi), \\ 0.5, & x \in(-\pi / 6, \pi / 6), \\ 0, & \text { otherwise, }
 	\end{cases}
 \end{equation}
-leads to a disconnect in the positive support region and after some time to a total absorption of the initial data. As before for this test case a periodic boundary condition was chosen.\\
+leads to a disconnect in the positive support region and after some time to a total absorption of the initial data see Fig.~\ref{fig:Divorce}. The examples presented by Zhang and Wu, in which the parameters \( p \) and \( m \) satisfy \( p + m = 2 \) with \( 0 < p < 1 \), could also be reproduced reliably.\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT0.0.png}
-		\caption{$t=0s$}
+		\caption{$t=0\,\text{s}$}
 		\label{fig:Divorce0}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT0.200023.png}
-		\caption{$t=0.200023s$}
+		\caption{$t=0.200023\,\text{s}$}
 		\label{fig:Divorce0.2}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT0.400015.png}
-		\caption{$t=0.400015s$}
+		\caption{$t=0.400015\,\text{s}$}
 		\label{fig:Divorce0.400015}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT0.700358.png}
-		\caption{$t=0.700358s$}
+		\caption{$t=0.700358\,\text{s}$}
 		\label{fig:Divorce0.7}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT0.803358.png}
-		\caption{$t=0.803358s$}
+		\caption{$t=0.803358\,\text{s}$}
 		\label{fig:Divorce0.8}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DivorceT1png.png}
-		\caption{$t=1s$}
+		\caption{$t=1\,\text{s}$}
 		\label{fig:Divorcet1}
 	\end{subfigure}
-	\caption{$p=0.01$, $M=3$, $c=1$}
-	\label{fig:BBVariousM}
-\end{figure}
-\paragraph{Hyperbolic System}For the hyperbolic balance law, we consider the initial data\\
-\[
-u_0(x) = \frac{1}{\sqrt{2\pi}} \exp\left(-\frac{x^2}{2}\right),
-\]\\
-defined on the domain $[-6, 6]$. The main objective of this investigation is to examine whether the solution converges as $\varepsilon \to 0$. Figure~\ref{fig:gam8pp2central1s} compares for parameter choice of $m=1$ the effects of different values of $\varepsilon$ and shows that as $\varepsilon$ decreases, the approximate solution indeed converges to the expected result. Remarkably, even for $\varepsilon = 0.01$, the numerical solution already exhibits good accuracy, and the differences for an order of magnitude smaller $\varepsilon$ remain tolerable. Therefore, to investigate whether the hyperbolic system can capture the behavior of the porous medium equation for different values of $m$, the parameter $\varepsilon = 0.01$ was chosen. All subsequent numerical experiments regarding the hyperbolic system were conducted on a mesh with $N_{\text{cells}} = 80$ and the same domain as before. The \textit{CFL} number was chosen as $\textit{CFL} = 0.9$ and for the numerical flux the central flux was chosen to determine the cell boundary value. However changing the nonlinearity parameter results in substantial oscillations in the solution that propagate through the whole domain.
+	\caption{Numerical results for the porous medium equation with strong absorption term with exponent $p=0.01$, $m=3$, $c=1$ and polynomial degree $l=3$}
+	\label{fig:Divorce}
+\end{figure}\\
+\clearpage
+\paragraph{Hyperbolic System}
+All numerical experiments for the hyperbolic system were conducted on the spatial domain \( [-6, 6] \) using a uniform mesh with \( N_{\text{cells}} = 320 \), unless stated otherwise. The Courant–Friedrichs–Lewy (CFL) number was set to \( \textit{CFL} = 0.9 \), and a central numerical flux was used to compute interface values at cell boundaries. The artificial parameter \( \varepsilon = 0.01 \) was selected to investigate the behavior of the porous medium equation, unless otherwise specified. Only for the experiment of varying $\varepsilon$ the polynomial degree of $l=2$ was chosen for all other tests the choice was $l=3$.\\
 \\
+\textit{Case 1} We consider the initial data
+\[
+u_0(x) = \frac{\pi}{\sqrt{2}} \exp\left(-\frac{x^2}{2}\right),
+\label{eq: smoothInitialExp}
+\]
+which is smooth and compactly supported on the computational domain. The goal of this experiment is to examine whether the solution of the hyperbolic system converges to that of the porous medium equation as \( \varepsilon \to 0 \).\\
+\\
+Fig.~\ref{fig:gam8pp2central1s} illustrates the behavior of the solution for \( m = 1 \) under varying values of \( \varepsilon \). As \( \varepsilon \) decreases, the numerical solution converges toward the expected result. Notably, even for \( \varepsilon = 0.01 \), the approximation exhibits good accuracy, and further reductions in \( \varepsilon \) produce only marginal improvements. A comparison to the LDG formulation is also provided in Fig.~\ref{fig:gam8pp2central1s} that clearly shows that the choice of $\varepsilon=0.01$ is reasonable, since we know that the LDG formulation is relatively exact for $m=1$.\\
+\\
+For \( m = 1 \), the diffusion corresponds to the classical heat equation, which yields smooth solutions for all \( t > 0 \). As a result, no limiters were applied in this case. However, increasing \( m \) introduces nonlinear diffusion effects, which lead to the formation of steep gradients in the solution after a certain time \( t > 0 \). To address this, the two previously introduced limiters were employed. Specifically, if the first limiter (minmod) flags a troubled cell, the two neighboring cells are also limited by projecting their solutions to first-order polynomials. This conservative strategy enhances stability and helps reduce oscillations.\\
+\\
+Despite this aggressive limiting, substantial oscillations still occur for larger nonlinearities such as \( m = 6, 7, 8 \). In contrast, for smaller values of \( m \), the solution remains mostly free of spurious oscillations when starting from smooth initial data (compare Fig.~\ref{fig:HGAVariousM}).\\
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=1.\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM8PP2Central1s}
-	\caption{$m = 1$}
+	\includegraphics[width=.9\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM8PP2Central1s}
+	\includegraphics[width=.9\linewidth]{../../../Studium/Forschungsmodul/Pictures/ComparisonLDGHBLS}
+	\caption{Results for the hyperbolic system with varying $\varepsilon$ and a comparison to the LDG method for the exponent $m = 1$}
 	\label{fig:gam8pp2central1s}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM2P5N320}
-		\caption{BBM2}
-		\label{fig:bbm2}
+		\caption{$m=2$}
+		\label{fig:gam2}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM3P5N320}
-		\caption{BBM3}
-		\label{fig:bbm3}
+		\caption{$m=3$}
+		\label{fig:gam3}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM4P5N320Eps1e-2}
-		\caption{BBM4}
-		\label{fig:bbm4}
+		\caption{$m=4$ }
+		\label{fig:gam4}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM5P5N320}
-		\caption{BBM5}
-		\label{fig:bbm5}
+		\caption{$m=5$}
+		\label{fig:gam5}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM6P5N320}
-		\caption{BBM6}
+		\caption{$m=6$}
 		\label{fig:bbm7}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM7P5N320}
-		\caption{BBM7}
-		\label{fig:bbm7}
+		\caption{$m=7$}
+		\label{fig:gam7}
 	\end{subfigure}
-		\vspace{0.5em}
+	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM8P5N320}
-		\caption{BBM6}
-		\label{fig:bbm7}
+		\caption{$m=8$}
+		\label{fig:gam8}
 	\end{subfigure}
-	\caption{$PP_N=3$, $M=2$}
-	\label{fig:BBVariousM}
-\end{figure}
-
+	\caption{Numerical results for varying nonlinearity factors with smooth initial data and polynomial degree of $l=3$ calculated until $t=1\,\text{s}$}
+	\label{fig:HGAVariousM}
+\end{figure}\\
+\textit{Case 2 }For relative non-smooth initial data, such as the Barenblatt solution at \( t = 1\,\text{s} \), the numerical scheme is able to capture the general diffusion behavior of the solution. However, as in the smooth case, increasing the nonlinearity significantly amplifies oscillations, particularly near the free boundary. As a result, the accurate resolution of the free boundary evolution cannot be reliably achieved. Nevertheless, in regions where the solution remains smooth, the method still delivers acceptable accuracy, especially for cases with \( m \leq 3 \) as can be seen in Fig.~\ref{fig:HBBVariousM}.\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM3PP3N320}
-		\caption{BBM2}
-		\label{fig:bbm2}
+		\caption{$m=3$}
+		\label{fig:hbbm3}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM4PP3N320}
-		\caption{BBM3}
-		\label{fig:bbm3}
+		\caption{$m=4$}
+		\label{fig:hbbm4}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM5PP3N320}
-		\caption{BBM4}
-		\label{fig:bbm4}
+		\caption{$m=5$}
+		\label{fig:hbbm5}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM6PP3N320}
-		\caption{BBM5}
-		\label{fig:bbm5}
+		\caption{$m=6$}
+		\label{fig:hbbm6}
 	\end{subfigure}
 	\vspace{0.5em}
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM7PP3N320}
-		\caption{BBM6}
-		\label{fig:bbm7}
+		\caption{$m=7$}
+		\label{fig:hbbm7}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[b]{0.45\linewidth}
 		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/BBM8PP3N320}
-		\caption{BBM7}
-		\label{fig:bbm7}
+		\caption{$m=8$}
+		\label{fig:hbbm8}
 	\end{subfigure}
-	\caption{$PP_N=3$, $M=2$}
-	\label{fig:BBVariousM}
-\end{figure}
-
-
+	\caption{Numerical results for varying nonlinearity factors with relative smooth initial data and polynomial degree of $l=3$ calculated until $t=2\,\text{s}$}
+	\label{fig:HBBVariousM}
+\end{figure}\\
+Notably, the computation times for this relatively fine grid with \( N_{\text{cells}} = 320 \) are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for relative smooth initial data such as the Barenblatt formula.\\
+\\
+\textit{Case 3 }Considering now the two-Box initial condition\\
+\begin{equation*}
+	u_0(x)= 
+	\begin{cases}
+		1, & \text{if } x \in (-3.7, -0.7) \cup (0.7, 3.7), \\
+		0, & \text{otherwise},
+	\end{cases}
+\end{equation*}\\
+the hyperbolic system fails to produce acceptable solutions. The presence of huge discontinuities and therefore steep gradients leads to severe oscillations that cannot be sufficiently suppressed, even with the aggressive application of the previously introduced limiters. As a result, the numerical scheme is unable to capture the correct behavior of the solution for this type of discontinuous initial data, see Figure: \ref{fig:DoubleUnitStep}.\\
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DoubleUSInitial}
+		\caption{$t=0\,\text{s}$}
+		\label{fig:doubleinit}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/DoubleUS0_00475796}
+		\caption{$t=0.00475796\,\text{s}$}
+		\label{fig:hbbm4}
+	\end{subfigure}
+	\caption{Numerical results for varying nonlinearity factors with smooth initial data and polynomial degree of $l=3$ calculated until $t=1\,\text{s}$}
+	\label{fig:DoubleUnitStep}
+\end{figure}\\
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_0}
+		\caption{$t=0\,\text{s}$}
+		\label{fig:hbbm3}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_0_202313}
+		\caption{$t=0.202313\,\text{s}$}
+	\end{subfigure}
+	\vspace{0.5em}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_0_402589}
+		\caption{$t=0.402589\,\text{s}$}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_0_611282}
+		\caption{$t=0.611282\,\text{s}$}
+	\end{subfigure}
+	\vspace{0.5em}
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_0_802021}
+		\caption{$t=0.802021\,\text{s}$}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.45\linewidth}
+		\includegraphics[width=\linewidth]{../../../Studium/Forschungsmodul/Pictures/WaitM8P3N320_1_01939}
+		\caption{$t=1.01939\,\text{s}$}
+	\end{subfigure}
+	\caption{The numerical results gained from the hyperbolic system displaying waiting time phenomenon for polynomial degree of $l=3$ and nonlinearity exponent $m=8$}
+	\label{fig:HWaitingVariousM}
+\end{figure}\\
+\textit{Case 4} The final test case aims to investigate whether the hyperbolic system is capable of representing the waiting time phenomenon. For this purpose, the following specially designed initial condition is used\\
+\begin{equation*}
+	u_0(x)= \begin{cases}
+		\cos x, & \text{if } x \in\left(-\frac{\pi}{2}, \frac{\pi}{2}\right), \\
+		0, & \text{otherwise}.
+	\end{cases}
+\end{equation*}
+At early times \( t > 0\,\text{s} \), when the solution remains close to the initial data, the hyperbolic system successfully reproduces the waiting time phenomenon, even with a relatively small parameter value of \( \varepsilon = 0.01 \) (see Fig.~\ref{fig:HWaitingVariousM}). However, as time progresses, small oscillations begin to appear despite the strong enforcement of the modified limiters. These oscillations grow in magnitude over time but remain localized near the kinks in the solution.\\
+Despite these oscillations, the numerical solution appears to capture the qualitative behavior of the porous medium equation (PME) accurately and is capable of producing sharp transitions at the free boundary. This case is particularly noteworthy due to the high nonlinearity exponent \( m = 8 \). In comparison, the hyperbolic system was unable to accurately capture the sharp free boundary for the Barenblatt initial data with the same exponent at \( t = 1\,\text{s} \) (compare Fig.~\ref{fig:hbbm8}), which supports the observation that the choice of initial data plays a crucial role in the accuracy and stability of the simulation.
 \clearpage
 \section{Conclusion}
 	The LDG method effectively solves the PME while maintaining stability and high-order accuracy. Future work includes extensions to higher dimensions and adaptive mesh refinement.
 	\newpage
 	\bibliographystyle{plain}
 	\bibliography{/home/nikolaus/Studium/Forschungsmodul/Ausarbeitung/references.bib}
-	
+	\clearpage
+\section{Appendix}
+\begin{table}[h]
+	\centering
+	\begin{minipage}[t]{0.7\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim. & \#steps\\
+				\hline
+				10 & 4.52e-03 & - & 1.12e-02 & - & 227 & 336 & 56\\
+				20 & 3.05e-03 & 0.57 & 6.30e-03 & 0.83 & 1302 & 1332 & 222\\
+				40 & 3.21e-03 & -0.08 & 4.91e-03 & 0.36 & 10092 & 12868 & 883\\
+				80 & 3.19e-03 & 0.01 & 3.95e-03 & 0.31 & 41119 & 42649 & 3530\\
+				160 & 3.18e-03 & 0.00 & 3.50e-03 & 0.18 & 167100 & 166384 & 14115\\
+				320 & 3.18e-03 & 0.00 & 3.28e-03 & 0.09 & 664708 & 1605483 & 56455\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{Error calculation results for $l=1,~m=8$}
+		\label{table:BBM8P1}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.7\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim. & \#steps\\
+				\hline
+				10 & 2.28e-04 & - & 6.45e-04 & - & 509 & 365 & 82\\
+				20 & 5.37e-05 & 2.09 & 9.30e-05 & 2.79 & 3375 & 404 & 328\\
+				40 & 5.23e-05 & 0.04 & 6.80e-05 & 0.45 & 8426 & 7851 & 1309\\
+				80 & 5.20e-05 & 0.01 & 5.75e-05 & 0.24 & 53905 & 23397 & 5234\\
+				160 & 5.19e-05 & 0.00 & 5.37e-05 & 0.10 & 233769 & 67510 & 20935\\
+				320 & 5.19e-05 & 0.00 & 5.29e-05 & 0.02 & 820520 & 393031 & 83738\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{Error calculation results for $l=2,~m=8$}
+		\label{table:APBBM8P2}
+	\end{minipage}
+	\vspace{0.5cm}
+	\begin{minipage}[t]{0.7\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.40e-04 & - & 9.53e-04 & - & 1009 & 557 & 110\\
+				20 & 5.26e-07 & 8.05 & 1.86e-06 & 9.00 & 3955 & 2743 & 437\\
+				40 & 4.59e-07 & 0.20& 6.22e-07 & 1.58 & 20872 & 19004 & 1745\\
+				80 &  4.59e-07 & 0.00 & 4.92e-07 & 0.34 & 66962 & 52520 & 6977\\
+				160 & 4.59e-07 & 0.00 & 4.70e-07 & 0.07 & 327605 & 265718 & 27908\\
+				320 & 4.59e-07 & 0.00 & 4.70e-07 & 0.00 & 1521531 & 339425 & 1025272\\
+				\hline
+		\end{tabular}}
+		\caption*{Error calculation results for $l=3,~m=8$}
+		\label{table:BBM8P3}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.7\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 2.61e-05 & - & 1.67e-04 & - & 1085 & 807 & 137\\
+				20 & 3.12e-08 & 9.71 & 7.14e-08 & 11.19 & 6433 & 3276 & 546\\
+				40 & 3.06e-08 & 0.03 & 3.63e-08 & 0.98 & 23034 & 26129 & 2181\\
+				80 & 3.08e-08 & -0.01 & 3.20e-08 & 0.18 & 1208 & 102158 & 95678\\
+				160 & 3.08e-08 & 0.00 & 3.14e-08 & 0.03 & 418511 & 282164 & 34885\\
+				320 &  3.08e-08 & 0.00 & 3.14e-08 & 0.00 & 1101816 & 1475461 & 139537\\
+				\hline
+		\end{tabular}}
+		\caption*{Error calculation results for $l=4,~m=8$}
+		\label{table:BBM8P4}
+	\end{minipage}
+	\begin{minipage}[t]{0.7\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.20e-05 & - & 7.81e-05 & - & 12578 & 9315 & 1636\\
+				20 & 4.21e-09 & 11.48 & 1.04e-08 & 12.88 & 67883 & 39246 & 6541\\
+				40 & 4.17e-09 & 0.01 & 4.63e-09 & 1.17 &358207& 290520 & 26164\\
+				80 & 4.13e-09 & 0.01 & 4.27e-09& 0.12 & 1315959 & 983439 & 104653\\
+				160 & 4.13e-09  & 0.00 & 4.92e-09 & -0.20 & 5415132 & 3868565 & 418608\\
+				320 &  4.07e-09 & 0.00 & 4.25e-09 & 0.00 & 24891778  & 19679230 & 1674432\\
+				\hline
+		\end{tabular}}
+		\caption*{Error calculation results for $l=5,~m=8$}
+		\label{table:BBM8P5}
+	\end{minipage}
+	\caption{Error calculation results for the endtime $t=1.05\,\text{s}$, $m=8$ and various polynomial degrees $l$ for the LDG system the Barenblatt function at $t=1\,\text{s}$ as initial data}
+	\label{TBL:APSHITERRORCALC}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.09e-02 & - & 2.11e-02 & - & 102 & 126 & 21\\
+				20 & 2.60e-03 & 2.07 & 5.46e-03 & 1.95 & 1155 & 1488 & 83\\
+				40 & 6.29e-04 & 2.05 & 1.44e-03 & 1.93 & 5731 & 5709 & 330\\
+				80 & 1.57e-04 & 2.01 & 3.32e-04 & 2.11 & 19171 & 16462 & 1318\\
+				160 & 3.91e-05 & 2.00 & 8.02e-05 & 2.05 & 82244 & 72648 & 5269\\
+				320 & 9.79e-06 & 2.00 & 1.97e-05 & 2.02 & 307524 & 267161 & 21074\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{$l=1,~m=3$}
+		\label{table:BBM3P1}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 9.15e-04 & - & 5.64e-03 & - & 235 & 95 & 32\\
+				20 & 4.32e-05 & 4.40 & 2.56e-04 & 4.46 & 1129 & 740 & 124\\
+				40 & 5.18e-06 & 3.06 & 4.37e-05 & 2.55 & 4947 & 2961 & 494\\
+				80 & 6.41e-07 & 3.01 & 4.98e-06 & 3.13 & 13940 & 11853 & 1976\\
+				160 & 8.07e-08 & 2.99 & 5.96e-07 & 3.06 & 75289 & 47413 & 7903\\
+				320 & 1.01e-08 & 3.00 & 7.29e-08 & 3.03 & 461077 & 189655 & 31610\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{$l=2,~m=3$}
+		\label{table:APBBM3P2}
+	\end{minipage}
+	\vspace{0.5cm}
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 5.98e-04 & - & 3.51e-03 & - & 456 & 288 & 42\\
+				20 & 2.82e-06 & 7.73 & 1.77e-05 & 7.63 & 2824 & 2479 & 165\\
+				40 & 1.51e-07 & 4.23 & 1.50e-06 & 3.57 & 11778 & 9795 & 659\\
+				80 & 9.34e-09 & 4.01 & 8.22e-08 & 4.19 & 39231 & 27082 & 2635\\
+				160 & 5.93e-10 & 3.98 & 4.83e-09 & 4.09 & 190875 & 117858 & 10537\\
+				320 & 5.26e-10 & 0.17 & 1.07e-08 & -1.15 & 722761 & 455974 & 42147\\
+				\hline
+		\end{tabular}}
+		\caption*{$ l=3,~m=3$}
+		\label{table:BBM3P3}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.97e-04 & - & 1.61e-03 & - & 734 & 448 & 52\\
+				20 & 1.45e-07 & 10.41 & 9.72e-07 & 10.69 & 2408 & 2433 & 206\\
+				40 & 3.16e-09 & 5.52 & 4.61e-08 & 4.40 & 9671 & 9797 & 824\\
+				80 & 1.12e-10 & 4.81 & 1.28e-09 & 5.17 & 36854 & 42260 & 3293\\
+				160 & 7.59e-11 & 0.57 & 8.65e-10 & 0.56 & 153971 & 161134 & 13171\\
+				320 & 1.01e-10 & -0.41 & 9.52e-10 & -0.14 & 606102 & 639989 & 52683\\
+				\hline
+		\end{tabular}}
+		\caption*{$ l=4,~m=3$}
+		\label{table:BBM3P4}
+	\end{minipage}
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 6.60e-05 & - & 6.38e-04 & - & 7044 & 3708 & 618\\
+				20 & 2.17e-08 & 11.57 & 1.44e-07 & 12.12 & 50055 & 43906 & 2470\\
+				40 & 1.81e-10 & 6.90 & 9.24e-10 & 7.28 & 195788 & 155101 & 9879\\
+				80 & 5.55e-11 & 1.71 & 5.58e-10 & 0.73 & 650785 & 463878 & 39513\\
+				160 & 1.47e-10 & -1.41 & 1.53e-09 & -1.46 & 3028715 & 1859780 & 158049\\
+				320 & 4.88e-11 & 1.60 & 2.54e-10 & 2.59 & 11331375 & 7311999 & 632194\\
+				\hline
+		\end{tabular}}
+		\caption*{$l=5,~m=3$}
+		\label{table:BBM3P5}
+	\end{minipage}
+	\caption{Error calculations for final time $t=1.05\,\text{s}$, $m=3$ and varying polynomial degree for the LDG system the Barenblatt function at $t=1\,\text{s}$ as initial data}
+	\label{tabl:APError M=3}
+\end{table}
+\begin{table}[h]
+	\centering
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 8.84e-02 & - & 3.58e-01 & - & 2071 & 2111 & 352\\
+				20 & 4.84e-02 & 0.87 & 3.78e-01 & -0.08 & 18794 & 19201 & 1387\\
+				40 & 3.63e-02 & 0.42 & 2.57e-01 & 0.56 & 87938 & 81809 & 5528\\
+				80 & 3.04e-02 & 0.25 & 1.71e-01 & 0.58 & 341070 & 300362 & 22097\\
+				160 & 2.14e-02 & 0.50 & 1.17e-01 & 0.55 & 1290441 & 1116830 & 88370\\
+				320 & 1.49e-02 & 0.52 & 8.23e-02 & 0.51 & 5122249 & 4424667 & 353464\\
+				\hline
+		\end{tabular}}
+		\caption*{$l=1, m=3$}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.69e-01 & - & 6.67e-01 & - & 6081 & 561 & 514\\
+				20 & 2.25e-01 & -0.41 & 1.25e+00 & -0.91 & 31713 & 12386 & 2065\\
+				40 & 2.33e-01 & -0.05 & 1.77e+00 & -0.50 & 117348 & 49671 & 8279\\
+				80 & 2.57e-01 & -0.14 & 3.11e+00 & -0.82 & 498766 & 198603 & 33131\\
+				160 & 3.84e-01 & -0.58 & 6.51e+00 & -1.06 & 2137409 & 793967 & 132509\\
+				320 & 5.27e-01 & -0.46 & 1.16e+01 & -0.83 & 7894659 & 2829346 & 530013\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{$l=2, m=3$}
+	\end{minipage}
+	\vspace{0.5cm}
+	\begin{minipage}[t]{0.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 1.67e-01 & - & 6.04e-01 & - & 5920 & 4116 & 680\\
+				20 & 9.45e-02 & 0.82 & 4.40e-01 & 0.46 & 45536 & 33434 & 2755\\
+				40 & 4.70e-02 & 1.01 & 2.90e-01 & 0.60 & 194827 & 134580 & 11042\\
+				80 & 1.85e-02 & 1.35 & 1.41e-01 & 1.04 & 777279 & 492690 & 44180\\
+				160 & 1.58e-02 & 0.22 & 1.32e-01 & 0.10 & 3100555 & 1923621 & 176726\\
+				320 & 8.46e-03 & 0.90 & 8.88e-02 & 0.57 & 12215401 & 7572357 & 706916\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{$l=3, m=3$}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{.75\linewidth}
+		\centering
+		\resizebox{\linewidth}{!}{%
+			\begin{tabular}{cccccccc}
+				\hline
+				$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+				\hline
+				10 & 2.25e-01 & - & 9.43e-01 & - & 11703 & 7606 & 848\\
+				20 & 1.68e-01 & 0.42 & 1.04e+00 & -0.14 & 42595 & 40745 & 3441\\
+				40 & 9.50e-02 & 0.82 & 8.21e-01 & 0.34 & 172107 & 175815 & 13798\\
+				80 & 4.87e-02 & 0.97 & 3.68e-01 & 1.16 & 681005 & 708505 & 55222\\
+				160 & 4.27e-02 & 0.19 & 3.04e-01 & 0.27 & 2780841 & 2829610 & 220890\\
+				320 & 3.04e-02 & 0.49 & 2.26e-01 & 0.43 & 10707423 & 10660451 & 883592\\
+				\hline
+			\end{tabular}
+		}
+		\caption*{$l=4, m=3$}
+	\end{minipage}
+	\caption{Error calculations for varying polynomial degrees and the nonlinearity factor $m=3$ at $t=2\,\text{s}$,for the LDG system the Barenblatt function at $t=1\,\text{s}$ as initial data}
+	\label{TBL:APFULLSECOND ERROR}
+\end{table}
 \end{document}

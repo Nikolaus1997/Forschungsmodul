@@ -327,7 +327,7 @@ void Computation::runSimulation()
             time_+=dt_;
             iter++;
 
-            if(iter%int(settings_.nWriteState)==0 or (time_>=0.6 and useSource_)){
+            if(iter%int(settings_.nWriteState)==0 ){
                 writecounter++;
                 grid_->fillSolution(grid_->solution_,grid_->u_);
                 grid_->fillSolution(grid_->derivative_,grid_->ut_);
