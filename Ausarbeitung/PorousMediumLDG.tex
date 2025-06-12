@@ -8,7 +8,7 @@
 \usepackage{stmaryrd} 
 \usepackage{listings}
 \usepackage{booktabs}
-\usepackage{printlen, printsudoku}
+\usepackage{printlen}
 \usepackage{subcaption}  % for subfigures
 \usepackage{caption}  
 \usepackage{algorithm}
@@ -35,7 +35,7 @@
 
 	
 	\section{Introduction}
-The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction, and many more. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
+The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
 The general form of the PME is
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m), \quad x \in \Omega, \quad t > 0,
@@ -44,8 +44,8 @@ where \( m > 1 \) is a constant characterizing the medium's diffusion behavior. 
 \[
 \frac{\partial u}{\partial t} = \Delta (u^m) = \nabla \cdot (m u^{m-1} \nabla u) = \nabla \cdot (a(u)\nabla u), \quad x \in \Omega, \quad t > 0,
 \]
-where \( a(u) = m u^{m-1} \geq 0 \). Generally, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution vanishes.\\ Another interesting novelty of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a finite positive time (the waiting time), after which it instantaneously moves with finite speed, e.g. see chapter \ref{sec:numerical-results}.\\
-A fundamental example of a solution is the Barenblatt (or source-type) solution \cite{Barenblatt}, which can be written explicitly as a formula which is given by
+where \( a(u) = m u^{m-1} \geq 0 \). Generally, the PME can be identified as a nonlinear diffusion equation of the degenerate parabolic type, since it degenerates when \( u=0 \). Notably, if the initial data has compact support, the solution of the initial value problem for the PME will also have compact support at any given time \( t>0 \). Due to this feature, the PME exhibits finite speed of propagation at the moving front or ``free boundary'' region where the solution $ u $ vanishes.\\ Another interesting novelty of the PME is the so-called waiting time phenomenon, which can occur for specially chosen initial data. In this case, the free boundary remains stationary until a certain time (the waiting time), after which it instantaneously moves with finite speed, e.g. see chapter \ref{sec:numerical-results}.\\
+A fundamental example of a solution is the Barenblatt (or source-type) solution \cite{Barenblatt}, which can be written explicitly as the formula 
 \begin{equation}
 	\label{eq:barenblatt function}
 	B_m(x, t)=t^{-k}\left[\left(1-\frac{k(m-1)}{2 m} \frac{|x|^2}{t^{2 k}}\right)_{+}\right]^{1 /(m-1)},
@@ -54,7 +54,7 @@ where \( (u)_{+}=\max (u, 0) \) and \( k=1/(m+1) \). For any time \( t>0 \), thi
 \[
 \alpha_m(t)=\sqrt{\frac{2 m}{k(m-1)}} \cdot t^k.
 \]
-This solution will later be useful for assessing the accuracy of the numerical methods presented. In this work, two numerical frameworks will be tested. One relies on the Local Discontinuous Galerkin (LDG) formulation proposed by Zhang and Wu \cite{Zhang2009}, while the other employs a hyperbolic system that degenerates into the PME as the parameter \(\varepsilon \to 0\), similar to the system introduced by Jin, Pareschi, and Toscani \cite{Jin1998}. Both approaches utilize a Galerkin ansatz on discontinuous basis functions of varying polynomial degree. Since this ansatz tends to produce oscillations near the free boundary, the LDG method introduces an artificial diffusion parameter \(\gamma\) and employs limiters extensively in the vicinity of the free boundary to adress this issue. However, for the hyperbolic system, these oscillations are unavoidable, as will be demonstrated by the findings in this work. 
+This solution will later be useful for assessing the accuracy of the numerical methods presented. In this work, two numerical frameworks will be tested. One relies on the Local Discontinuous Galerkin (LDG) formulation proposed by Zhang and Wu \cite{Zhang2009}, while the other employs a hyperbolic system that degenerates into the PME as the parameter \(\varepsilon \to 0\), similar to the system introduced by Jin, Pareschi, and Toscani \cite{Jin1998}. Both approaches utilize a Galerkin ansatz on discontinuous basis functions of varying polynomial degree. Since this ansatz tends to produce oscillations near the free boundary, the LDG method introduces an artificial diffusion parameter \(\gamma\) and employs limiters extensively in the vicinity of the free boundary to address this issue. In contrast, for the hyperbolic system, these oscillations are unavoidable, as will be demonstrated in chapter \ref{sec:numerical-results}. 
 
 
 %-------------------------------------------------------------------------------------------------------%
@@ -152,7 +152,7 @@ is well-defined and serves as an approximation of \( \sqrt{a(u_h)} \). However, 
 \[
 \sqrt{a(u_h)}.
 \]
-The numerical behavior of this replacement is highly sensitive to how equality is determined between \( u_h^+ \) and \( u_h^- \). To robustly assess whether these two values are approximately equal within machine precision, we adopt the adaptive tolerance criterion proposed by Kopriva~\cite{Kopriva2009}, specifically Algorithm 139: \texttt{AlmostEqual}. This method enhances the stability and reliability of the scheme by applying a practical and adaptive threshold for floating-point comparisons.
+The numerical behavior of this replacement is strongly influenced by how equality is determined between \( u_h^+ \) and \( u_h^- \). To robustly assess whether these two values are approximately equal within machine precision, we adopt the adaptive tolerance criterion proposed by Kopriva~\cite{Kopriva2009}, specifically Algorithm 139: \texttt{AlmostEqual}. This method enhances the stability and reliability of the scheme by applying a practical and adaptive threshold for floating-point comparisons.
 
 %------------------------------------------------------------------------------------------------------------%
 \subsection{Hyperbolic Balance law System}\label{sec:HBL}
@@ -233,13 +233,12 @@ then no limiting is needed. Otherwise, a local first-order $L^2$-projection $u_h
 
 \subsubsection{Second Limiter: Positivity Preservation}
 
-The slope limiter alone does not guarantee non-negativity within the cell, which is essential due to the presence of square roots in the model. To enforce positivity, a second limiting step is introduced:
-
+The slope limiter $ \Lambda\Pi^1 $ alone does not guarantee non-negativity within the cell, which is essential due to the presence of square roots in the LDG formulation. To enforce positivity, a second limiting step is introduced:
 \begin{enumerate}
 	\item If any value in a cell is negative, compute a local first-order $L^2$-projection $u_h^1$ of $u_h$.
 	\item Calculate the average value $\bar{u}_i$ and apply the second limiter $P\Pi u_h^1$.
 \end{enumerate}
-This second limiter reconstructs a linear function based on the cell average to ensure positivity throughout the cell:
+This second limiter reconstructs a linear function based on the cell average to ensure positivity throughout the cell
 \begin{equation*}
 	P \Pi^1_h u_h^1 = 
 	\begin{cases}
@@ -247,19 +246,20 @@ This second limiter reconstructs a linear function based on the cell average to 
 		\left[1 + \frac{2(x - x_i)}{h_i} \right] \bar{u}_i, & \text{if } u_{h, i-1/2}^{+} < 0.
 	\end{cases}
 \end{equation*}
-This reconstruction ensures that the solution is bounded, continuous, and positive throughout the cell. The general $L^2$-projected linear function takes the form:
-\begin{equation*}
-	f(x) = \left( u_{i+1/2}^{-} - u_{i-1/2}^{+} \right) \frac{x - x_i}{h_i} + \frac{1}{2} \left( u_{i+1/2}^{-} + u_{i-1/2}^{+} \right).
-\end{equation*}
-Assuming only one interface value is negative, we modify the solution such that:
+Assuming only one interface value is negative, which numerical experiments in chapter \ref{sec:numerical-results} verify, we make use of the midpoint integration rule after the first-order $ L^2$-projection was done with
 \[
 \bar{u}_i = \frac{1}{2} \left( u_{i+1/2}^{-} + u_{i-1/2}^{+} \right),
 \]
-which preserves the cell average and ensures:
+which preserves the cell average and ensures
 \[
 2|\bar{u}_i| < u_{i-1/2}^{+} \quad \text{or} \quad 2|\bar{u}_i| < u_{i+1/2}^{-}.
-\]
-This ensures that the reconstruction does not introduce new extrema. Since the negative interface value is clamped to zero, the total variation does not increase, thus maintaining the TVD (total variation diminishing) property.
+\] 
+This guarantees that the reconstruction does not introduce new extrema. Since the negative interface value is clamped to zero, the total variation does not increase, thus fulfilling the TVB (Total Variation Bound) property.
+As a result, this linear reconstruction guarantees that the solution remains bounded, continuous, and positive within the cell. The reconstructed function takes the explicit form
+\begin{equation*}
+	u^1_h(x) = \left( u_{i+1/2}^{-} - u_{i-1/2}^{+} \right) \frac{x - x_i}{h_i} + \frac{1}{2} \left( u_{i+1/2}^{-} + u_{i-1/2}^{+} \right).
+\end{equation*}
+
 \paragraph{Handling Negative Cell Averages}
 While Zhang and Wu \cite{Zhang2009} showed that their method avoids negative cell averages for polynomial degree $l = 0$, the numerical experiments provided in this work indicate this does not always hold in practice for varying polynomial degrees. Therefore, as a final safeguard:
 \begin{equation*}
@@ -287,7 +287,7 @@ The third-order Runge-Kutta update from time \( t^n \) to \( t^{n+1} = t^n + \De
 	u_h^{n+1} &= \frac{1}{3} u_h^n + \frac{2}{3} u^{(2)} + \frac{2}{3} \Delta t^n \, \mathcal{L}_h\big(u^{(2)}\big).
 \end{aligned}
 \]
-The time step \( \Delta t^n \) must satisfy appropriate stability constraints, which differ depending on the numerical scheme. These conditions are expressed as:\\
+The time step \( \Delta t^n \) must satisfy appropriate stability constraints, which differ depending on the numerical scheme. These conditions are expressed as\\
 \begin{align}
 	\text{LDG:} \quad
 	\frac{\max |f'(u_h^n)| \, \Delta t^n}{\Delta x} + \frac{2 \max |a(u_h^n)| \, \Delta t^n}{(\Delta x)^2} &\leq \textit{CFL} \cdot \frac{1}{l+ 1}, \\
@@ -296,7 +296,7 @@ The time step \( \Delta t^n \) must satisfy appropriate stability constraints, w
 \end{align}
 where \( l \) denotes the maximal polynomial degree of the basis functions, and \textit{CFL} is the Courant–Friedrichs–Lewy number selected according to stability requirements.\\
 In line with Zhang and Wu~\cite{Zhang2009}, a \textit{CFL} number of \( 0.02 \) was adopted for the LDG method with polynomial degree \( l = 2 \), and this value was retained throughout this work even for higher-order polynomials. For the hyperbolic system, a substantially larger value of \( \textit{CFL} = 0.9 \) was found to yield stable results in all tested scenarios.\\
-This choice stands in contrast to the more restrictive \textit{CFL} numbers reported by Sigal and Shu~\cite{RKShuSigal}, particularly those presented in their Table 2.1. However, the increased \textit{CFL} value is justified in the current study, since the time step scales with \( \Delta t/(\Delta x)^2 \), and stability is maintained provided that the grid spacing satisfies \( \max \Delta x_i < 1 \) for all \( 1 \leq i \leq N_{\text{cells}} \).
+This choice stands in contrast to the more restrictive \textit{CFL} numbers reported by Sigal and Shu~\cite{RKShuSigal}, particularly those presented in their Table 2.1. However, the increased \textit{CFL} value is justified in the current study, since the time step scales with \( \frac{\Delta t}{(\Delta x)^2\varepsilon} \), and stability is maintained provided that the grid spacing satisfies \( \max \Delta x_i < 1 \) for all \( 1 \leq i \leq N_{\text{cells}} \).
 
 %-------------------------------------------------------------------------------------------------------------%
 %-------------------------------------------------------------------------------------------------------------%
@@ -325,7 +325,7 @@ For the implementation, \texttt{C++ version:(Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.
 					
 					\noindent
 					\textbf{Numerical Parameters:} \\
-					$\quad$ Flux Function: \texttt{barenblatt} \\
+					$\quad$ Flux Function: \texttt{ldg} \\
 					$\quad$ Riemann Solver: \texttt{upwind} \\
 					$\quad$ Epsilon: $0.0$
 					
@@ -371,7 +371,7 @@ For the implementation, \texttt{C++ version:(Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.
 	}
 	\caption{Example parameter.ini file.}
 \end{figure}\\
-Furthermore, the code was tested using \texttt{long double} floating-point precision. However, this led to significant stability issues within the LDG formulation, maybe cause to the comparison process with the \texttt{Algorithm:AlmostEqual} for the evaluation of the jump-term Eq.~\ref{eq:jumpterm} . As a result, the use of \texttt{long double} was abandoned, and computations were reverted to standard \texttt{double} precision. Switching from the LDG formulation to the hyperbolic system is straightforward: it only requires changing the \texttt{FluxFunction} and setting the parameter \( \varepsilon \neq 0 \) and the \texttt{FluxFunction} parameter to everything else but \texttt{barenblatt}. This flexibility enables the simulation of a wide range of test cases and modifications to the porous medium equation. For example, one can include a source term of the form \( cu^p \), and/or add a transport term, which can be specified via the \texttt{TransportFlux} option.\\
+Furthermore, the code was tested using \texttt{long double} floating-point precision. However, this led to significant stability issues within the LDG formulation, possibly due to the comparison process with the \texttt{Algorithm:AlmostEqual} for the evaluation of the jump-term Eq.~\ref{eq:jumpterm} . As a result, the use of \texttt{long double} was abandoned, and computations were reverted to standard \texttt{double} precision. Switching from the LDG formulation to the hyperbolic system is straightforward: it only requires changing the \texttt{FluxFunction} and setting the parameter \( \varepsilon \neq 0 \) and \texttt{FluxFunction}  to anything else but \texttt{ldg}. This flexibility enables the simulation of a wide range of test cases and modifications to the porous medium equation. For example, one can include a source term of the form \( cu^p \), and/or add a transport term, which can be specified via the \texttt{TransportFlux} option.\\
 For all error calculations, a fixed evaluation grid consisting of 1000 points is used. This grid remains constant across all tests. The solution is evaluated at these points using the Legendre basis functions and the computed coefficients. The user can specify the interval over which the evaluation points are distributed (default: \( [-1.5, 1.5] \)).\\
 \begin{algorithm}
 	\caption{Rough representation of the simulation loop}
@@ -413,11 +413,11 @@ To initiate the simulation, one must select the artificial diffusion parameter \
 	\frac{1}{2} \sqrt{a(u_{h,j})}, & \text{otherwise}.
 \end{cases}
 \]
-This approach has been analytically justified and is suggested to extend naturally to higher-order polynomial basis functions beyond the case of polynomial degree \(l=0\).In the following numerical experiments, no stability issues were encountered, even for high exponents such as \(m=8\) coupled with a high order polynomial like $l=5$.\\
+This approach has been analytically justified and is suggested to extend naturally to higher-order polynomial basis functions beyond the case of polynomial degree \(l=0\). In the following numerical experiments, no stability issues were encountered, even for high exponents such as \(m=8\) coupled with a high order polynomial like $l=5$.\\
 \\
-\textit{Case 1 } For the first numerical experiment the Barenblatt solution~(Eq.:\ref{eq:barenblatt function}) was used as the initial condition at \(t=1\,\mathrm{s}\). As expected the numerical experiments show that the accuracy of the numerical scheme appears to heavily depend on the nonlinearity.
-Only for the odd exponent \(m=3\), the number of limiter calls are in comparison rather low, and the experimental order of convergence (EOC) was maintained.
-In contrast, for all even exponents (e.g $m=2$), the number of limiter calls increases substantially compare Tab.:\ref{table:BBM2P2} and Tab.:\ref{table:BBM3P2}, and no improvement in accuracy is observed with \(h\)-refinement.
+\textit{Case 1 } For the first numerical experiment the Barenblatt solution~(Eq.:\ref{eq:barenblatt function}) was used as initial condition at \(t=1\,\mathrm{s}\). As expected the numerical experiments show that the accuracy of the numerical scheme appears to heavily depend on the nonlinearity.
+Only for the odd exponents (\(m=1,~3,~5,~7\)), the numbers of limiter calls are in comparison rather low, and the experimental order of convergence (EOC) is maintained.
+In contrast, for all even exponents (e.g $m=2,~4,~6,~8$), the numbers of limiter calls increase substantially, compare Tab.:\ref{table:BBM2P2} and Tab.:\ref{table:BBM3P2}, and no improvement in accuracy was observed with \(h\)-refinement.
 \begin{table}[h]
 		\centering
 		\resizebox{\linewidth}{!}{%
@@ -437,7 +437,8 @@ In contrast, for all even exponents (e.g $m=2$), the number of limiter calls inc
 		\caption{Error calculation results for $l=2,~m=8$ for the Barenblatt function at $t=1\,\text{s}$ as initial data and the end time $t=1.05\,\textit{s}$}
 		\label{table:BBM8P2}
 \end{table}
-This behavior is particularly noticeable under \(h\)-refinement, whereas for \(l/p\)-refinement, an improvement in accuracy is indeed achieved. The first error calculations (Tab. \ref{table:BBM8P2} and Tab. \ref{table:BBM3P2}) in this work were performed up to the final time \(t=1.05\,\mathrm{s}\) to enable direct comparison with the results of Zhang and Shu~\cite{Zhang2009}, who also used this final time for their error analysis. However, it should be noted that their approach disregarded the entire computational domain and instead imposed Dirichlet boundary conditions, computing errors only within the arch region and excluding areas containing kinks. Specifically, they focused solely on the domain \([-1.5, 1.5]\) with Dirichlet boundaries. In contrast, the present study computed the approximate solution over the entire domain \([-6,6]\) and performed error calculations exclusively within the subdomain \([-1.5,1.5]\). This fundamental difference in the treatment of boundary conditions and domain extents leads to substantial discrepancies in the experimental order of convergence (EOC). Consequently, their assertion that ``[...] the accuracy is preserved in the smooth part of the solution [...]'' (Zhang and Shu~\cite{Zhang2009}, p.~140) cannot be reproduced when the entire domain \([-6,6]\) is considered and an even exponent \(m\) is chosen. However, for odd exponents \(m\), this statement does hold (see Tab. \ref{table:BBM3P2}). Interestingly, the accuracy appears to be limited at an order of magnitude of \(10^{-11}\), beyond which no further improvement is observed (see Appendix \ref{TBL:APFULLSECOND ERROR}). This behavior of the numerical scheme could be linked to the use of double-precision arithmetic coupled with the adaptive threshold for floating-point comparisons in this work.\\
+This behavior is particularly noticeable under \(h\)-refinement, whereas for \(l/p\)-refinement an improvement in accuracy is indeed achieved. The first error calculations (Tab. \ref{table:BBM8P2} and Tab. \ref{table:BBM3P2}) in this work were performed up to the final time \(t=1.05\,\mathrm{s}\) to enable direct comparison with the results of Zhang and Shu~\cite{Zhang2009}, who also used this final time for their error analysis. However, it should be noted that their approach disregarded the entire computational domain and instead imposed Dirichlet boundary conditions, computing errors only within the arch region and excluding areas containing kinks. Specifically, they focused solely on the domain \([-1.5, 1.5]\) with Dirichlet boundaries. In contrast, the present study computed the approximate solution over the entire domain \([-6,6]\) and performed error calculations exclusively within the subdomain \([-1.5,1.5]\). This fundamental difference in the treatment of boundary conditions and domain extents leads to substantial discrepancies in the experimental order of convergence (EOC). Consequently, their assertion that ``[...] the accuracy is preserved in the smooth part of the solution [...]'' (Zhang and Shu~\cite{Zhang2009}, p.~140) cannot be reproduced when the entire domain \([-6,6]\) is considered and an even exponent \(m\) is chosen. However, for odd exponents \(m\), this statement does hold (see Tab. \ref{table:BBM3P2}). Interestingly, the accuracy appears to be limited at an order of magnitude of \(10^{-11}\), beyond which no further improvement is observed (see Appendix \ref{TBL:APFULLSECOND ERROR}). This behavior of the numerical scheme could be linked to the use of \texttt{double}
+precision coupled with the adaptive threshold for floating-point comparisons in this work.\\
 \begin{table}[h]
 		\centering
 		\resizebox{\linewidth}{!}{%
@@ -587,7 +588,7 @@ leads to a disconnect in the positive support region and after some time to a to
 \end{figure}\\
 \clearpage
 \paragraph{Hyperbolic System}
-All numerical experiments for the hyperbolic system were conducted on the spatial domain \( [-6, 6] \) using a uniform mesh with \( N_{\text{cells}} = 320 \), unless stated otherwise. The Courant–Friedrichs–Lewy (CFL) number was set to \( \textit{CFL} = 0.9 \), and a central numerical flux was used to compute interface values at cell boundaries. The artificial parameter \( \varepsilon = 0.01 \) was selected to investigate the behavior of the porous medium equation, unless otherwise specified. Only for the experiment of varying $\varepsilon$ the polynomial degree of $l=2$ was chosen for all other tests the choice was $l=3$.\\
+All numerical experiments for the hyperbolic system were conducted on the spatial domain \( [-6, 6] \) using a uniform mesh with \( N_{\text{cells}} = 320 \), unless stated otherwise. The Courant–Friedrichs–Lewy (CFL) number was set to \( \textit{CFL} = 0.9 \), and a central numerical flux was used to compute interface values at cell boundaries. The artificial parameter \( \varepsilon = 0.01 \) was selected to investigate the behavior of the porous medium equation, unless otherwise specified. Only for the experiment of varying $\varepsilon$ the polynomial degree of $l=2$ was chosen. For all other tests the choice was $l=3$.\\
 \\
 \textit{Case 1} We consider the initial data
 \[
@@ -651,7 +652,7 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\caption{Numerical results for varying nonlinearity factors with smooth initial data and polynomial degree of $l=3$ calculated until $t=1\,\text{s}$}
 	\label{fig:HGAVariousM}
 \end{figure}\\
-\textit{Case 2 }For relative non-smooth initial data, such as the Barenblatt solution at \( t = 1\,\text{s} \), the numerical scheme is able to capture the general diffusion behavior of the solution. However, as in the smooth case, increasing the nonlinearity significantly amplifies oscillations, particularly near the free boundary. As a result, the accurate resolution of the free boundary evolution cannot be reliably achieved. Nevertheless, in regions where the solution remains smooth, the method still delivers acceptable accuracy, especially for cases with \( m \leq 3 \) as can be seen in Fig.~\ref{fig:HBBVariousM}.\\
+\textit{Case 2 }For relative non-smooth initial data, such as the Barenblatt solution at \( t = 1\,\text{s} \), the numerical scheme is able to capture the general diffusion behavior of the solution. However, as in the smooth case, increasing the nonlinearity significantly amplifies oscillations, especially near the free boundary. As a result, the accurate depiction of the free boundary evolution cannot be reliably achieved. Nevertheless, in regions where the solution remains smooth, the method still delivers acceptable accuracy, especially for cases with \( m \leq 3 \) as can be seen in Fig.~\ref{fig:HBBVariousM}.\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
@@ -692,13 +693,13 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\caption{Numerical results for varying nonlinearity factors with relative smooth initial data and polynomial degree of $l=3$ calculated until $t=2\,\text{s}$}
 	\label{fig:HBBVariousM}
 \end{figure}\\
-Noteworthy are the computation times (example $m=3,\,l=2$ computation time: HBL $ t_{HBL} = 17.00082\,\textit{s}$, LDG $t_{LDG}=2301.42\,\text{s}$) for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDG formulation. This is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
+Noteworthy are the computation times (example $m=3,\,l=2$ computation time: HBL $ t_{HBL} = 17.00082\,\textit{s}$, LDG $t_{LDG}=2301.42\,\text{s}$) for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDG formulation. This result is somewhat counter intuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
 \\
 \textit{Case 3 }Considering now the two-Box initial condition\\
 \begin{equation*}
 	u_0(x)= 
 	\begin{cases}
-		1, & \text{if } x \in (-3.7, -0.7) \cup (0.7, 3.7), \\
+		1, & \text{if } x \in (-3.7, -0.7) \cup (0.7, 3.7) \\
 		0, & \text{otherwise},
 	\end{cases}
 \end{equation*}\\
@@ -765,14 +766,15 @@ the hyperbolic system fails to produce acceptable solutions. The presence of hug
 		0, & \text{otherwise}.
 	\end{cases}
 \end{equation*}\\
-At early times \( t > 0\,\text{s} \), when the solution remains close to the initial data, the hyperbolic system successfully reproduces the waiting time phenomenon, even with a relatively small parameter value of \( \varepsilon = 0.01 \) (see Fig.~\ref{fig:HWaitingVariousM}). However, as time progresses, small oscillations begin to appear despite the strong enforcement of the modified limiters. These oscillations grow in magnitude over time but remain localized near the kinks in the solution.\\
+At early times \( t > 0\,\text{s} \), when the solution remains close to the initial data, the hyperbolic system successfully reproduces the waiting time phenomenon, even when using a relatively small parameter value of \( \varepsilon = 0.01 \) (see Fig.~\ref{fig:HWaitingVariousM}). However, as time progresses, small oscillations begin to appear despite the strong enforcement of the modified limiters. These oscillations grow in magnitude over time but remain localized near the kinks in the solution.\\
 Despite these oscillations, the numerical solution appears to capture the qualitative behavior of the porous medium equation (PME) accurately and is capable of producing sharp transitions at the free boundary. This case is particularly noteworthy due to the high nonlinearity exponent \( m = 8 \). In comparison, the hyperbolic system was unable to accurately capture the sharp free boundary for the Barenblatt initial data with the same exponent at \( t = 1\,\text{s} \) (compare Fig.~\ref{fig:hbbm8}), which supports the observation that the choice of initial data plays a crucial role in the accuracy and stability of the simulation.
 \clearpage
 \section{Conclusion}
-This research project presents a numerical investigation of the porous medium equation (PME) using two distinct spatial discretization strategies: the Local Discontinuous Galerkin (LDG) method and a hyperbolic balance law (HBL) formulation. The implementation emphasizes critical numerical properties, including preservation of positivity, suppression of spurious oscillations, and adaptive tolerance thresholds for identifying nearly equal values. These features contribute to maintaining both numerical stability and physical accuracy, particularly in degenerate regimes.
-The numerical results indicate that the LDG method, when equipped with carefully tuned limiters, provides accurate and robust solutions over a broad range of nonlinearity exponents $m$. Although certain difficulties remain for extended simulation times—especially in accurately resolving both the free boundary and smooth interior regions—the LDG approach successfully captures essential features of the PME, such as the waiting time phenomenon and the splitting of the support region.
-By comparison, the HBL formulation exhibits reduced robustness with respect to oscillatory behavior. Nonetheless, it accurately captures key qualitative behaviors of the PME, including nonlinear diffusion effects and waiting time dynamics, even for relatively large values of the relaxation parameter $\varepsilon$. However, no evidence of support splitting was observed in the corresponding test case. Additionally, the use of non-smooth initial data, such as the Barenblatt function, was found to induce significant oscillations near points where the initial profile lacks continuous differentiability. In such cases, the application of a stricter limiter proved effective in controlling these oscillations.
-A detailed analysis of convergence behavior, limiter activity, and solution structure highlights the influence of initial data selection and boundary treatment on the accuracy and stability of the HBL system. In particular, discrepancies in the observed experimental orders of convergence for the LDG method, when compared with previous studies such as those by Zhang and Shu, are primarily attributed to the full-domain computation strategy employed in this work.
+In this research project a numerical investigation of the porous medium equation (PME) using two distinct spatial discretization strategies were presented, the Local Discontinuous Galerkin (LDG) method and a hyperbolic balance law (HBL) formulation. The implementation emphasizes critical numerical properties, including preservation of positivity, suppression of spurious oscillations and adaptive tolerance thresholds for identifying nearly equal values. These features contribute to maintaining numerical stability as well as physical accuracy, particularly in degenerate regimes.
+The numerical results show that the LDG method, when equipped with carefully tuned limiters, provides accurate and robust solutions over a broad range of nonlinearity exponents $m$ and polynomial degrees $ l $. Although certain difficulties remain for extended simulation times, especially in accurately depicting both the free boundary and smooth interior regions, the LDG approach successfully captures essential features of the PME, such as the waiting time phenomenon, nonlinear diffusion and the splitting of the support region.
+By comparison, the HBL formulation exhibits reduced robustness with respect to oscillatory behavior.It still captures essential qualitative behaviors of the PME, including nonlinear diffusion effects and waiting time dynamics, even with relatively large values of the relaxation parameter $\varepsilon$. However, the divorce of the support region cannot be observed in the corresponding test case. Additionally, the use of non-smooth initial data, such as the Barenblatt function, led to significant oscillations near points where the initial profile lacks continuous differentiability. In such cases, the application of a stricter limiter proved effective in controlling these oscillations.
+A detailed analysis of convergence behavior, limiter activity, and solution structure highlights the influence of initial data selection and boundary treatment on the accuracy and stability of the HBL system. In particular, discrepancies in the observed experimental orders of convergence for the LDG method, when compared with previous studies such as those by Zhang and Wu \cite{Zhang2009}, are primarily attributed to the full-domain computation strategy employed in this work.\\
+In the future one might introduce a remeshing procedure coupled with mesh adaptivity to the LDG scheme to improve the accuracy and mass conservation. Furthermore this may alleviate the problem of occurring negative values, reducing the number of $ P\Pi_h $ limiter calls are necessary. Also an extension to 2D would be interesting. 
 %\begin{figure}[h]
 %	\centering
 %		\includegraphics[scale=0.2]{../../../Studium/Forschungsmodul/Pictures/2dBB31sec}
