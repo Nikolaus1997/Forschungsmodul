@@ -8,7 +8,7 @@
 
 class Flux {
 public:
-    enum class FunctionType { Burgers, Linear, BuckleyLeverett, Barenblatt};
+    enum class FunctionType { Burgers, Linear, BuckleyLeverett, LDG};
 
     // Constructor
     Flux() : selectedFunction(FunctionType::Burgers) {}

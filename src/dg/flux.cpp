@@ -28,7 +28,7 @@ std::array<double, 2> Flux::compute(double u, double q, double m)
 {
 
       switch (selectedFunction) {
-            case FunctionType::Barenblatt:
+            case FunctionType::LDG:
                 return barenBlattFlux(u,q, m);
             default:
                 throw std::invalid_argument("Invalid flux function type");

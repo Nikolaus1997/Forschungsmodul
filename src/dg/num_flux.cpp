@@ -58,7 +58,7 @@ double NumericalFlux::downwind(double u_l, double u_r, Flux flux_)
 double NumericalFlux::lax(double u_l, double u_r, Flux flux_, double dt, double meshWidth)
 {
     // Example implementation: average of left and right
-    double alpha = 5.*sqrt(epsilon_); // Assuming meshWidth is the spatial step size
+    double alpha = std::min(meshWidth/dt,1.); // Assuming meshWidth is the spatial step size
     return 0.5*(flux_.compute(u_l) + flux_.compute(u_r)) + 0.5 * (u_r - u_l)*alpha;
     //return 0.0;
 }

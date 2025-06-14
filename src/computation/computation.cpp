@@ -75,8 +75,8 @@ void Computation::initialize(std::string filename)
         flux_.setFluxFunction(Flux::FunctionType::BuckleyLeverett);
         std::cout<< "Choosing the buckley flux function..."<<std::endl;
     }
-    else if (settings_.fluxFunction == "barenblatt") {
-        flux_.setFluxFunction(Flux::FunctionType::Barenblatt);
+    else if (settings_.fluxFunction == "ldg") {
+        flux_.setFluxFunction(Flux::FunctionType::LDG);
         std::cout<< "Choosing the barenblatt flux function..."<<std::endl;
     } 
     else {
@@ -85,19 +85,19 @@ void Computation::initialize(std::string filename)
 
     if (settings_.transportFlux == "linear") {
         transportFlux_.setFluxFunction(Flux::FunctionType::Linear);
-        std::cout<< "Choosing the linear flux function..."<<std::endl;
+        std::cout<< "Choosing the linear flux as transportfunction..."<<std::endl;
     }
     else if (settings_.transportFlux == "burgers") {
         transportFlux_.setFluxFunction(Flux::FunctionType::Burgers);
-        std::cout<< "Choosing the burgers flux function..."<<std::endl;
+        std::cout<< "Choosing the burgers flux transportfunction..."<<std::endl;
     } 
     else if (settings_.transportFlux == "buckley") {
         transportFlux_.setFluxFunction(Flux::FunctionType::BuckleyLeverett);
-        std::cout<< "Choosing the buckley flux function..."<<std::endl;
+        std::cout<< "Choosing the buckley flux transportfunction..."<<std::endl;
     }
-    else if (settings_.transportFlux == "barenblatt") {
-        transportFlux_.setFluxFunction(Flux::FunctionType::Barenblatt);
-        std::cout<< "Choosing the barenblatt flux function..."<<std::endl;
+    else if (settings_.transportFlux == "ldg") {
+        transportFlux_.setFluxFunction(Flux::FunctionType::LDG);
+        std::cout<< "Choosing the LDG flux transportfunction..."<<std::endl;
     } 
     else {
         std::cout << "flux function not found!" << std::endl;
@@ -249,17 +249,16 @@ void Computation::runSimulation()
     initVdm();
     grid_->fillArray(grid_->u(),VdM_->VdM_,VdM_->L_);
     grid_->fillSolution(grid_->solution_,grid_->u());
-
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         initVdmJ();
         grid_->fillArray(grid_->j(),VdM_->VdMJ_,VdM_->L_);
         grid_->fillSolution(grid_->solutionJ_,grid_->j());
     }
     VdM_->LprintValues();
     VdM_->LprimePrintValues();
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt and !almostEqual(epsilon_,0.0)){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG and !almostEqual(epsilon_,0.0)){
         dt_ = settings_.CFL*1/(nCells_[0]*nCells_[0])*1/double(settings_.BarenblattM)*sqrt(epsilon_)*1./(PP_N_+1.);}
-    else if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt){
+    else if(flux_.getFluxFunction()==Flux::FunctionType::LDG){
         dt_ = settings_.CFL*1/(nCells_[0]*nCells_[0])*1/double(settings_.BarenblattM)*1./(PP_N_+1.);
     }
     else{
@@ -267,20 +266,17 @@ void Computation::runSimulation()
     }
     std::cout<<"dt: "<<dt_<<std::endl;
     double numberN = settings_.nWriteState/dt_*settings_.CFL;
-    
     if(time_<dt_){
         grid_->fillSolution(grid_->solution_,grid_->u_);
         grid_->fillSolution(grid_->derivative_,grid_->ut_);
         outputWriterParaview_ = std::make_unique<OutputWriterParaview>(grid_);
         outputWriterParaview_->writeFile(time_,settings_.OutputName);
-
     }
     double errorTime =0.0;
     int writecounter =0;
     double numberofIterations = settings_.endTime/dt_;
     calcError(errorTime);
-    // // grid_->x_.printValues();
-    // grid_->u_.printValues();
+
     if(useLimiter_){
         std::cout<<"Using Limiter"<<std::endl;
     firstLimiter(grid_->u());
@@ -293,7 +289,7 @@ void Computation::runSimulation()
     grid_->checkValues(grid_->u());
     }
     calcError(errorTime);
-    // grid_->u_.printValues();
+
     while (time_<settings_.endTime)
         {
             if(almostEqual(epsilon_,0.0)){
@@ -312,8 +308,7 @@ void Computation::runSimulation()
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
                     calcDt();
                     eulerTimeStep();
-                    // firstLimiter(grid_->u());
-                    // secondLimiter(grid_->u());
+
 
 
                 }else if(settings_.timeStepping=="RK" or settings_.timeStepping=="rungeKutta" or settings_.timeStepping=="RungeKutta"){
@@ -339,9 +334,6 @@ void Computation::runSimulation()
                 calcError(time_); 
                 printError();
             }
-
-            // calcDt();
-
             std::cout<<"\rCurrent Time: "<<time_<<" End Time: "<<settings_.endTime<< std::flush;
     }
     std::cout<<" TIME: "<<time_<<std::endl;
@@ -351,7 +343,6 @@ void Computation::runSimulation()
     printError();
     outputWriterParaview_->writeFile(time_,settings_.OutputName);
     outputWriterParaview_->writeFileTrueSolution(time_,settings_.OutputName+"TrueSolution");
-    //calcError(time_);
     timer.stop();
     std::cout << "Elapsed time: " << timer.elapsedMilliseconds()/1000 << " s." << " nStates: "<<iter<<" firstLimiterCalls "<<firstLimiterCalls_<<" secondlimiterCalls "<<secondLimiterCalls_ <<std::endl;
 }
@@ -371,7 +362,7 @@ void Computation::calcDt(){
             // if(abs(u_temp)<1E-11)
             //     continue;
             double m_ = double(settings_.BarenblattM);
-            if(flux_.selectedFunction==Flux::FunctionType::Barenblatt){
+            if(flux_.selectedFunction==Flux::FunctionType::LDG){
                 //c = m_*pow(u_temp,m_-1.0);
                 c =     m_*pow(u_temp,double(m_-1.0));
                // c1 =    j_temp;
@@ -386,7 +377,7 @@ void Computation::calcDt(){
         }
     }
     dx = meshWidth_[0];   
-    if(flux_.selectedFunction!=Flux::FunctionType::Barenblatt and !almostEqual(epsilon_,0.0))
+    if(flux_.selectedFunction!=Flux::FunctionType::LDG and !almostEqual(epsilon_,0.0))
         dt_ = settings_.CFL*dx/(max+maxj)*epsilon_*0.5*sqrt(epsilon_)*1./(PP_N_+1.);
     else
         dt_ = settings_.CFL*dx*dx*1./(PP_N_+1.)*0.5*1/(max+2*max)*dx;
@@ -476,7 +467,7 @@ void Computation::calcQ(Array2D& u)
 
 void Computation::eulerTimeStep()
 {   
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         calcUdt(grid_->u_,VdM_->VdM_t_);
         std::cout<<" U "<<std::endl;
     }else{  
@@ -575,7 +566,7 @@ void Computation::applyLimiter(Array2D& u) {
     grid_->checkValues(u); 
 }
 void Computation::applyCalcUdt(Array2D& u, Array2D& VdM_t) {
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
      calcUdt(u,VdM_t); // Compute the time derivative for u^n
     }else
     {
@@ -585,7 +576,7 @@ void Computation::applyCalcUdt(Array2D& u, Array2D& VdM_t) {
     grid_->fillArray(grid_->ut_,VdM_t,VdM_->L_);
 }
 void Computation::applyCalcUdtEps(Array2D& u,Array2D& j) {
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         
         calcUdt(u,j,VdM_->VdMJ_t_,epsilon_); // Compute the time derivative for u^n
     }else
@@ -599,7 +590,7 @@ void Computation::rungeKutta() {
     // Step 1: Compute the intermediate stage u^(1)
     applyCalcUdtEps(grid_->u_,grid_->j_); // Compute the time derivative for u^n
 
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
         //firstLimiter(grid_->jt_);
         for (int i = 0; i < grid_->j_.size()[0]; i++) {
@@ -609,8 +600,8 @@ void Computation::rungeKutta() {
             }
         }
     }
-    //if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    //if(flux_.getFluxFunction()==Flux::FunctionType::LDG)
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         calcUdt(grid_->j_1_,VdM_->VdM_t_);
     }// Compute the time derivative for u^n
     //calcUdt(grid_->j_,VdM_->VdM_t_); // Compute the time derivative for u^n
@@ -632,7 +623,7 @@ void Computation::rungeKutta() {
 
     applyLimiter(grid_->u1_);
     applyCalcUdtEps(grid_->u1_,grid_->j_1_); // Compute the time derivative for u^n
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
         //firstLimiter(grid_->jt_);
         for (int i = 0; i < grid_->j_.size()[0]; i++) {
@@ -644,8 +635,8 @@ void Computation::rungeKutta() {
             }
         }
     }
-    //if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt)
+    //if(flux_.getFluxFunction()==Flux::FunctionType::LDG)
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG)
         calcUdt(grid_->j_2_,VdM_->VdM_t_); // Compute the time derivative for u^n
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
     //firstLimiter(grid_->ut_);
@@ -668,14 +659,14 @@ void Computation::rungeKutta() {
     }
     applyLimiter(grid_->u2_);
     
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
         calcUdt(grid_->u2_,grid_->j_2_,VdM_->VdMJ_t_,epsilon_); // Compute the time derivative for u^n
     }else
     {
         calcQ(grid_->u2_);
         calcUdt(grid_->u2_,grid_->q_,grid_->u2_,VdM_->VdM_t_);
     } // Compute the time derivative for u^(2)
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG){
     // Ensure all updates to time derivatives are reflected
         grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
         //firstLimiter(grid_->jt_);
@@ -688,8 +679,8 @@ void Computation::rungeKutta() {
             }
         }   
     }
-    //if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt){
-    if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt)
+    //if(flux_.getFluxFunction()==Flux::FunctionType::LDG){
+    if(flux_.getFluxFunction()!=Flux::FunctionType::LDG)
         calcUdt(grid_->j_,VdM_->VdM_t_); // Compute the time derivative for u^n
     //}
     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
@@ -1268,9 +1259,15 @@ void Computation::calcUdt(Array2D& u_, Array2D& VdM_t){
             for (int j = 0; j <=PP_N_; j++) {
                 
             flux_term = -gFlux_.computeNumFlux(ur_iminus,ul_i,flux_,dt_,meshWidth_[0])*VdM_->L_(0,j)  + gFlux_.computeNumFlux(ur_i,ul_iplus,flux_,dt_,meshWidth_[0]);
-            
-            double integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return flux_.compute(x);}
+            double integ = 0.0;
+            if(useSource_){
+                integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return flux_.compute(x);}
+                                                                ,i,j ,grid_->faces(i),grid_->faces(i+1),u_,grid_->u_);
+            }else{
+                    integ =quad_->IntFluxGaussLegendreQuad([&](double x) {return flux_.compute(x);}
                                                                 ,i,j ,grid_->faces(i),grid_->faces(i+1),u_);
+            }
+            //std::cout<<" FROM CALC UUUU "<<" i "<<i<<std::en
             // if(abs(flux_term)<1E-8)
             //     flux_term = 0.0;
             // if(abs(integ)<1E-8)
