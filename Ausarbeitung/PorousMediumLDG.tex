@@ -30,8 +30,9 @@
 \begin{document}
 	\maketitle
 \begin{abstract}
-The porous medium equation (PME) is a nonlinear parabolic partial differential equation that models processes including fluid flow, heat transfer, and diffusion in porous materials. This research project employs the Local Discontinuous Galerkin Finite Element (LDGFE) method to numerically solve the PME. The method is evaluated under various configurations, including different polynomial orders of basis functions, to assess their impact on solution behavior. In addition, a Hyperbolic Balance Law (HBL) system, known to degenerate into the PME under appropriate parameter regimes, is investigated. For both numerical approaches, extensive simulations are conducted to explore their respective strengths and limitations. The results demonstrate that the HBL formulation qualitatively captures the essential features of nonlinear diffusion and is capable of handling certain non-smooth initial data in regimes with relatively small nonlinearity.
-\end{abstract}	
+	The porous medium equation (PME) is a nonlinear parabolic partial differential equation that models processes including fluid flow, heat transfer, and diffusion in porous materials. This research project employs the Local Discontinuous Galerkin Finite Element (LDGFE) method to numerically solve the PME. The method is evaluated under various configurations, including different polynomial orders of basis functions, to assess their impact on solution behavior. As expected, the LDGFE method performs very well, providing accurate and stable results across all tested scenarios. In addition, a Hyperbolic Balance Law (HBL) system, known to degenerate into the PME under appropriate parameter regimes, is investigated. For both numerical approaches, extensive simulations are conducted to explore their respective strengths and limitations. The results demonstrate that the HBL formulation qualitatively captures the essential features of nonlinear diffusion and is capable of handling certain non-smooth initial data in regimes with relatively small nonlinearity.
+\end{abstract}
+
 \section{Introduction}
 The \text{porous medium equation (PME)} is a nonlinear diffusion equation that models various physical and biological phenomena, such as isentropic gas flow through porous media, nonlinear heat conduction. The unknown function \( u(x,t) \) typically represents a nonnegative quantity such as concentration, density, or temperature.\\
 The general form of the PME is
@@ -599,14 +600,32 @@ u_0(x) = \frac{\pi}{\sqrt{2}} \exp\left(-\frac{x^2}{2}\right),
 which is smooth and compactly supported on the computational domain. The goal of this experiment is to examine whether the solution of the hyperbolic system converges to that of the porous medium equation as \( \varepsilon \to 0 \).
 Fig.~\ref{fig:gam8pp2central1s} illustrates the behavior of the solution for \( m = 1 \) under varying values of \( \varepsilon \). As \( \varepsilon \) decreases, the numerical solution converges toward the expected result. Remarkably, even for a relatively high \( \varepsilon = 0.01 \), the approximation exhibits good accuracy, and further reductions in \( \varepsilon \) produce only marginal improvements. A comparison to the LDGFE formulation is also provided in Fig.~\ref{fig:gam8pp2central1s} that clearly shows that the choice of $\varepsilon=0.01$ is reasonable, since we know that the LDGFE formulation is relatively exact for $m=1$.\\
 For \( m = 1 \), the diffusion corresponds to the classical heat equation, which yields smooth solutions for all \( t > 0 \). As a result, no limiters were applied in this case. However, increasing \( m \) introduces nonlinear diffusion effects, which lead to the formation of steep gradients in the solution after a certain time \( t > 0 \). To address this, the two previously introduced limiters were employed. Specifically, if the first limiter (minmod) flags a troubled cell, the two neighboring cells are also limited by projecting their solutions to first-order polynomials. This conservative strategy enhances stability and helps reduce oscillations.
-Despite this aggressive limiting, substantial oscillations still occur for larger nonlinearities such as \( m = 6, 7, 8 \). In contrast, for smaller values of \( m \), the solution remains mostly free of spurious oscillations when starting from smooth initial data (compare Fig.~\ref{fig:HGAVariousM}).\\
+Despite this aggressive limiting, substantial oscillations still occur for larger nonlinearities such as \( m = 6, 7, 8 \). In contrast, for smaller values of \( m \), the solution remains mostly free of spurious oscillations when starting from smooth initial data (compare Fig.~\ref{fig:HGAVariousM}). The Tab. \ref{table:HBLBBM3P2} for $m = 3$ demonstrates a modest improvement under $h$-refinement, though the accuracy achieved is still considerably lower than that of the LDGFE scheme.\\
+\begin{table}[h]
+	\centering
+	\begin{tabular}{cccccccc}
+		\hline
+		$N$ & $L^2$ Error & EOC$_{L^2}$ & $L^\infty$ Error & EOC$_{L^\infty}$ & \#1st Lim. & \#2nd Lim.& \#steps\\
+		\hline
+		10 & 9.72e-03 & - & 3.85e-02 & - & 1511 & 0 & 348\\
+		20 & 1.42e-02 & -0.55 & 4.64e-02 & -0.27 & 3779 & 7870 & 744\\
+		40 & 9.75e-03 & 0.55 & 2.89e-02 & 0.68 & 4467 & 15070 & 1217\\
+		80 & 2.18e-03 & 2.16 & 7.10e-03 & 2.02 & 16963 & 32538 & 2244\\
+		160 & 1.41e-03 & 0.63 & 3.49e-03 & 1.02 & 77863 & 74295 & 4426\\
+		320 & 1.38e-03 & 0.03 & 2.91e-03 & 0.26 & 150517 & 137316 & 8848\\
+		\hline
+	\end{tabular}
+	\caption{Error table for $l=2, m=3$ calculated with the HBL system for the Barenblatt initial data at $t=1s$ calculated until $t=1.05s$}
+	\label{table:HBLBBM3P2}
+\end{table}\\
+\newpage
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=.9\linewidth]{../../../Studium/Forschungsmodul/Pictures/GaM8PP2Central1s}
 	\includegraphics[width=.9\linewidth]{../../../Studium/Forschungsmodul/Pictures/ComparisonLDGHBLS}
 	\caption{Results for the hyperbolic system with varying $\varepsilon$ and a comparison to the LDGFE method for the exponent $m = 1$}
 	\label{fig:gam8pp2central1s}
-\end{figure}\\
+\end{figure}
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
@@ -652,8 +671,8 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\end{subfigure}
 	\caption{Numerical results for varying nonlinearity factors with smooth initial data and polynomial degree of $l=3$ calculated until $t=1s$}
 	\label{fig:HGAVariousM}
-\end{figure}\\
-\textit{Case 2 }For relative smooth initial data, such as the Barenblatt solution at \( t = 1s \), the numerical scheme is able to capture the general diffusion behavior of the solution. However, as in the smooth case, increasing the nonlinearity significantly amplifies oscillations, especially near the free boundary. As a result, the accurate depiction of the free boundary evolution cannot be reliably achieved. Nevertheless, in regions where the solution remains smooth, the method still delivers acceptable accuracy, especially for cases with \( m \leq 3 \) as can be seen in Fig.~\ref{fig:HBBVariousM}.\\
+\end{figure}
+\hspace{-.65cm}\textit{Case 2 }For relative smooth initial data, such as the Barenblatt solution at \( t = 1s \), the numerical scheme is able to capture the general diffusion behavior of the solution. However, as in the smooth case, increasing the nonlinearity significantly amplifies oscillations, especially near the free boundary. As a result, the accurate depiction of the free boundary evolution cannot be reliably achieved. Nevertheless, in regions where the solution remains smooth, the method still delivers acceptable accuracy, especially for cases with \( m \leq 3 \) as can be seen in Fig.~\ref{fig:HBBVariousM}.\\
 \begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{0.45\linewidth}
@@ -694,8 +713,7 @@ Despite this aggressive limiting, substantial oscillations still occur for large
 	\caption{Numerical results for varying nonlinearity factors with relative smooth initial data and polynomial degree of $l=3$ calculated until $t=2s$}
 	\label{fig:HBBVariousM}
 \end{figure}\\
-Noteworthy are the computation times (consider Tab. \ref{table:Compute}) for this relatively fine grid with \( N_{\text{cells}} = 320 \) which are significantly lower than those observed when using the LDGFE formulation. This result is somewhat counter intuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. This performance advantage was observed consistently for \( \varepsilon = 0.01 \) under single-core computations. Implying a use-case for which the nonlinearity is not as great the hyperbolic system can be of advantage for smooth initial data.\\
-\\
+Noteworthy are the computation times (see Tab.~\ref{table:Compute}) for the relatively fine grid with \( N_{\text{cells}} = 320 \), which are significantly lower than those observed for the LDGFE formulation. This result is somewhat counterintuitive, given the introduction of the artificial parameter \( \varepsilon \) and its expected impact on time step restrictions. Nevertheless, this performance advantage was consistently observed for \( \varepsilon = 0.01 \) under single-core computations. This suggests that, in scenarios where the nonlinearity is relatively mild and the initial data is smooth, the hyperbolic system may offer a computationally advantageous alternative.\\
 \textit{Case 3 }Considering now the two-Box initial condition\\
 \begin{equation*}
 	u_0(x)= 
@@ -844,11 +862,14 @@ Despite these oscillations, the numerical solution appears to capture the qualit
 \end{table}
 \clearpage
 \section{Conclusion}
-In this research project a numerical investigation of the porous medium equation (PME) using two distinct theoretical approaches were presented, the Local Discontinuous Galerkin (LDGFE) method and a Hyperbolic Balance Law (HBL) formulation. The implementation emphasizes critical numerical properties, including preservation of positivity, suppression of spurious oscillations and adaptive tolerance thresholds for identifying nearly equal values. These features contribute to maintaining numerical stability as well as physical accuracy, particularly in degenerate regimes.
-The numerical results show that the LDGFE method, when equipped with carefully tuned limiters, provides accurate and robust solutions over a broad range of nonlinearity exponents $m$ and polynomial degrees $ l $. Although certain difficulties remain for extended simulation times, especially in accurately depicting both the free boundary and smooth interior regions, the LDGFE approach successfully captures essential features of the PME, such as the waiting time phenomenon (compare Fig. 7 in \cite{Zhang2009}), nonlinear diffusion and the splitting of the support region.
-By comparison, the HBL formulation exhibits reduced robustness with respect to oscillatory behavior. It still captures essential qualitative behaviors of the PME, including nonlinear diffusion effects and waiting time dynamics, even with relatively large values of the relaxation parameter $\varepsilon$. The divorce in support region can also be observed in the corresponding test case. Additionally, the use of non-smooth initial data, such as the Barenblatt function, led to significant oscillations, which were effectively controlled through the application of a modified limiter.
-A detailed analysis of convergence behavior, limiter activity, and solution structure highlights the influence of initial data selection and boundary treatment on the accuracy and stability of the HBL system. In particular, discrepancies in the observed experimental orders of convergence for the LDGFE method, when compared with previous studies such as those by Zhang and Wu \cite{Zhang2009}, are primarily attributed to the full-domain computation strategy employed in this work. Finally, the comparison of compute times between the LDGFE scheme and the HBL system indicates that the latter is significantly faster, with speedups of up to a factor of $\approx 10 $.
-In the future one might introduce a remeshing procedure coupled with mesh adaptivity to the LDGFE scheme to improve the accuracy and mass conservation. Furthermore this may alleviate the problem of occurring negative values, reducing the number of $ P\Pi_h $ limiter calls are necessary. Also an extension to 2D would be interesting. 
+
+In this research project, a numerical investigation of the Porous Medium Equation (PME) was conducted using two distinct theoretical approaches: the Local Discontinuous Galerkin Finite Element (LDGFE) method and a Hyperbolic Balance Law (HBL) formulation. The implementation emphasizes key numerical properties, including the preservation of positivity, suppression of spurious oscillations, and adaptive tolerance thresholds for detecting nearly equal values. These features collectively contribute to ensuring numerical stability and maintaining physical accuracy, particularly in degenerate regimes.
+The numerical results demonstrate that the LDGFE method, when equipped with carefully calibrated limiters, yields accurate and robust solutions over a broad range of nonlinearity exponents $m$ and polynomial degrees $l$. Although challenges persist for extended simulation times, especially in accurately resolving both the free boundary and smooth interior regions, the LDGFE approach successfully captures the essential features of the PME, such as the waiting time phenomenon (see Fig.~7 in \cite{Zhang2009}), nonlinear diffusion, and the splitting of the support region.
+In contrast, the HBL formulation exhibits reduced robustness, particularly in terms of controlling oscillatory behavior. Nonetheless, it successfully captures the qualitative dynamics of the PME, including nonlinear diffusion and waiting time effects, even for relatively large values of the relaxation parameter $\varepsilon$. The splitting of the support region is also observed in the corresponding test case. The use of non-smooth initial data, such as the Barenblatt function, induces significant oscillations, which are effectively mitigated through the application of a modified limiter.
+A detailed analysis of convergence behavior, limiter activity, and solution structure was conducted for the LDGFE method, and partially for the HBL system. Notably, discrepancies in the observed experimental orders of convergence for the LDGFE method, when compared with previous studies such as Zhang and Wu \cite{Zhang2009}, are primarily attributed to the full-domain computation strategy employed in this work.
+A comparison of computational performance reveals that the HBL formulation is significantly faster, offering speedups of up to a factor of approximately 10 compared to the LDGFE scheme.\\
+\noindent \textbf{Future Work:} Future improvements could include the integration of remeshing procedures coupled with mesh adaptivity for both the LDGFE and HBL schemes. This would enhance accuracy and improve mass conservation. Moreover, such techniques may alleviate the occurrence of negative values, thereby reducing the frequency of $P\Pi_h$ limiter invocations. Finally, extending the framework to two spatial dimensions represents an interesting and worthwhile direction for further research.
+
 
 
 %\begin{figure}[h]
@@ -864,6 +885,7 @@ In the future one might introduce a remeshing procedure coupled with mesh adapti
 	\bibliography{/home/nikolaus/Studium/Forschungsmodul/Ausarbeitung/references.bib}
 	\clearpage
 \section{Appendix}
+Here all the additional numerical results are displayed:
 \begin{table}[h]
 	\centering
 	\begin{tabular}{cccccccc}
@@ -878,7 +900,7 @@ In the future one might introduce a remeshing procedure coupled with mesh adapti
 		320 & 6.91e-09 & 3.00 & 4.62e-08 & 3.06 & 46884787 & 25016201 & 4197468\\
 		\hline
 	\end{tabular}
-	\caption{Convergence results for P=2, M=5}
+	\caption{Convergence results for $l=2$, $m=5$ for the LDGFE scheme until the end time of $t=1.05s$ with the Barenblatt solution as the initial data at $t=1.0s$}
 	\label{table:BBM5P2e-2}
 \end{table}
 \begin{table}[h]
@@ -895,7 +917,7 @@ In the future one might introduce a remeshing procedure coupled with mesh adapti
 		320 & 3.09e-09 & 3.00 & 2.01e-08 & 3.04 & 54443892 & 31538492 & 5864492\\
 		\hline
 	\end{tabular}
-	\caption{Convergence results for P=2, M=7}
+	\caption{Convergence results for $l=2$, $m=7$ for the LDGFE scheme until the end time of $t=1.05s$ with the Barenblatt solution as the initial data at $t=1.0s$}
 	\label{table:BBM7P25e-2}
 \end{table}
 \begin{table}[h]
