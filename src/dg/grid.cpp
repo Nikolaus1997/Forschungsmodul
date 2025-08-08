@@ -1,8 +1,9 @@
 #include <dg/grid.h>
 #include "grid.h"
 
-Grid::Grid(std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes):
-nCells_(nCells), meshWidth_(meshWidth), u_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
+Grid::Grid(std::array<double, 2>  physicalSize,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes):
+physicalSize_(physicalSize), nCells_(nCells), meshWidth_(meshWidth), 
+                                        u_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
                                         j_      ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
                                         jt_     ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
                                         j_1_    ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
@@ -30,7 +31,8 @@ nCells_(nCells), meshWidth_(meshWidth), u_      ({numberNodes,numberNodes,int(nC
                                         u_analyze_true_    ({300,1}),
                                         faces_  ({int(nCells_[0]+1),2}),
                                         l2_error_({1}),
-                                        linf_error_({1})
+                                        linf_error_({1}),
+                                        nodal_solution_complete_({numberNodes+2,numberNodes+2,int(nCells_[0]*nCells_[1])})
 {
 }
 const std::array<double,2> Grid::meshWidth() const
@@ -215,6 +217,79 @@ void Grid::fillFaces(Array3D& f, const Array3D& VdM, const Array2D& L)
 
 }
 
+void Grid::prepareNodalDataForVisualization(const Array3D& VdM_, const std::unique_ptr<Quadrature>& quad)
+{
+    // --- LOGIC CORRECTION ---
+    // The number of interior nodes is u_.size()[0], which is N-1.
+    // The polynomial degree N is therefore u_.size()[0] + 1.
+    const int polyDegree = u_.size()[0] +1;
+    const int nodesPerDim = polyDegree + 1;
+    const int nCellsX = nCells_[0];
+    const int nCellsY = nCells_[1];
+
+
+
+    // Loop over each master cell to assemble its complete nodal data
+    for (int j_cell = 0; j_cell < nCellsY; ++j_cell)
+    {
+        for (int i_cell = 0; i_cell < nCellsX; ++i_cell)
+        {
+            int cell_idx = this->elemId(i_cell, j_cell);
+
+            // Loop over all (N+1)x(N+1) nodes of the target visualization grid
+            for (int j_node = 0; j_node < nodesPerDim; ++j_node)
+            {
+                for (int i_node = 0; i_node < nodesPerDim; ++i_node)
+                {
+                    double value = 0.0;
+                    
+                    // The boundary checks must use `polyDegree`, not `polyDegree-1`.
+                    bool is_interior_row = (j_node > 0 && j_node < polyDegree);
+                    bool is_interior_col = (i_node > 0 && i_node < polyDegree);
+
+                    if (is_interior_row && is_interior_col)
+                    {
+                        // Case 1: Interior Node. This logic is correct.
+                        value = u_(i_node - 1, j_node - 1, cell_idx);
+                    }
+                    else if (is_interior_row && i_node == 0) // Left Face
+                    {
+                        // Case 2: Left Face. This logic is correct.
+                        value = faceId(j_node - 1, 0, cell_idx);
+                    }
+                    else if (is_interior_row && i_node == polyDegree) // Right Face
+                    {
+                        // Case 3: Right Face. This logic is correct.
+                        value = faceId(j_node - 1, 2, cell_idx);
+                    }
+                    else if (is_interior_col && j_node == 0) // Bottom Face
+                    {
+                        // Case 4: Bottom Face. This logic is correct.
+                        value = faceId(i_node - 1, 1, cell_idx);
+                    }
+                    else if (is_interior_col && j_node == polyDegree) // Top Face
+                    {
+                        // Case 5: Top Face. This logic is correct.
+                        value = faceId(i_node - 1, 3, cell_idx);
+                    }
+                    else
+                    {
+                        // --- LOGIC CORRECTION ---
+                        // Case 6: Corner Node. The original loops were incorrect.
+                        // We MUST call the (now corrected) evaluatePolynomial function
+                        // to get the true value at the corner.
+                        double xi  = quad->basis_.nodes(i_node);
+                        double eta = quad->basis_.nodes(j_node);
+
+                        value = this->evaluatePolynomial(i_cell, j_cell, xi, eta, VdM_, quad);
+                    }
+                    nodal_solution_complete_(i_node, j_node, cell_idx) = value;
+                }
+            }
+        }
+    }
+}
+
 void Grid::fillSolution(Array2D& x,const Array3D& u)
 {
     // std::cout<<" FILL SOLUTION "<<std::endl;
@@ -230,6 +305,35 @@ void Grid::fillSolution(Array2D& x,const Array3D& u)
         }
     }   
 
+}
+
+Array3D Grid::getNodalSolutionComplete()
+{
+    return nodal_solution_complete_;
+}
+
+double Grid::evaluatePolynomial(int cell_i, int cell_j, double xi, double eta, const Array3D VdM_, const std::unique_ptr<Quadrature>& quad) const
+{
+    // This function requires access to the modal coefficients (VdM).
+    // Let's assume they are stored in a member variable `VdM_`.
+    // If they are not, this function will need access to them.
+    // Placeholder for your modal coefficient array
+
+    const int polyDegree = u_.size()[0]+1; // Assuming u_ is a square grid of size (N+1)x(N+1)
+    const int nBasisFunctions = polyDegree + 1;
+    double solutionValue = 0.0;
+
+    // This loop must match your basis expansion
+    for (int l_j = 0; l_j < nBasisFunctions; ++l_j) {
+
+            double basis_val_x = quad->LegendrePolynomialAndDerivative(l_j, xi)[0];
+            double basis_val_y = quad->LegendrePolynomialAndDerivative(l_j, eta)[0];
+            
+            // Note: VdM dimensions might be different, e.g., VdM(cell_idx, l)
+            solutionValue += VdM_(cell_i, cell_j, l_j) * basis_val_x * basis_val_y;
+        
+    }
+    return solutionValue;
 }
 
 void Grid::fillDerivative(Array2D& x,const std::shared_ptr<Vandermonde> VdM)

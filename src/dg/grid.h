@@ -13,7 +13,7 @@
 class Grid
 {
 public:
-    Grid(std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes);
+    Grid(std::array<double, 2>  physicalSize,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes);
 
     //get the mesh width, i.e. the length of a single cell in x and y direction 
     const std::array<double, 2> meshWidth() const;
@@ -80,13 +80,19 @@ public:
 
     void fillArray(Array3D& x, const Array3D& VdM, const Array2D& L);
     void fillFaces(Array3D &f, const Array3D &VdM, const Array2D &L);
+    void prepareNodalDataForVisualization(const Array3D& VdM_,const std::unique_ptr<Quadrature> &quad);
     void fillDerivative(Array2D &x, std::shared_ptr<Vandermonde> VdM);
-    void fillSolution(Array2D& x,const Array3D& u);
+    void fillSolution(Array2D &x, const Array3D &u);
+    Array3D getNodalSolutionComplete();
 
+    double evaluatePolynomial(int cell_i, int cell_j, double xi, double eta, const Array3D VdM_, const std::unique_ptr<Quadrature> &quad) const;
+
+    
 
 protected:
     const std::array<int, 2>        nCells_;
     const std::array<double, 2>     meshWidth_;
+    const std::array<double, 2>     physicalSize_;
     Array2D solution_,solutionJ_;
     Array2D  derivative_;
     Array3D u_,u_analyze_, u_analyze_true_;
@@ -96,6 +102,7 @@ protected:
     Array3D u2_;
     Array3D u1_;
     Array3D ut_;
+    Array3D nodal_solution_complete_;
     Array2D elemId;
     Array3D x_, x_analyze_,y_;
     Array2D faces_, faceFlux_, faceFluxQ_;
@@ -103,5 +110,4 @@ protected:
     Array1D linf_error_;
     friend class Computation;
     friend class OutputWriterParaview;
-
 };

@@ -21,7 +21,7 @@ void Computation::initialize(std::string filename)
 
     PP_N_= settings_.PP_N;
 
-    nNodes = PP_N_;
+    nNodes = PP_N_-1;
 
     nCells_= settings_.nCells;
     dt_ = settings_.CFL*1/(nCells_[0]);
@@ -43,7 +43,7 @@ void Computation::initialize(std::string filename)
     //basis_ = std::make_unique<Basis>(PP_N_);
 
 
-    grid_ = std::make_shared<Grid>(nCells_,meshWidth_, nNodes);
+    grid_ = std::make_shared<Grid>(settings_.physicalSize,nCells_,meshWidth_, nNodes);
 
     if (settings_.PP_N==0)
     {
@@ -164,14 +164,14 @@ void Computation::runSimulation()
     int iter = 0;
     fillFaces();
     std::cout<< "Faces: "<<std::endl;
-   //grid_->faces_.printValues();
-   //grid_->elemId.printValues();
+    grid_->faces_.printValues();
+   grid_->elemId.printValues();
 
    fillX();
    std::cout<< "X: "<<std::endl;
-   // grid_->x_.print();
-   // std::cout<< "Y : "<<std::endl;  
-//    grid_->y_.print();
+    grid_->x_.print();
+   std::cout<< "Y : "<<std::endl;  
+   grid_->y_.print();
    initVdm();
    //VdM_->printValues();
    VdM_->LprintValues();
@@ -266,8 +266,11 @@ void Computation::runSimulation()
                 grid_->fillSolution(grid_->solution_,grid_->u_);
                 grid_->fillSolution(grid_->derivative_,grid_->ut_);
                 //grid_->fillSolution(grid_->solutionJ_,grid_->j_);
-                outputWriterParaview_->writeFile(time_,settings_.OutputName);
-                outputWriterParaview_->writeFileTrueSolution(time_,settings_.OutputName+"TrueSolution");
+
+                //grid_->prepareNodalDataForVisualization(VdM_->VdM_,quad_);
+
+                //outputWriterParaview_->writeHighOrderFile(time_,settings_.OutputName, VdM_, quad_);
+                outputWriterParaview_->writeFile(time_,settings_.OutputName+"AverageSolution");
                 std::cout<<"Write State TIME: "<<time_<<std::endl;
                 //calcError(time_); 
             }
@@ -472,330 +475,6 @@ void Computation::rungeKutta(){
         }
     }
 }
-// void Computation::rungeKutta() {
-//     // Step 1: Compute the intermediate stage u^(1)
-//     if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
-//         calcUdt(grid_->u_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     }else
-//     {
-//         calcQ(grid_->u_);
-//         calcUdt(grid_->u_,grid_->q_,VdM_->VdMJ_t_,epsilon_);
-//     }
-//     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
-//     //firstLimiter(grid_->jt_);
-//     for (int i = 0; i < grid_->j_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->j_.size()[1]; j++) {
-//             // u^(1) = u^n + Δt * L_h(u^n)
-//             grid_->j_1_(i, j)  = grid_->j_(i,j)+ dt_ * grid_->jt_(i, j);
-//         }
-//     }
-//     for(int i = 0; i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0; j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdMJ1_(i,j) = VdM_->VdMJ_(i,j)+ dt_ * VdM_->VdMJ_t_(i,j);
-//         }
-//     }
-
-//     if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
-//         calcUdt(grid_->j_1_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
-//     //firstLimiter(grid_->ut_);
-//     for (int i = 0; i < grid_->j_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->j_.size()[1]; j++) {
-//             // u^(1) = u^n + Δt * L_h(u^n)
-//             grid_->u1_(i, j)  = grid_->u_(i,j)+ dt_ * grid_->ut_(i, j);
-//         }
-//     }
-//     for(int i = 0; i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0; j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdM1_(i,j) = VdM_->VdM_(i,j)+ dt_ * VdM_->VdM_t_(i,j);
-//         }
-//     }
-
-//     if(useLimiter_){
-//     //    std::cout<<" U1 "<<std::endl;
-//     //    grid_->u1_.printValues();
-//     //secondLimiter(grid_->j_1_);
-//     firstLimiter(grid_->u1_);
-//     firstLimiter(grid_->j_1_);
-//     //    std::cout<<" AFTER first LIMITER U1 "<<std::endl;
-//     //    grid_->u1_.printValues();
-//     secondLimiter(grid_->u1_);
-//     }
-//     //    std::cout<<" AFTER LIMITER U1 "<<std::endl;
-//     //    grid_->u1_.printValues();
-//     // Step 2: Compute the intermediate stage u^(2)
-//     if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
-//         calcUdt(grid_->u1_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     }else
-//     {
-//         calcQ(grid_->u1_);
-//         calcUdt(grid_->u1_,grid_->q_,VdM_->VdMJ_t_,epsilon_);
-//     }// Compute the time derivative for u^(1)
-
-//     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
-//     //firstLimiter(grid_->jt_);
-//     for (int i = 0; i < grid_->j_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->j_.size()[1]; j++) {
-//             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
-//             grid_->j_2_(i, j) = (3.0 / 4.0) * grid_->j_(i, j) +
-//                                 (1.0 / 4.0) * grid_->j_1_(i, j) +
-//                                 (1.0 / 4.0) * dt_ * grid_->jt_(i, j);
-//         }
-//     }
-//     for(int i = 0;i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdMJ2_(i,j) = (3.0 / 4.0) * VdM_->VdMJ_(i,j) +
-//                                 (1.0 / 4.0) * VdM_->VdMJ1_(i,j) +
-//                                 (1.0 / 4.0) * dt_ * VdM_->VdMJ_t_(i,j);
-//         }
-//     }
-//     if(flux_.getFluxFunction()==Flux::FunctionType::Barenblatt)
-//         calcUdt(grid_->j_2_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
-//     //firstLimiter(grid_->ut_);
-//     for (int i = 0; i < grid_->j_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->j_.size()[1]; j++) {
-//             // u^(2) = 3/4 * u^n + 1/4 * u^(1) + (1/4 * Δt) * L_h(u^(1))
-//             grid_->u2_(i, j) = (3.0 / 4.0) * grid_->u_(i, j) +
-//                                 (1.0 / 4.0) * grid_->u1_(i, j) +
-//                                 (1.0 / 4.0) * dt_ * grid_->ut_(i, j);
-//         }
-//     }
-//     for(int i = 0;i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdM2_(i,j) = (3.0 / 4.0) * VdM_->VdM_(i,j) +
-//                                 (1.0 / 4.0) * VdM_->VdM1_(i,j) +
-//                                 (1.0 / 4.0) * dt_ * VdM_->VdM_t_(i,j);
-//         }
-//     } 
-//     if(useLimiter_){
-//     //  std::cout<<" U2 "<<std::endl;
-//     //  grid_->u2_.printValues();
-//     //secondLimiter(grid_->u2_); 
-//     firstLimiter(grid_->u2_);
-//     firstLimiter(grid_->j_2_);
-//     secondLimiter(grid_->u2_); 
-//     }
-//     //  std::cout<<" AFTER LIMITER U2 "<<std::endl;
-//     //  grid_->u2_.printValues();
-//     // Step 2: Compute the intermediate stage u^(2)
-//     if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
-//         calcUdt(grid_->u2_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     }else
-//     {
-//         calcQ(grid_->u2_);
-//         calcUdt(grid_->u2_,grid_->q_,VdM_->VdMJ_t_);
-//     } // Compute the time derivative for u^(2)
-//     // Ensure all updates to time derivatives are reflected
-//     grid_->fillArray(grid_->jt_,VdM_->VdMJ_t_,VdM_->L_);
-//     //firstLimiter(grid_->jt_);
-//     for (int i = 0; i < grid_->u_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->u_.size()[1]; j++) {
-//             // u^(n+1) = 1/3 * u^n + 2/3 * u^(2) + (2/3 * Δt) * L_h(u^(2))
-//             grid_->j_(i, j) = (1.0 / 3.0) *  grid_->j_(i, j) +
-//                                (2.0 / 3.0) *  grid_->j_2_(i, j) +
-//                                (2.0 / 3.0) * dt_ *  grid_->jt_(i, j);
-//         }
-//     }
-//     for(int i = 0;i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdMJ_(i,j) = (1.0 / 3.0) *  VdM_->VdMJ_(i,j) +
-//                                (2.0 / 3.0) *  VdM_->VdMJ2_(i,j) +
-//                                (2.0 / 3.0) * dt_ *  VdM_->VdMJ_t_(i,j);
-//         }
-//     }
-
-//     if(flux_.getFluxFunction()!=Flux::FunctionType::Barenblatt){
-//         calcUdt(grid_->j_,VdM_->VdM_t_); // Compute the time derivative for u^n
-//     }
-//     grid_->fillArray(grid_->ut_,VdM_->VdM_t_,VdM_->L_);
-//     //firstLimiter(grid_->ut_);
-//     for (int i = 0; i < grid_->u_.size()[0]; i++) {
-//         for (int j = 0; j <grid_->u_.size()[1]; j++) {
-//             // u^(n+1) = 1/3 * u^n + 2/3 * u^(2) + (2/3 * Δt) * L_h(u^(2))
-//             grid_->u_(i, j) = (1.0 / 3.0) *  grid_->u_(i, j) +
-//                                (2.0 / 3.0) *  grid_->u2_(i, j) +
-//                                (2.0 / 3.0) * dt_ *  grid_->ut_(i, j);
-//         }
-//     }
-//     for(int i = 0;i<VdM_->VdM_.size()[0];i++){
-//         for(int j = 0;j<VdM_->VdM_.size()[1];j++){
-//             VdM_->VdM_(i,j) = (1.0 / 3.0) *  VdM_->VdM_(i,j) +
-//                                (2.0 / 3.0) *  VdM_->VdM2_(i,j) +
-//                                (2.0 / 3.0) * dt_ *  VdM_->VdM_t_(i,j);
-//         }
-//     }
-
-//     if(useLimiter_){
-//     //   std::cout<<" U "<<std::endl;
-//     //   grid_->u_.printValues();
-//     //secondLimiter(grid_->j_);
-//     firstLimiter(grid_->u_);
-//     firstLimiter(grid_->j_);
-//     secondLimiter(grid_->u_);
-//     //   std::cout<<" AFTER LIMITER U "<<std::endl;
-//     //   grid_->u_.printValues();   
-//     } 
-// }
-
-
-
-// void Computation::firstLimiter(Array2D &u)
-// {
-//     for(int i=0;i<grid_->u_.size()[0];i++){
-//         double limit_l=0.0, limit_r=0.0;
-//         double u_r =0.0, u_l =0.0,u_mean = 0.0,u_mean_plus = 0.0,u_mean_minus = 0.0;
-//         bool check = false;
-//         u_r = u(i,nNodes+1);
-//         u_l = u(i,0);
-//         if(i==0){
-//             for(int k = 0; k<u.size()[1];k++){
-//                 u_mean += u(i,k);
-//                 u_mean_plus += u(i+1,k);
-//                 u_mean_minus += u(nCells_[0]-1,k);
-//             }
-//         }else if(i==nCells_[0]-1){
-//             for(int k = 0; k<u.size()[1];k++){
-//                 u_mean += u(i,k);
-//                 u_mean_plus += u(0,k);
-//                 u_mean_minus += u(i-1,k);
-//             }
-//             }else{
-//             for(int k = 0; k<u.size()[1];k++){
-//                 u_mean += u(i,k);
-//                 u_mean_plus += u(i+1,k);
-//                 u_mean_minus += u(i-1,k);
-//             }
-//                     }
-//         u_mean = u_mean/(u.size()[1]);
-//         u_mean_plus = u_mean_plus/(u.size()[1]); 
-//         u_mean_minus = u_mean_minus/(u.size()[1]);
-              
-//         double a = u_r -u_mean;
-//         double b = u_mean - u_mean_minus;
-//         double c = u_mean_plus - u_mean;    
-//         limit_r = u_mean+limiter_.computeLimiter(a,b,c,meshWidth_[0]);
-//         double a_ = u_mean - u_l;
-//         double b_ = u_mean - u_mean_minus;
-//         double c_ = u_mean_plus - u_mean;
-//         limit_l = u_mean-limiter_.computeLimiter(a_,b_,c_,meshWidth_[0]);
-        
-//         if(std::abs(limit_r-u_r)>1E-10){
-//             // for(int k = 1; k<u.size()[1]-1;k++){
-//             //     u(i,k) = u_mean;
-//             // }
-//             proj_.makeProjection(u,grid_->x_,i,2);
-//             check = true;
-//         }else
-//         if(std::abs(limit_l-u_l)>1E-10){
-//             // for(int k = 1; k<u.size()[1]-1;k++){
-//             //     u(i,k) = u_mean;
-//             // }
-//             proj_.makeProjection(u,grid_->x_,i,2);
-//             check = true;
-//         }    
-//         if(check){
-//             double mean_i= 0.0,mean_iminus = 0.0,mean_iplus = 0.0;   
-//             for(int j = 0;j<u.size()[1];j++){
-//                 mean_i += u(i,j);
-//                 if((i>0))   
-//                     mean_iminus += u(i-1,j);
-//                 if((i<nCells_[0]-1))
-//                     mean_iplus += u(i+1,j);
-//             }
-//             mean_i = mean_i/(u.size()[1]);
-//             mean_iminus = mean_iminus/(u.size()[1]);
-//             mean_iplus = mean_iplus/(u.size()[1]);
-//             double slope = (u(i,nNodes+1)-u(i,0))/meshWidth_[0];
-//             for(int j = 0;j<u.size()[1];j++){
-//                 u(i,j)= mean_i+(grid_->x_(i,j)-(grid_->x(i,0)+grid_->x(i,nNodes+1))/2.0)
-//                             *limiter_.computeLimiter(slope,(mean_i-mean_iminus)*2./double(meshWidth_[0]),(mean_iplus-mean_i)*2./double(meshWidth_[0]),double(meshWidth_[0]));
-//                     }
-//         firstLimiterCalls_++;
-//         }
-//     }
-
-// }
-
-// void Computation::secondLimiter(Array2D &u)
-// {
-//     for(int i=0;i<u.size()[0];i++){
-//         for(int j=0;j<u.size()[1];j++){
-//             if(u(i,j)<0){
-//                 proj_.makeProjection(u,grid_->x_,i,2);
-
-//               double x_j = (grid_->x_(i,0)+grid_->x_(i,nNodes+1))/2.0;
-//               double mean = 0.0;
-
-//             for(int k = 0;k<u.size()[1];k++){
-//                 mean += u(i,k);
-//             }
-//             mean = mean/(u.size()[1]);
-//             //std::cout<<" PROJECTION i "<<i<<" "<<u(i,0)<<" "<<u(i,1)<<" "<<u(i,2)<<" "<<u(i,3)<<" "<<u(i,4)<<" mean "<<mean<<" x_j "<<x_j<<std::endl;
-//                     if(u(i,nNodes+1)<0.){
-//                         for(int k = 0;k<u.size()[1];k++){
-//                             if(abs(grid_->x(i,k)-double(x_j)-meshWidth_[0]/2.)<1E-14){
-//                                 u(i,k)=0.0;
-//                             }else{
-
-//                             u(i,k)=(1.0-2.0/double(meshWidth_[0])*(grid_->x(i,k)-x_j))*mean;
-//                             }
-//                             if(mean<0)
-//                                 u(i,k) =0.;
-//                             //std::cout<<"RIGHT "<<" ij "<<i<<" "<<j<<" u "<<u(i,k)<<" mean "<<mean<<" x_j "<<x_j<<" x "<<grid_->x(i,k)<<" "<<grid_->x(i,k)-x_j-meshWidth_[0]/2.<<std::endl; 
-//                         }
-//                         secondLimiterCalls_++;
-//                         break;
-//                     }else
-//                     if(u(i,0)<0.){
-//                         for(int k = 0;k<u.size()[1];k++){
-//                             if(abs(grid_->x(i,k)-x_j+meshWidth_[0]/2)<1E-14){
-//                                 u(i,k)=0.0;
-//                             }else{
-
-//                             u(i,k)=(1.0+2.0/meshWidth_[0]*(grid_->x(i,k)-x_j))*mean;
-//                             }
-//                             if(mean<0)
-//                                 u(i,k) =0.;
-//                             //std::cout<<"LEFT "<<" ij "<<i<<" "<<j<<" u "<<u(i,k)<<" mean "<<mean<<" x_j "<<x_j<<" x "<<grid_->x(i,k)<<" "<<grid_->x(i,k)-x_j-meshWidth_[0]/2.<<std::endl; 
-
-//                         }
-//                         secondLimiterCalls_++;
-//                         break;
-//                 }
-//             }
-//         }
-//     }
-
-
-
-// }
-
-// void Computation::thirdLimiter(Array2D &u){
-//     double old_ =0.0, current_ =0.0;
-//     for(int i=0;i<u.size()[0];i++){
-//         for(int j=0;j<u.size()[1];j++){
-//             old_ = current_;
-//             current_ = u(i,j);
-//             if((std::max(old_,0.0)==0 and std::min(current_,0.0)==current_) or (std::min(old_,0.0)==old_ and std::max(current_,0.0)==0.0)){
-//                 proj_.makeProjection(u,grid_->x_,i,2);
-
-//               double x_j = (grid_->x_(i,0)+grid_->x_(i,nNodes+1))/2.0;
-//               double mean = 0.0;
-
-//             for(int k = 0;k<u.size()[1];k++){
-//                 mean += u(i,k);
-//             }
-//             mean = mean/(u.size()[1]);
-//             //std::cout<<" PROJECTION i "<<i<<" "<<u(i,0)<<" "<<u(i,1)<<" "<<u(i,2)<<" "<<u(i,3)<<" "<<u(i,4)<<" mean "<<mean<<" x_j "<<x_j<<std::endl;
-//             u(i,j ) = mean;
-//             break;
-                
-//             }
-//         }
-//     }
-// }
-
 
 
 void Computation::calcUdt(const Array3D& u,const Array3D& q, Array3D& VdM_t)
@@ -814,14 +493,7 @@ void Computation::calcUdt(const Array3D& u,const Array3D& q, Array3D& VdM_t)
             double flux_term = quad_->surfaceInt2D(deg,grid_->faces_(iCell,0),grid_->faces_(iCell+1,0),grid_->faceFlux_);
             double integ =quad_->volumeInt2D([&](double u, double q) {return flux_.compute(u,q,m_)[0];},deg,iCell,jCell,
                                             grid_->faces(iCell,0),grid_->faces(iCell+1,0),grid_->faces(jCell+1,1),grid_->faces(jCell,1),grid_->elemId,u,q);
-            //std::cout<<" FROM CALC UUUU "<<" i "<<i<<std::endl;
-            // if(abs(flux_term)<1E-12)
-            //     flux_term = 0.0;
-            // integ =quad_->IntFluxU([&](double u, double q) { return flux_.compute(u, q, m)[0]; }, i, j,
-            //                                 grid_->faces(i), grid_->faces(i+1),u, q,grid_->j_);
-            // // if(abs(integ)<1E-12)
-            // //     integ = 0.0;
-            // // Apply the formula for the update of VdM_t_* pow(-1, j) 
+
             VdM_->VdM_t_(iCell,jCell,deg) =(integ-flux_term)*1/meshWidth_[0]*(2.0*double(deg)+1.0)*1/meshWidth_[0]*(2.0*double(deg)+1.0);
             // VdM_t(i,j) = (integ + flux_term)*double((2.0 * l + 1.0)/meshWidth_[0]);///(meshWidth_[0]);
             //std::cout<<" IN CALCUDT I " <<i<<" J "<<j<<" FLUX TERM "<<flux_term<<" INTEGRAL "<<integ<<" VDMT "<<VdM_->VdM_t_(i,j)<<" meshWidth "<<double(meshWidth_[0])<<std::endl;
@@ -951,8 +623,6 @@ void Computation::initVdm() {
                         return initialCond_.computeInitialCondition2D(x,y, initCondA_, initCondB_,settings_.BarenblattTime, settings_.BarenblattM);
                     },
                     deg, grid_->faces(i,0), grid_->faces(i+1,0), grid_->faces(k,1), grid_->faces(k+1,1));
-            //
-
             // Scale integral and store in VdM_
             VdM_->VdM_(i, k,deg) = integral * (2.0 * double(deg) + 1.0) / meshWidth_[0]* (2.0 * double(deg) + 1.0) / meshWidth_[0];
                 

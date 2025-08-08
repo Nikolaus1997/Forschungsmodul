@@ -21,12 +21,15 @@ public:
   //! @param discretization shared pointer to the discretization object that will contain all the data to be written to the file
   OutputWriterParaview(std::shared_ptr<Grid> grid);
 
+  void writeHighOrderFile(double currentTime, std::string OutputName, std::shared_ptr<Vandermonde> VdM, const std::unique_ptr<Quadrature>& quad);
+
   //! write current velocities to file, filename is output_<count>.vti
   void writeFile(double currentTime,std::string OutputName);
 
   void writeFileTrueSolution(double currentTime, std::string OutputName);
 
-  private:
 
+  private:
+  
   vtkSmartPointer<vtkXMLImageDataWriter> vtkWriter_;   //< vtk writer to write ImageData
 };
