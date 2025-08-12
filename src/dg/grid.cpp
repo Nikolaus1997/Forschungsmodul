@@ -1,8 +1,8 @@
 #include <dg/grid.h>
 #include "grid.h"
 
-Grid::Grid(std::array<double, 2>  physicalSize,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes):
-physicalSize_(physicalSize), nCells_(nCells), meshWidth_(meshWidth), 
+Grid::Grid(std::array<double, 2>  physicalSizeX,std::array<double, 2>  physicalSizeY,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes):
+physicalSizeX_(physicalSizeX),physicalSizeY_(physicalSizeY),nCells_(nCells), meshWidth_(meshWidth), 
                                         u_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
                                         j_      ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
                                         jt_     ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
@@ -222,7 +222,7 @@ void Grid::prepareNodalDataForVisualization(const Array3D& VdM_, const std::uniq
     // --- LOGIC CORRECTION ---
     // The number of interior nodes is u_.size()[0], which is N-1.
     // The polynomial degree N is therefore u_.size()[0] + 1.
-    const int polyDegree = u_.size()[0] +1;
+    const int polyDegree = u_.size()[0] ;
     const int nodesPerDim = polyDegree + 1;
     const int nCellsX = nCells_[0];
     const int nCellsY = nCells_[1];
@@ -319,7 +319,7 @@ double Grid::evaluatePolynomial(int cell_i, int cell_j, double xi, double eta, c
     // If they are not, this function will need access to them.
     // Placeholder for your modal coefficient array
 
-    const int polyDegree = u_.size()[0]+1; // Assuming u_ is a square grid of size (N+1)x(N+1)
+    const int polyDegree = u_.size()[0]; // Assuming u_ is a square grid of size (N+1)x(N+1)
     const int nBasisFunctions = polyDegree + 1;
     double solutionValue = 0.0;
 

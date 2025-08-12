@@ -128,12 +128,12 @@ void OutputWriterParaview::writeHighOrderFile(double currentTime, std::string Ou
 
     // 1. GET GRID PARAMETERS
     // Correct way to get polyDegree is from the grid, not u_ directly.
-    const int polyDegree = grid_->u_.size()[0]+1; // Assuming u_ is a square grid of size (N+1)x(N+1)
+    const int polyDegree = grid_->u_.size()[0]; // Assuming u_ is a square grid of size (N+1)x(N+1)
     const int nodesPerDim = polyDegree + 1;
     const int nNodesPerCell = nodesPerDim * nodesPerDim;
     const int nCellsX = grid_->nCells()[0];
     const int nCellsY = grid_->nCells()[1];
-    const double physicalSizeStart = grid_->physicalSize_[0];
+    const double physicalSizeStart = grid_->physicalSizeX_[0];
     const double dx = grid_->meshWidth()[0];
     const double dy = grid_->meshWidth()[1];
 const auto vtk_reorder_map = getVtkLagrangeQuadrilateralReorderingMap(polyDegree);
@@ -204,61 +204,119 @@ const auto vtk_reorder_map = getVtkLagrangeQuadrilateralReorderingMap(polyDegree
 }
 
 
-// ==============================================================================
-// [ORIGINAL FUNCTION - UNCHANGED] Low-order writer for cell averages
-// ==============================================================================
-void OutputWriterParaview::writeFile(double currentTime,std::string OutputName)
+void OutputWriterParaview::writeFile(double currentTime, std::string OutputName)
 {
+
+    // Optional: include MPI rank in the filename for safer parallel runs
+    int rank = 0;
+
+
     // Assemble the filename
     std::stringstream fileName;
-    fileName << "out/" << OutputName << "_CellAvg_" << std::setw(4) << std::setfill('0') << fileNo_ << ".vti";
-    // We reuse the fileNo_ here, and add a suffix to distinguish the file type
+    fileName << "out/" << OutputName << "_CellAvg_"
+             << std::setw(4) << std::setfill('0') << fileNo_
+             << std::setw(4) << std::setfill('0') 
+             << ".vti";
     fileNo_++;
 
-    // Assign the new file name to the output vtkWriter_
-    vtkWriter_->SetFileName(fileName.str().c_str());
-  
-    const double physicalSizeStart = -6.283;//grid_->getPhysicalSizeStart();
-    const double physicalSizeEnd = 6.283;//grid_->getPhysicalSizeEnd();
+    // Geometry and sizing (rectangular domains supported)
+    const double xStart = grid_->physicalSizeX_[0];
+    const double xEnd   = grid_->physicalSizeX_[1];
+    const double yStart = grid_->physicalSizeY_[0];
+    const double yEnd   = grid_->physicalSizeY_[1];
+
     const int nCellsX = grid_->solution_.size()[0];
     const int nCellsY = grid_->solution_.size()[1];
-    const double domainWidth = physicalSizeEnd - physicalSizeStart;
-    const double dx = domainWidth / nCellsX;
-    const double dy = domainWidth / nCellsY;
 
+    if (nCellsX <= 0 || nCellsY <= 0) {
+        std::cerr << "[Error] Invalid grid size: (" << nCellsX << ", " << nCellsY << ")\n";
+        return;
+    }
+
+    const double dx = (xEnd - xStart) / static_cast<double>(nCellsX);
+    const double dy = (yEnd - yStart) / static_cast<double>(nCellsY);
+
+    // Build vtkImageData with node dimensions (cells + 1)
     vtkSmartPointer<vtkImageData> dataSet = vtkSmartPointer<vtkImageData>::New();
-    dataSet->SetOrigin(physicalSizeStart, physicalSizeStart, 0.0);
+    dataSet->SetOrigin(xStart, yStart, 0.0);
     dataSet->SetSpacing(dx, dy, 1.0);
     dataSet->SetDimensions(nCellsX + 1, nCellsY + 1, 1);
 
-    vtkSmartPointer<vtkDoubleArray> arraySolution = vtkSmartPointer<vtkDoubleArray>::New();
-    arraySolution->SetName("u_cell_average");
-    arraySolution->SetNumberOfComponents(1);
-    arraySolution->SetNumberOfTuples(nCellsX * nCellsY);
-  
-    int index = 0;
-    for (int j = 0; j < nCellsY; j++)
+    // -------------------------
+    // Cell-centered data array
+    // -------------------------
+    vtkSmartPointer<vtkDoubleArray> arrayCellAvg = vtkSmartPointer<vtkDoubleArray>::New();
+    arrayCellAvg->SetName("u_cell_average");
+    arrayCellAvg->SetNumberOfComponents(1);
+    arrayCellAvg->SetNumberOfTuples(static_cast<vtkIdType>(nCellsX) * static_cast<vtkIdType>(nCellsY));
+
     {
-        for (int i = 0; i < nCellsX; i++, index++)
-        {
-            arraySolution->SetValue(index, grid_->solution_(i, j));
+        vtkIdType idx = 0;
+        for (int j = 0; j < nCellsY; ++j) {
+            for (int i = 0; i < nCellsX; ++i, ++idx) {
+                arrayCellAvg->SetValue(idx, grid_->solution_(i, j));
+            }
         }
     }
+    dataSet->GetCellData()->AddArray(arrayCellAvg);
+    dataSet->GetCellData()->SetActiveScalars("u_cell_average");
 
-    dataSet->GetCellData()->AddArray(arraySolution);
-    
+    // -----------------------------------------------------------
+    // Point-centered (vertex) data derived from cell averages
+    // Each vertex gets the mean of adjacent cells that share it:
+    //   avg of up to four cells: (i-1,j-1), (i-1,j), (i,j-1), (i,j)
+    // Edge/corner vertices average only the existing neighbors.
+    // -----------------------------------------------------------
+    vtkSmartPointer<vtkDoubleArray> arrayPointInterp = vtkSmartPointer<vtkDoubleArray>::New();
+    arrayPointInterp->SetName("u_point_interp");
+    arrayPointInterp->SetNumberOfComponents(1);
+    arrayPointInterp->SetNumberOfTuples(static_cast<vtkIdType>(nCellsX + 1) * static_cast<vtkIdType>(nCellsY + 1));
+
+    auto pointIndex = [nCellsX, nCellsY](int i, int j) -> vtkIdType {
+        return static_cast<vtkIdType>(j) * static_cast<vtkIdType>(nCellsX + 1)
+             + static_cast<vtkIdType>(i);
+    };
+
+    for (int j = 0; j <= nCellsY; ++j) {
+        for (int i = 0; i <= nCellsX; ++i) {
+            double sum = 0.0;
+            int count = 0;
+
+            // (i-1, j-1)
+            if (i - 1 >= 0 && j - 1 >= 0) { sum += grid_->solution_(i - 1, j - 1); ++count; }
+            // (i-1, j)
+            if (i - 1 >= 0 && j < nCellsY) { sum += grid_->solution_(i - 1, j); ++count; }
+            // (i, j-1)
+            if (i < nCellsX && j - 1 >= 0) { sum += grid_->solution_(i, j - 1); ++count; }
+            // (i, j)
+            if (i < nCellsX && j < nCellsY) { sum += grid_->solution_(i, j); ++count; }
+
+            const double value = (count > 0) ? (sum / static_cast<double>(count)) : 0.0;
+            arrayPointInterp->SetValue(pointIndex(i, j), value);
+        }
+    }
+    dataSet->GetPointData()->AddArray(arrayPointInterp);
+    dataSet->GetPointData()->SetActiveScalars("u_point_interp");
+
+    // -------------------------
+    // Time metadata in FieldData
+    // -------------------------
     vtkSmartPointer<vtkDoubleArray> arrayTime = vtkSmartPointer<vtkDoubleArray>::New();
     arrayTime->SetName("TIME");
+    arrayTime->SetNumberOfComponents(1);
     arrayTime->SetNumberOfTuples(1);
     arrayTime->SetTuple1(0, currentTime);
     dataSet->GetFieldData()->AddArray(arrayTime);
 
+    // Finalize and write
     dataSet->Squeeze();
+    vtkWriter_->SetFileName(fileName.str().c_str());
     vtkWriter_->SetInputData(dataSet);
     vtkWriter_->SetDataModeToBinary();
     vtkWriter_->Write();
 
-    std::cout << "Wrote cell-average file: " << fileName.str() << std::endl;
+    // std::cout << "Wrote cell-average/point file: " << fileName.str()
+    //           << "  (t = " << currentTime << ")\n";
 }
 
 void OutputWriterParaview::writeFileTrueSolution(double currentTime,std::string OutputName)

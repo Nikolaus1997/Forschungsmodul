@@ -205,7 +205,7 @@ double Quadrature::surfaceInt2D(int deg ,double a, double b, const Array2D& face
             double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
             double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
         if(i == 0 or i == 1)  
-            sol += -1.*weight *L*faceFlux(k-1,i)*pow(-1.,deg);
+            sol += -weight *L*faceFlux(k-1,i)*pow(-1.,deg);
         else if(i == 2 or i==3)
             sol += weight *L*faceFlux(k-1,i);
         }   

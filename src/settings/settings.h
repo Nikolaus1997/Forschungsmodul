@@ -10,6 +10,8 @@ struct Settings
   std::string OutputName = "linearFlux";
   std::array<int,2> nCells;             //< number of cells in x and y direction
   std::array<double,2> physicalSize;    //< physical size of the domain
+  std::array<double,2> physicalSizeX;    //< physical size of the domain
+  std::array<double,2> physicalSizeY;    //< physical size of the domain
   double endTime = 10.0;                //< end time of the simulation
   double dt = 0.001;                      //< maximum time step width
   double CFL = 0.9;                     //< CFL number
@@ -27,6 +29,8 @@ struct Settings
   double BarenblattM = 0;
   double BarenblattTime= 1.0;
   double Epsilon = 0.001;
+  double Delta = 0.001;
+  double Beta = 0.001;
 
   std::array<double,2> dirichletBcBottom;  //< prescribed values of u,v at bottom of domain
   std::array<double,2> dirichletBcTop;     //< prescribed values of u,v at top of domain

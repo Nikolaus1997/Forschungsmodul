@@ -67,11 +67,11 @@ class Computation
         int firstLimiterCalls_,secondLimiterCalls_; 
         double dt_;    
         double b_,m_;
-        double a_;
+        double a_,aX_,bX_,aY_,bY_;
         double nNodes;
         double initCondA_;
         double initCondB_;
-        double epsilon_;
+        double epsilon_,beta_,delta_;
         int PP_N_;
         Projection proj_;
         Flux flux_;

@@ -13,9 +13,10 @@
 class Grid
 {
 public:
-    Grid(std::array<double, 2>  physicalSize,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes);
 
-    //get the mesh width, i.e. the length of a single cell in x and y direction 
+    Grid(std::array<double, 2> physicalSizeX, std::array<double, 2> physicalSizeY, std::array<int, 2> nCells, std::array<double, 2> meshWidth, int numberNodes);
+
+    // get the mesh width, i.e. the length of a single cell in x and y direction
     const std::array<double, 2> meshWidth() const;
 
     //get number of cells in each coordinate direction 
@@ -92,7 +93,7 @@ public:
 protected:
     const std::array<int, 2>        nCells_;
     const std::array<double, 2>     meshWidth_;
-    const std::array<double, 2>     physicalSize_;
+    const std::array<double, 2>     physicalSizeX_,physicalSizeY_;
     Array2D solution_,solutionJ_;
     Array2D  derivative_;
     Array3D u_,u_analyze_, u_analyze_true_;

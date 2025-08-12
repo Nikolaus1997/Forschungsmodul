@@ -10,9 +10,14 @@ void Computation::initialize(std::string filename)
     settings_.printSettings();
 
     epsilon_ = settings_.Epsilon;
+    beta_ = settings_.Beta;
+    delta_ = settings_.Delta;
+
     m_ = double(settings_.BarenblattM);
-    a_ = settings_.physicalSize[0];
-    b_ = settings_.physicalSize[1];
+    aX_ = settings_.physicalSizeX[0];
+    bX_ = settings_.physicalSizeX[1];
+    aY_ = settings_.physicalSizeY[0];
+    bY_ = settings_.physicalSizeY[1];
     initCondA_ = settings_.initCondA;
     initCondB_ = settings_.initCondB;
 
@@ -21,12 +26,12 @@ void Computation::initialize(std::string filename)
 
     PP_N_= settings_.PP_N;
 
-    nNodes = PP_N_-1;
+    nNodes = PP_N_;
 
     nCells_= settings_.nCells;
     dt_ = settings_.CFL*1/(nCells_[0]);
-    meshWidth_[0] =  (b_-a_)/double(nCells_[0]);
-    meshWidth_[1] =  (b_-a_)/double(nCells_[0]);
+    meshWidth_[0] =  (bX_-aX_)/double(nCells_[0]);
+    meshWidth_[1] =  (bY_-aY_)/double(nCells_[1]);
     innerMeshWidth_[0] = meshWidth_[0]/(nNodes+2);
     innerMeshWidth_[1] = meshWidth_[1]/(nNodes+2);
     //initialize the Vandermonde Matrix
@@ -43,7 +48,7 @@ void Computation::initialize(std::string filename)
     //basis_ = std::make_unique<Basis>(PP_N_);
 
 
-    grid_ = std::make_shared<Grid>(settings_.physicalSize,nCells_,meshWidth_, nNodes);
+    grid_ = std::make_shared<Grid>(settings_.physicalSizeX,settings_.physicalSizeY,nCells_,meshWidth_, nNodes);
 
     if (settings_.PP_N==0)
     {
@@ -270,8 +275,8 @@ void Computation::runSimulation()
                 //grid_->prepareNodalDataForVisualization(VdM_->VdM_,quad_);
 
                 //outputWriterParaview_->writeHighOrderFile(time_,settings_.OutputName, VdM_, quad_);
-                outputWriterParaview_->writeFile(time_,settings_.OutputName+"AverageSolution");
-                std::cout<<"Write State TIME: "<<time_<<std::endl;
+                outputWriterParaview_->writeFile(time_,settings_.OutputName);
+                //std::cout<<"Write State TIME: "<<time_<<std::endl;
                 //calcError(time_); 
             }
 
@@ -507,9 +512,9 @@ void Computation::fillFaces()
     {
             for(int k = 0; k<grid_->faces_.size()[1];k++){
                 if(k==0){
-                    grid_->faces_(i,k) = a_+i*meshWidth_[0];
+                    grid_->faces_(i,k) = aX_+i*meshWidth_[0];
                 }else if(k==1){
-                    grid_->faces_(i,k) = a_+i*meshWidth_[0];
+                    grid_->faces_(i,k) = aY_+i*meshWidth_[1];
                 }
             }
         

@@ -91,6 +91,25 @@ void Settings::loadFromFile(std::string filename)
       physicalSize[1] = atof(parameterValue.c_str());
     }
 
+    if (parameterName=="physicalSizeStartX")
+    {
+      physicalSizeX[0] = atof(parameterValue.c_str());
+    }
+
+    if (parameterName=="physicalSizeEndX")
+    {
+      physicalSizeX[1] = atof(parameterValue.c_str());
+    }
+        if (parameterName=="physicalSizeStartY")
+    {
+      physicalSizeY[0] = atof(parameterValue.c_str());
+    }
+
+    if (parameterName=="physicalSizeEndY")
+    {
+      physicalSizeY[1] = atof(parameterValue.c_str());
+    }
+
     if (parameterName=="dirichletBottomX")
     {
      dirichletBcBottom[0] = atof(parameterValue.c_str());  
@@ -200,6 +219,16 @@ void Settings::loadFromFile(std::string filename)
     if(parameterName=="Epsilon")
     {
       Epsilon = atof(parameterValue.c_str());
+    }
+
+    if(parameterName=="Delta")
+    {
+      Delta = atof(parameterValue.c_str());
+    }
+    
+    if(parameterName=="Beta")
+    {
+      Beta = atof(parameterValue.c_str());
     }
   }
 }
