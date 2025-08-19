@@ -204,7 +204,7 @@ const auto vtk_reorder_map = getVtkLagrangeQuadrilateralReorderingMap(polyDegree
 }
 
 
-void OutputWriterParaview::writeFile(double currentTime, std::string OutputName)
+void OutputWriterParaview::writeFile(double currentTime, std::string OutputName, Array2D& solution)
 {
 
     // Optional: include MPI rank in the filename for safer parallel runs
@@ -225,8 +225,8 @@ void OutputWriterParaview::writeFile(double currentTime, std::string OutputName)
     const double yStart = grid_->physicalSizeY_[0];
     const double yEnd   = grid_->physicalSizeY_[1];
 
-    const int nCellsX = grid_->solution_.size()[0];
-    const int nCellsY = grid_->solution_.size()[1];
+    const int nCellsX = solution.size()[0];
+    const int nCellsY = solution.size()[1];
 
     if (nCellsX <= 0 || nCellsY <= 0) {
         std::cerr << "[Error] Invalid grid size: (" << nCellsX << ", " << nCellsY << ")\n";
@@ -254,7 +254,7 @@ void OutputWriterParaview::writeFile(double currentTime, std::string OutputName)
         vtkIdType idx = 0;
         for (int j = 0; j < nCellsY; ++j) {
             for (int i = 0; i < nCellsX; ++i, ++idx) {
-                arrayCellAvg->SetValue(idx, grid_->solution_(i, j));
+                arrayCellAvg->SetValue(idx, solution(i, j));
             }
         }
     }
@@ -283,13 +283,13 @@ void OutputWriterParaview::writeFile(double currentTime, std::string OutputName)
             int count = 0;
 
             // (i-1, j-1)
-            if (i - 1 >= 0 && j - 1 >= 0) { sum += grid_->solution_(i - 1, j - 1); ++count; }
+            if (i - 1 >= 0 && j - 1 >= 0) { sum += solution(i - 1, j - 1); ++count; }
             // (i-1, j)
-            if (i - 1 >= 0 && j < nCellsY) { sum += grid_->solution_(i - 1, j); ++count; }
+            if (i - 1 >= 0 && j < nCellsY) { sum += solution(i - 1, j); ++count; }
             // (i, j-1)
-            if (i < nCellsX && j - 1 >= 0) { sum += grid_->solution_(i, j - 1); ++count; }
+            if (i < nCellsX && j - 1 >= 0) { sum += solution(i, j - 1); ++count; }
             // (i, j)
-            if (i < nCellsX && j < nCellsY) { sum += grid_->solution_(i, j); ++count; }
+            if (i < nCellsX && j < nCellsY) { sum += solution(i, j); ++count; }
 
             const double value = (count > 0) ? (sum / static_cast<double>(count)) : 0.0;
             arrayPointInterp->SetValue(pointIndex(i, j), value);

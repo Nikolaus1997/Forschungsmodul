@@ -4,6 +4,7 @@
 #include <functional>
 #include <cmath>
 #include <iostream>
+#include <array>
 
 class InitialCondition
 {
@@ -17,6 +18,8 @@ public:
 
 
     double computeInitialCondition(double x, double a, double b, double time = 0 , double m = 0.);
+
+    std::array<double, 2> computeInitialConditionGradient2D(double x, double y, double a, double b);
 
     double computeInitialCondition2D(double x, double y, double a, double b, double time = 0 , double m = 0.);
 

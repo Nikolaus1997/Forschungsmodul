@@ -231,6 +231,7 @@ void Settings::loadFromFile(std::string filename)
       Beta = atof(parameterValue.c_str());
     }
   }
+  OutputName = OutputName+initialCondition + RiemannSolver+ std::to_string(Epsilon) + "_PP" + std::to_string(PP_N) + "N" + std::to_string(nCells[0]) + "X" + std::to_string(nCells[1]) + "Y";
 }
 
 //output all settings to console

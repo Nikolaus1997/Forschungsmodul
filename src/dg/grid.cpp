@@ -4,23 +4,28 @@
 Grid::Grid(std::array<double, 2>  physicalSizeX,std::array<double, 2>  physicalSizeY,std::array<int, 2>  nCells, std::array<double, 2>  meshWidth, int numberNodes):
 physicalSizeX_(physicalSizeX),physicalSizeY_(physicalSizeY),nCells_(nCells), meshWidth_(meshWidth), 
                                         u_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
-                                        j_      ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
-                                        jt_     ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
-                                        j_1_    ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
-                                        j_2_    ({int(nCells_[0]),int(nCells_[1]),(numberNodes+2)}),
-                                        true_solution_({int(nCells_[0]),int(nCells_[0]),(numberNodes+2)}),
-                                        q_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
-                                        ut_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
                                         u1_     ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
-                                        u2_    ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
-                                        elemId ({int(nCells_[0]),int(nCells_[1])}),
-                                        faceFlux_({numberNodes,4}),
-                                        faceFluxQ_({numberNodes,4}),
-                                        faceIdQ({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        u2_     ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
+                                        ut_     ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
                                         faceId({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
                                         faceId1({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
                                         faceId2({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
                                         face_dt({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        j_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1]),2}),
+                                        jt_     ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1]),2}),
+                                        j_1_    ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1]),2}),
+                                        j_2_    ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1]),2}),
+                                        faceIdJ({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        faceIdJ1({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        faceIdJ2({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        face_dtJ({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+                                        true_solution_({int(nCells_[0]),int(nCells_[0]),(numberNodes+2)}),
+                                        q_      ({numberNodes,numberNodes,int(nCells_[0]*nCells_[1])}),
+                                        elemId ({int(nCells_[0]),int(nCells_[1])}),
+                                        faceFlux_({numberNodes,4}),
+                                        faceFluxJ_({numberNodes,4}),
+                                        faceIdQ({numberNodes,4,int(nCells_[0])*int(nCells_[1])}),
+
                                         solution_({int(nCells_[0]*(numberNodes)),int(nCells_[1]*(numberNodes))}),
                                         solutionJ_({int(nCells_[0]*(numberNodes)),int(nCells_[0]*(numberNodes))}),
                                         derivative_({int(nCells_[0]*(numberNodes)),int(nCells_[0]*(numberNodes))}),
@@ -101,21 +106,11 @@ double &Grid::x(int i,int j,int k)
     return x_(i,j,k);
 }
 
-Array3D &Grid::j()
+Array4D &Grid::j()
 {
     return j_;
 }
 
-double Grid::j(int i, int j, int k) const
-{
-    return j_(i,j,k);
-}
-
-double &Grid::j(int i, int j, int k)
-{
-    // TODO: insert return statement here
-    return j_(i,j,k);
-}
 
 const Array2D &Grid::faces() const
 {
@@ -194,8 +189,37 @@ void Grid::fillArray(Array3D& x,const Array3D& VdM, const Array2D& L)
     }
 }
 
-void Grid::fillFaces(Array3D& f, const Array3D& VdM, const Array2D& L)
+void Grid::fillArray(Array4D& x,const Array4D& VdM, const Array2D& L)
 {
+    int nNodes = L.size()[0]; // Number of interpolation points (per direction)
+    // std::cout<<" FILL ARRAY "<<std::endl;
+    // std::cout<<" SIZE "<<x.size()[0]<<" "<<x.size()[1]<<" "<<x.size()[2]<<std::endl;
+    for(int i = 0; i <2; i++){
+        for (int iCell = 0; iCell < nCells_[0]; ++iCell) {
+            for (int jCell = 0; jCell < nCells_[1]; ++jCell) {
+                for (int node_i = 0; node_i < nNodes-2; ++node_i) {
+                    for (int node_j = 0; node_j < nNodes-2; ++node_j) {
+                        int idx = elemId(iCell,jCell);
+                        x(node_i, node_j, idx, i) = 0.0;
+                        for (int l = 0; l < VdM.size()[2]; ++l) {
+                            //std::cout<<" I "<<iCell<<" J "<<jCell<<" nodeI "<<node_i<<" nodeJ "<<node_j<<" l "<<l<<" idx "<<idx<<std::endl;
+                            x(node_i, node_j, idx, i) += 
+                                VdM(iCell, jCell, l, i) * L(node_i+1, l) * L(node_j+1, l);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Grid::fillFaces(Array3D& f, const Array3D& VdM, const Array2D& L)
+{   /**  _ 3 _
+        |     |
+       0|     |2
+        |_ _ _|
+           1
+    */
     //left Interface 0, right Interface 2, top Interface 3, bottom Interface 1
     int nNodes = L.size()[0]-2; // Number of interpolation points (per direction)
     for(int iCell = 0; iCell < nCells_[0]; ++iCell) {
@@ -209,6 +233,38 @@ void Grid::fillFaces(Array3D& f, const Array3D& VdM, const Array2D& L)
                             f(node_j, faceId, idx) += VdM(iCell, jCell, l) * L(0, l) * L(node_j+1, l);
                         else if(faceId==2 or faceId==3)
                             f(node_j, faceId, idx) += VdM(iCell, jCell, l) * L(node_j+1, l) * L(nNodes+1, l);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void Grid::fillFaces(Array3D& f, const Array4D& VdM, const Array2D& L)
+{   /**  _ 3 _
+        |     |
+       0|     |2
+        |_ _ _|
+           1
+    */
+    //left Interface 0, right Interface 2, top Interface 3, bottom Interface 1
+    int nNodes = L.size()[0]-2; // Number of interpolation points (per direction)
+    for(int iCell = 0; iCell < nCells_[0]; ++iCell) {
+        for (int jCell = 0; jCell < nCells_[1]; ++jCell) {
+            for (int faceId = 0; faceId <4; ++faceId) {
+                for (int node_j = 0; node_j < nNodes; ++node_j) {
+                    int idx = elemId(iCell,jCell);
+                    f(node_j, faceId, idx) = 0.0;
+                    for (int l = 0; l < VdM.size()[2]; ++l) {
+                        if(faceId==0)
+                            f(node_j, faceId, idx) += VdM(iCell, jCell, l,0) * L(0, l) * L(node_j+1, l);
+                        else if(faceId==1)
+                            f(node_j, faceId, idx) += VdM(iCell, jCell, l,1) * L(0, l) * L(node_j+1, l);
+                        else if(faceId==2)
+                            f(node_j, faceId, idx) += VdM(iCell, jCell, l,0) * L(node_j+1, l) * L(nNodes+1, l);
+                        else if(faceId==3)
+                            f(node_j, faceId, idx) += VdM(iCell, jCell, l,1) * L(node_j+1, l) * L(nNodes+1, l);
                     }
                 }
             }
@@ -300,6 +356,22 @@ void Grid::fillSolution(Array2D& x,const Array3D& u)
             for (int node_i = 0; node_i < u.size()[0]; ++node_i) {
                 for (int node_j = 0; node_j < u.size()[1]; ++node_j) {
                     x(node_i+iCell*(u.size()[0]), node_j+jCell*(u.size()[1])) = u(node_i, node_j, idx);
+                }
+            }
+        }
+    }   
+
+}
+void Grid::fillSolution(Array2D& x,const Array4D& u, int dim)
+{
+    // std::cout<<" FILL SOLUTION "<<std::endl;
+    // std::cout<<" SIZE "<<u.size()[0]<<" "<<u.size()[1]<<" "<<u.size()[2]<<std::endl;
+    for (int iCell = 0; iCell < nCells_[0]; ++iCell) {
+        for (int jCell = 0; jCell < nCells_[1]; ++jCell) {
+            int idx = elemId(iCell,jCell);
+            for (int node_i = 0; node_i < u.size()[0]; ++node_i) {
+                for (int node_j = 0; node_j < u.size()[1]; ++node_j) {
+                    x(node_i+iCell*(u.size()[0]), node_j+jCell*(u.size()[1])) = u(node_i, node_j, idx,dim);
                 }
             }
         }

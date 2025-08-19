@@ -35,7 +35,40 @@ double InitialCondition::computeInitialCondition(double x, double a, double b, d
     }
 
 }
+std::array<double,2> InitialCondition::computeInitialConditionGradient2D(double x, double y, double a, double b)
+{
+    switch (selectedFunction){
+        case InitialCondType::Sinus:
+            // Example: sinusFunc(x,y) = sin(pi*x/a)*sin(pi*y/b)
+            {
+                double dx = (M_PI / a) * cos(M_PI * x / a) * sin(M_PI * y / b);
+                double dy = (M_PI / b) * sin(M_PI * x / a) * cos(M_PI * y / b);
+                return {dx, dy};
+            }
 
+        case InitialCondType::exponential:
+            // exp(-(x^2 + y^2))
+            {
+                double value = exp(-(x*x + y*y));
+                double dx = -2.0 * x * value;
+                double dy = -2.0 * y * value;
+                return {dx, dy};
+            }
+
+        case InitialCondType::gaussian:
+            // 2D normalized Gaussian: exp(-(x^2 + y^2)/2)/(2*pi)
+            {
+                double value = exp(-0.5*(x*x + y*y)) / (2.0*M_PI);
+                double dx = -x * value;
+                double dy = -y * value;
+                return {dx, dy};
+            }
+
+
+        default:
+            throw std::invalid_argument("Invalid initial condition type");
+    }
+}
 double InitialCondition::computeInitialCondition2D(double x, double y, double a, double b, double t, double m)
 {
     //if(selectedFunction != InitialCondType::Barenblatt){
@@ -47,9 +80,9 @@ double InitialCondition::computeInitialCondition2D(double x, double y, double a,
             case InitialCondType::Sinus:
                 return sinusFunc(x,y,a,b); 
             case InitialCondType::exponential:
-                return exp(-x*x);
+                return exp(-(x*x + y*y));
             case InitialCondType::gaussian:
-                return exp(-x*x*0.5)*1./(sqrt(2*M_1_PI));   
+                return exp(-(x*x + y*y) * 0.5) * 1./(sqrt(2*M_1_PI)); 
             case InitialCondType::Barenblatt:
                 return barenBlatt(x,y,a,b,t,m);
             default:
@@ -69,7 +102,6 @@ double InitialCondition::unitStep(double x, double a, double b)
     {
         return 0.0;
     }
-    
 }
 
 double InitialCondition::negativeUnitStep(double x, double a, double b)

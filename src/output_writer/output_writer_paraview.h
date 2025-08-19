@@ -24,10 +24,11 @@ public:
   void writeHighOrderFile(double currentTime, std::string OutputName, std::shared_ptr<Vandermonde> VdM, const std::unique_ptr<Quadrature>& quad);
 
   //! write current velocities to file, filename is output_<count>.vti
-  void writeFile(double currentTime,std::string OutputName);
+
+
+  void writeFile(double currentTime, std::string OutputName, Array2D &solution);
 
   void writeFileTrueSolution(double currentTime, std::string OutputName);
-
 
   private:
   

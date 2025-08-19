@@ -40,16 +40,23 @@ class Computation
         // void calcQ(const Array2D& u);
         void initVdm();
         void initVdmJ();
-        void calcQ(const Array3D &u,Array2D &faceIdQ);
+        void calcJdt(const Array3D &u, const Array4D &j, Array3D &faceId, Array4D &VdMJ_t, double epsilon);
+        
+        void calcQ(const Array3D &u, Array2D &faceIdQ);
+        
         void eulerTimeStep();
         void rungeKutta();
         void calcUdt(const Array3D &u, const Array3D &q, Array3D &VdM_t);
         void fillFaces();
+        
         void calcDt();
         void calcError(double currenTime);
         void calcUdt(const Array2D& u,const Array2D& q, Array2D& VdM_t, double epsilon = 1.0);
-        void calcUdt(const Array3D& u, Array3D& VdM_t);
-        void firstLimiter(Array2D& u);
+        
+        void calcUdt(const Array3D& u,Array3D& faceId, Array3D& VdM_t);
+        void calcUdt(const Array4D &j, Array3D &faceId, Array3D &VdM_t);
+        
+        void firstLimiter(Array2D &u);
         void secondLimiter(Array2D& u);
         void thirdLimiter(Array2D &u);
         void fillXanalyze(Array2D &x);

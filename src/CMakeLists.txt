@@ -29,6 +29,7 @@ add_executable(${PROJECT_NAME}
    integration/basis.cpp
    
    storage/array2d.cpp
+   storage/array4d.cpp
    storage/Vdm.cpp
   #  storage/field_variable.cpp
 

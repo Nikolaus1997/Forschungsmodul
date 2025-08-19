@@ -57,6 +57,174 @@ double Quadrature::IntGaussLegendreQuad(std::function<double(double,double)> fun
     //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
     return sol;
 }
+double Quadrature::IntGaussLegendreQuadDeriv(std::function<double(double,double)> func,int j ,double a, double b, double ay, double by)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        // Transforming the node from [-1, 1] to [a, b]
+        double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+        double L = LegendrePolynomialAndDerivative(j,node)[1];
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [ay, by]
+            double transformedNodeY = 0.5 * (by - ay) * nodeY + 0.5 * (by + ay); 
+            double Ly = LegendrePolynomialAndDerivative(j,nodeY)[0];          
+        //std::cout<<"j "<<j<<" weight: "<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" L: "<<L<<std::endl;
+        sol += weight * func(transformedNode,transformedNodeY)*L*Ly*weightY;
+        //std::cout<<"i "<<i<<" k "<<k<<" weight: "<<weight<<" weighty: "<<weightY<<" node: "<<transformedNode<<" func "<<func(transformedNode,transformedNodeY) <<" "<<" transformednodey "<<transformedNodeY <<" L: "<<L<<std::endl; 
+        //std::cout<<"j "<<j<<" weight: "<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" L: "<<L<<std::endl;
+        }   
+    }
+
+    // Scale by the length of the interval
+    sol *= 0.5 * (b - a);
+    //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
+    return sol;
+}
+double Quadrature::IntGaussLegendreQuad(std::function<double(double,double)> func,int j ,double a, double b, double ay, double by, double m)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        // Transforming the node from [-1, 1] to [a, b]
+        double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+        double L = LegendrePolynomialAndDerivative(j,node)[0];
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [ay, by]
+            double transformedNodeY = 0.5 * (by - ay) * nodeY + 0.5 * (by + ay); 
+            double Ly = LegendrePolynomialAndDerivative(j,nodeY)[0];          
+        //std::cout<<"j "<<j<<" weight: "<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" L: "<<L<<std::endl;
+        sol += weight * pow(func(transformedNode,transformedNodeY),m)*L*Ly*weightY;
+        //std::cout<<"i "<<i<<" k "<<k<<" weight: "<<weight<<" weighty: "<<weightY<<" node: "<<transformedNode<<" func "<<func(transformedNode,transformedNodeY) <<" "<<" transformednodey "<<transformedNodeY <<" L: "<<L<<std::endl; 
+        //std::cout<<"j "<<j<<" weight: "<<weight<<" node: "<<node<<" transformedNode "<<transformedNode <<" "<<" L: "<<L<<std::endl;
+        }   
+    }
+
+    // Scale by the length of the interval
+    sol *= 0.5 * (b - a)*0.5 * (by - ay);
+    //std::cout<<"sol: "<<sol<<" j "<<j<<std::endl;
+    return sol;
+}
+
+double Quadrature::IntSurfaceLegendreGauss(std::function<double(double,double)> func,int deg ,double a, double b, double ay, double by, double m)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int numberFaces = 4;
+    double faceFlux=0.0; // Assuming a simple case where the flux is constant on each face
+    for (int i = 0; i < numberFaces; i++)
+    {
+        for(int k = 1; k < length-1; k++)
+        {
+            double node = basis_.nodes(k);
+            double weight = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [a, b]
+            double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+            
+            if(i == 0)
+                faceFlux = func(a, transformedNode);
+            else if(i == 1)
+                faceFlux = func(transformedNode, ay);
+            else if(i == 2)
+                faceFlux = func(b, transformedNode);
+            else if(i == 3)
+                faceFlux = func(transformedNode, by);
+
+            double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
+        if(i == 0 or i == 1)  
+            sol += -weight *L*faceFlux*pow(-1.,deg);
+        else if(i == 2 or i==3)
+            sol += weight *L*faceFlux;
+        }   
+    }
+    sol *= 0.5 * (b - a);
+    return sol;
+}
+
+double Quadrature::IntSurfaceLegendreGaussX(std::function<double(double,double)> func,int deg ,double a, double b, double ay, double by, double m)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int numberFaces = 4;
+    double faceFlux=0.0; // Assuming a simple case where the flux is constant on each face
+    for (int i = 0; i < numberFaces; i++)
+    {
+        for(int k = 1; k < length-1; k++)
+        {
+            double node = basis_.nodes(k);
+            double weight = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [a, b]
+            double transformedNode = 0.5 * (by - ay) * node + 0.5 * (by + ay);
+            
+            if(i == 0)
+                faceFlux = func(a, transformedNode);
+            else if(i == 1)
+                continue;
+            else if(i == 2)
+                faceFlux = func(b, transformedNode);
+            else if(i == 3)
+                continue;
+
+            double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
+        if(i == 0)  
+            sol += -weight *L*faceFlux*pow(-1.,deg);
+        else if(i == 2)
+            sol += weight *L*faceFlux;
+        }   
+    }
+    sol *= 0.5 * (b - a);
+    return sol;
+}
+
+double Quadrature::IntSurfaceLegendreGaussY(std::function<double(double,double)> func,int deg ,double a, double b, double ay, double by, double m)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int numberFaces = 4;
+    double faceFlux=0.0; // Assuming a simple case where the flux is constant on each face
+    for (int i = 0; i < numberFaces; i++)
+    {
+        for(int k = 1; k < length-1; k++)
+        {
+            double node = basis_.nodes(k);
+            double weight = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [a, b]
+            double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+            
+            if(i == 0)
+                continue;
+            else if(i == 1)
+                faceFlux = func(transformedNode, ay);
+            else if(i == 2)
+                continue;
+            else if(i == 3)
+                faceFlux = func(transformedNode, by);
+
+            double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
+        if(i == 1)  
+            sol += -weight *L*faceFlux*pow(-1.,deg);
+        else if(i==3)
+            sol += weight *L*faceFlux;
+        }   
+    }
+    sol *= 0.5 * (b - a);
+    return sol;
+}
+
 // int i is the position index j is the polynomial index
 double Quadrature::IntFluxGaussLegendreQuad(std::function<double(double)> func,int i,int j ,double a, double b,const Array2D& u)
 {
@@ -202,12 +370,62 @@ double Quadrature::surfaceInt2D(int deg ,double a, double b, const Array2D& face
             double node = basis_.nodes(k);
             double weight = basis_.weights(k);
             // Transforming the node from [-1, 1] to [a, b]
-            double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+            //double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
             double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
         if(i == 0 or i == 1)  
             sol += -weight *L*faceFlux(k-1,i)*pow(-1.,deg);
         else if(i == 2 or i==3)
             sol += weight *L*faceFlux(k-1,i);
+        }   
+    }
+    sol *= 0.5 * (b - a);
+    return sol;
+}
+
+double Quadrature::surfaceInt2DX(int deg ,double a, double b, const Array2D& faceFlux)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int i = 0; i < faceFlux.size()[1]; i++)
+    {
+
+        for(int k = 1; k < length-1; k++)
+        {
+            double node = basis_.nodes(k);
+            double weight = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [a, b]
+            //double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+            double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
+         if(i == 0 )  
+            sol += -weight *L*faceFlux(k-1,0)*pow(-1.,deg);
+         else if(i == 2 )
+            sol += weight *L*faceFlux(k-1,2);
+        }   
+    }
+    sol *= 0.5 * (b - a);
+    return sol;
+}
+
+double Quadrature::surfaceInt2DY(int deg ,double a, double b, const Array2D& faceFlux)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    
+    for (int i = 0; i < faceFlux.size()[1]; i++)
+    {
+
+        for(int k = 1; k < length-1; k++)
+        {
+            double node = basis_.nodes(k);
+            double weight = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [a, b]
+            //double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
+            double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
+        if(i == 1)  
+            sol += -weight *L*faceFlux(k-1,1)*pow(-1.,deg);
+        else if(i==3)
+            sol += weight *L*faceFlux(k-1,3);
         }   
     }
     sol *= 0.5 * (b - a);
@@ -223,7 +441,6 @@ double Quadrature::volumeInt2D(std::function<double(double)> func,int deg ,int i
     {
         double node = basis_.nodes(i);
         double weight = basis_.weights(i);
-        double evaluation=0.0;
         std::array<double,2> L = LegendrePolynomialAndDerivative(deg,node);
         for(int k = 1; k < length-1; k++)
         {
@@ -240,6 +457,115 @@ double Quadrature::volumeInt2D(std::function<double(double)> func,int deg ,int i
 
     // Scale by the length of the interval
     sol *= 0.5 * (b - a) * 0.5 * (by - ay);
+    return sol;
+}
+
+double Quadrature::volumeInt2D(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array4D &u)
+{
+    int length = basis_.weights_.size()[0];
+    double sol1 = 0.0, sol2 = 0.0;
+    int iElem = elemId(iCell,jCell);
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        std::array<double,2> L = LegendrePolynomialAndDerivative(deg,node);
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [ay, by]
+            double transformedNodeY = 0.5 * (by - ay) * nodeY + 0.5 * (by + ay); 
+            std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
+
+            sol1 += weight * (u(i-1,k-1,iElem,0)*L[1]*Ly[0])*weightY;
+            sol2 += weight *(u(i-1,k-1,iElem,1)*L[0]*Ly[1])*weightY;
+        }   
+        //sol += weight * func(u(i,k))*L_prime;
+    }
+
+    // Scale by the length of the interval
+    double sol = 0.5 * (b - a)*sol2+ 0.5 * (by - ay)*sol1;
+    return sol;
+}
+
+double Quadrature::volumeInt2DJ(int dim,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array4D &u)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int iElem = elemId(iCell,jCell);
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        std::array<double,2> L = LegendrePolynomialAndDerivative(deg,node);
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+
+            std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
+
+            sol += weight * u(i-1,k-1,iElem,dim)*(L[0]*Ly[0])*weightY;
+        }   
+        //sol += weight * func(u(i,k))*L_prime;
+    }
+
+    // Scale by the length of the interval
+    sol *= 0.5 * (b - a)*0.5 * (by - ay);
+    return sol;
+}
+
+double Quadrature::volumeInt2DX(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int iElem = elemId(iCell,jCell);
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        std::array<double,2> L = LegendrePolynomialAndDerivative(deg,node);
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+            // Transforming the node from [-1, 1] to [ay, by]
+            std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
+
+            sol += weight * u(i-1,k-1,iElem)*(L[1]*Ly[0])*weightY;
+        }   
+        //sol += weight * func(u(i,k))*L_prime;
+    }
+
+    // Scale by the length of the interval
+    sol *= 0.5 * (by - ay);
+    return sol;
+}
+
+double Quadrature::volumeInt2DY(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u)
+{
+    int length = basis_.weights_.size()[0];
+    double sol = 0.0;
+    int iElem = elemId(iCell,jCell);
+    for (int i = 1; i < length-1; i++)
+    {
+        double node = basis_.nodes(i);
+        double weight = basis_.weights(i);
+        std::array<double,2> L = LegendrePolynomialAndDerivative(deg,node);
+        for(int k = 1; k < length-1; k++)
+        {
+            double nodeY = basis_.nodes(k);
+            double weightY = basis_.weights(k);
+            std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
+
+            sol += weight * u(i-1,k-1,iElem)*(L[0]*Ly[1])*weightY;
+        }   
+        //sol += weight * func(u(i,k))*L_prime;
+    }
+
+    // Scale by the length of the interval
+    sol *=  0.5 * (b - a);
     return sol;
 }
 double Quadrature::volumeInt2D(std::function<double(double,double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u, const Array3D &q)

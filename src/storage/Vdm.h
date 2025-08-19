@@ -3,6 +3,7 @@
 #include "storage/array3d.h"
 #include <array>
 #include <iostream>
+#include "array4d.h"
 class Vandermonde: public Array3D
 {
     public:
@@ -20,8 +21,6 @@ class Vandermonde: public Array3D
         double VdM(int i, int j, int k) const;
         double &VdM(int i, int j, int k);
         
-        double VdMJ(int i, int j, int k) const;
-        double &VdMJ(int i, int j, int k);
 
         double VdM1(int i, int j, int k) const;
         double &VdM1(int i, int j, int k);
@@ -44,11 +43,10 @@ class Vandermonde: public Array3D
     protected:
         Array3D VdM_;
         Array3D VdM_t_;
-        Array3D VdMJ_t_;
         Array3D VdMQ_;
-        Array3D VdMJ_;
-        Array3D VdM1_, VdMJ1_;
-        Array3D VdM2_, VdMJ2_;
+        Array3D VdM1_;
+        Array4D VdMJ1_, VdMJ2_,VdMJ_,VdMJ_t_;
+        Array3D VdM2_;
         Array2D L_;
         Array2D L_prime_;
     friend class Computation;
