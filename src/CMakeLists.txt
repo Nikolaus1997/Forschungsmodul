@@ -3,6 +3,14 @@ cmake_minimum_required(VERSION 3.8)
 # Define the project name.
 project(DG_FM)
 # Specify the name of the executable (${PROJECT_NAME} which is equal to what was set in the project() command).
+if(NOT CMAKE_CONFIGURATION_TYPES)  # i.e. not a multi-config generator
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." )
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+               "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+endif()
+
+# ---------- NEW: build toggle ----------
+option(ENABLE_MPI "Build with MPI support" ON)
 # Also specify the source files.
 add_executable(${PROJECT_NAME}
    main.cpp
@@ -58,14 +66,41 @@ message("The include directory of VTK: VTK_INCLUDE_DIRS: ${VTK_INCLUDE_DIRS}")
 
 # If an installation of vtk was found on the system
 if (VTK_FOUND)
-  include_directories(${VTK_INCLUDE_DIRS})               # add the include directory where the header files are for the compiler
-  target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES}) # add the libraries for the linker
+  #include_directories(${VTK_INCLUDE_DIRS})               # add the include directory where the header files are for the compiler
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${VTK_LIBRARIES}) # add the libraries for the linker
 endif(VTK_FOUND)
 # install numsim executable in build directory
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/../build)
 
 # Add additonial compile options to enable more warnings
 add_compile_options(-Wall -Wextra)
+
+if(ENABLE_MPI)
+  find_package(MPI REQUIRED)
+
+  # Prefer modern imported targets if available (CMake >= ~3.9/3.10)
+  if(TARGET MPI::MPI_CXX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE MPI::MPI_CXX)
+  else()
+    # Back-compat for CMake 3.8
+    include_directories(SYSTEM ${MPI_CXX_INCLUDE_PATH})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${MPI_CXX_LIBRARIES})
+    if(MPI_CXX_COMPILE_FLAGS)
+      target_compile_options(${PROJECT_NAME} PRIVATE ${MPI_CXX_COMPILE_FLAGS})
+    endif()
+    if(MPI_CXX_LINK_FLAGS)
+      set_property(TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS " ${MPI_CXX_LINK_FLAGS}")
+    endif()
+  endif()
+
+  # ---------- The "C++ compiler flag" ----------
+  # This defines a preprocessor macro you can test in code:
+  #   #ifdef DGFM_USE_MPI
+  #       MPI_Init(...); ...
+  #   #endif
+  target_compile_definitions(${PROJECT_NAME} PRIVATE DGFM_USE_MPI=1)
+endif()
+
 
 # Set the version of the C++ standard to use, we use C++14, published in 2014
 set(CMAKE_CXX_STANDARD 14)

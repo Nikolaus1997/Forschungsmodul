@@ -382,7 +382,7 @@ double Quadrature::surfaceInt2D(int deg ,double a, double b, const Array2D& face
     return sol;
 }
 
-double Quadrature::surfaceInt2DX(int deg ,double a, double b, const Array2D& faceFlux)
+double Quadrature::surfaceInt2DX(int deg ,double a, double b, const Array2D& faceFlux,double m)
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
@@ -398,16 +398,16 @@ double Quadrature::surfaceInt2DX(int deg ,double a, double b, const Array2D& fac
             //double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
             double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
          if(i == 0 )  
-            sol += -weight *L*faceFlux(k-1,0)*pow(-1.,deg);
+            sol += -weight *L*pow(faceFlux(k-1,0),m)*pow(-1.,deg);
          else if(i == 2 )
-            sol += weight *L*faceFlux(k-1,2);
+            sol += weight *L*pow(faceFlux(k-1,2),m);
         }   
     }
     sol *= 0.5 * (b - a);
     return sol;
 }
 
-double Quadrature::surfaceInt2DY(int deg ,double a, double b, const Array2D& faceFlux)
+double Quadrature::surfaceInt2DY(int deg ,double a, double b, const Array2D& faceFlux, double m)
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
@@ -423,9 +423,9 @@ double Quadrature::surfaceInt2DY(int deg ,double a, double b, const Array2D& fac
             //double transformedNode = 0.5 * (b - a) * node + 0.5 * (b + a);
             double L = LegendrePolynomialAndDerivative(deg,node)[0];                  
         if(i == 1)  
-            sol += -weight *L*faceFlux(k-1,1)*pow(-1.,deg);
+            sol += -weight *L*pow(faceFlux(k-1,1),m)*pow(-1.,deg);
         else if(i==3)
-            sol += weight *L*faceFlux(k-1,3);
+            sol += weight *L*pow(faceFlux(k-1,3),m);
         }   
     }
     sol *= 0.5 * (b - a);
@@ -516,7 +516,7 @@ double Quadrature::volumeInt2DJ(int dim,int deg ,int iCell, int jCell, double a,
     return sol;
 }
 
-double Quadrature::volumeInt2DX(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u)
+double Quadrature::volumeInt2DX(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u, double m)
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
@@ -533,7 +533,7 @@ double Quadrature::volumeInt2DX(std::function<double(double)> func,int deg ,int 
             // Transforming the node from [-1, 1] to [ay, by]
             std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
 
-            sol += weight * u(i-1,k-1,iElem)*(L[1]*Ly[0])*weightY;
+            sol += weight * pow(u(i-1,k-1,iElem),m)*(L[1]*Ly[0])*weightY;
         }   
         //sol += weight * func(u(i,k))*L_prime;
     }
@@ -543,7 +543,7 @@ double Quadrature::volumeInt2DX(std::function<double(double)> func,int deg ,int 
     return sol;
 }
 
-double Quadrature::volumeInt2DY(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u)
+double Quadrature::volumeInt2DY(std::function<double(double)> func,int deg ,int iCell, int jCell, double a, double b, double ay, double by,const Array2D& elemId ,const Array3D &u, double m)
 {
     int length = basis_.weights_.size()[0];
     double sol = 0.0;
@@ -559,7 +559,7 @@ double Quadrature::volumeInt2DY(std::function<double(double)> func,int deg ,int 
             double weightY = basis_.weights(k);
             std::array<double,2> Ly = LegendrePolynomialAndDerivative(deg,nodeY);          
 
-            sol += weight * u(i-1,k-1,iElem)*(L[0]*Ly[1])*weightY;
+            sol += weight * pow(u(i-1,k-1,iElem),m)*(L[0]*Ly[1])*weightY;
         }   
         //sol += weight * func(u(i,k))*L_prime;
     }

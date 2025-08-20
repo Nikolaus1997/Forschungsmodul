@@ -2,6 +2,9 @@
 #include "computation/computation.h"
 #include <iostream>
 #include <cstdlib>
+#ifdef DGFM_USE_MPI
+#include <mpi.h>
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +15,12 @@ int main(int argc, char *argv[])
 
     return EXIT_FAILURE;
   }
+#ifdef DGFM_USE_MPI
+  MPI_Init(&argc,&argv);
+  int r=0,p=1; MPI_Comm_rank(MPI_COMM_WORLD,&r); MPI_Comm_size(MPI_COMM_WORLD,&p);
+  if(r==0) std::printf("MPI up with %d ranks\n", p);
+#endif
+
 
 // std::cout <<R"(====================================================================================)"<<std::endl;
 // std::cout <<R"(________    ________  .____    ________  ___________ ______________________________ )"<<std::endl; 
@@ -45,5 +54,8 @@ std::cout <<R"(=================================================================
   computation.initialize(filename);
   computation.runSimulation();
 
+  #ifdef DGFM_USE_MPI
+  MPI_Finalize();
+  #endif
   return EXIT_SUCCESS;
 }

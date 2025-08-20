@@ -1,7 +1,7 @@
 #include "settings/settings.h"
 #include <fstream>   // for file operations
 #include <iomanip>
-
+#include <cstdio>
 
 void Settings::loadFromFile(std::string filename)
 {
@@ -231,7 +231,13 @@ void Settings::loadFromFile(std::string filename)
       Beta = atof(parameterValue.c_str());
     }
   }
-  OutputName = OutputName+initialCondition + RiemannSolver+ std::to_string(Epsilon) + "_PP" + std::to_string(PP_N) + "N" + std::to_string(nCells[0]) + "X" + std::to_string(nCells[1]) + "Y";
+  char buf[32];
+  std::snprintf(buf, sizeof buf, "%.0E", Epsilon); // "1E-03"
+  std::string s = buf;
+  if(OutputName!="")
+    OutputName = OutputName+"_"+initialCondition +"_"+ RiemannSolver+ s + "_PP" + std::to_string(PP_N) + "N" + std::to_string(nCells[0]) + "X" + std::to_string(nCells[1]) + "Y";
+  else
+    OutputName = OutputName+initialCondition +"_"+ RiemannSolver+ s + "_PP" + std::to_string(PP_N) + "N" + std::to_string(nCells[0]) + "X" + std::to_string(nCells[1]) + "Y";
 }
 
 //output all settings to console

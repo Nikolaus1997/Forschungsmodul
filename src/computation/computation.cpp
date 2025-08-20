@@ -258,6 +258,7 @@ void Computation::runSimulation()
                 }
             }else{
                 if(settings_.timeStepping=="euler" or settings_.timeStepping=="Euler"){
+                    calcDt();
                     if(time_+dt_>settings_.endTime)
                         dt_ = settings_.endTime-time_;
                     eulerTimeStep();
@@ -701,13 +702,13 @@ void Computation::calcJdt(const Array3D& u, const Array4D& j, Array3D& faceId ,A
             gFlux_.fillFluxArray(flux_,faceId,grid_->faceFluxJ_,grid_->elemId,iCell,jCell,dt_,meshWidth_[0]);
 
             for (int deg = 0; deg <=PP_N_; deg++) {
-                double flux_termX = quad_->surfaceInt2DX(deg,grid_->faces_(iCell,1),grid_->faces_(iCell+1,1),grid_->faceFluxJ_);
-                double flux_termY = quad_->surfaceInt2DY(deg,grid_->faces_(jCell,0),grid_->faces_(jCell+1,0),grid_->faceFluxJ_);
+                double flux_termX = quad_->surfaceInt2DX(deg,grid_->faces_(iCell,1),grid_->faces_(iCell+1,1),grid_->faceFluxJ_,m_);
+                double flux_termY = quad_->surfaceInt2DY(deg,grid_->faces_(jCell,0),grid_->faces_(jCell+1,0),grid_->faceFluxJ_,m_);
 
                 double integX =quad_->volumeInt2DX([&](double x) {return flux_.compute(x);},deg,iCell,jCell,
-                                            left,right,bottom,top,grid_->elemId,u) - quad_->volumeInt2DJ(0,deg,iCell,jCell,left,right,bottom,top,grid_->elemId,j);
+                                            left,right,bottom,top,grid_->elemId,u,m_) - quad_->volumeInt2DJ(0,deg,iCell,jCell,left,right,bottom,top,grid_->elemId,j);
                 double integY =quad_->volumeInt2DY([&](double x) {return flux_.compute(x);},deg,iCell,jCell,
-                                            left,right,bottom,top,grid_->elemId,u) - quad_->volumeInt2DJ(1,deg,iCell,jCell,left,right,bottom,top,grid_->elemId,j);                                       
+                                            left,right,bottom,top,grid_->elemId,u,m_) - quad_->volumeInt2DJ(1,deg,iCell,jCell,left,right,bottom,top,grid_->elemId,j);                                       
                 
                 VdMJ_t(iCell,jCell,deg,0) =1.0/epsilon*(integX-flux_termX)*1/meshWidth_[0]*(2.0*double(deg)+1.0)*1/meshWidth_[1]*(2.0*double(deg)+1.0);
                 VdMJ_t(iCell,jCell,deg,1) =1.0/epsilon*(integY-flux_termY)*1/meshWidth_[0]*(2.0*double(deg)+1.0)*1/meshWidth_[1]*(2.0*double(deg)+1.0);
